@@ -239,11 +239,10 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
         {hasCalculated ? (
           <>
             <div className="results-section">
-              <div className="results-header">{c.results}</div>
               {results.map((result, index) => (
                 <div key={result.id} className={`result-item ${result.quality === 'best' ? 'best' : ''}`}>
-                  <div className="result-rank">
-                    {index === 0 && result.quality === 'best' ? '★' : String(index + 1).padStart(2, '0')}
+                  <div className={`result-rank ${result.quality === 'best' ? 'result-rank-star' : ''}`}>
+                    {index === 0 && result.quality === 'best' ? '★' : `${index + 1}`}
                   </div>
                   <div className="result-info">
                     <div className="result-time">{result.time}</div>
@@ -299,7 +298,10 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
             )}
           </>
         ) : (
-          <div className="pre-result">{c.beforePrompt}</div>
+          <div className="pre-result">
+            <span>☾</span>
+            {c.beforePrompt}
+          </div>
         )}
       </div>
 
