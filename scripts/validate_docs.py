@@ -24,7 +24,11 @@ def main() -> int:
         elif not path.read_text(encoding='utf-8').strip().startswith('#'):
             errors.append(f'missing top-level heading: {rel}')
 
-    md_files = sorted(ROOT.rglob('*.md'))
+    ignored_dirs = {'node_modules', '.next', 'out', '.git', 'playwright-report', 'test-results'}
+    md_files = sorted(
+        path for path in ROOT.rglob('*.md')
+        if not any(part in ignored_dirs for part in path.relative_to(ROOT).parts)
+    )
     for path in md_files:
         text = path.read_text(encoding='utf-8')
         if '	' in text:

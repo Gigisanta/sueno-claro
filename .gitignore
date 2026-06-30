@@ -1,23 +1,13 @@
-# dependencies / build
 node_modules/
 .next/
 out/
-dist/
-build/
+.vercel/
+playwright-report/
+test-results/
 coverage/
+artifacts/visual-qa/
+tsconfig.tsbuildinfo
 .DS_Store
 .env
 .env.*
 !.env.example
-
-# mobile/runtime
-DerivedData/
-*.xcworkspace/xcuserdata/
-*.xcodeproj/xcuserdata/
-fastlane/report.xml
-fastlane/Preview.html
-
-# local agent/runtime
-.hermes/
-.cache/
-*.log
