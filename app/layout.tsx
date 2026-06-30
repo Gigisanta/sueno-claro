@@ -24,11 +24,13 @@ export const metadata: Metadata = {
     url: 'https://sueno-claro.vercel.app',
     siteName: 'Sueño Claro',
     type: 'website',
+    images: [{ url: '/og.svg', width: 1200, height: 630, alt: 'Sueño Claro private sleep calculator preview' }],
   },
   twitter: {
     card: 'summary_large_image',
     title: 'Sueño Claro — Sleep Cycle Calculator',
     description: 'A fast, private sleep cycle calculator.',
+    images: ['/og.svg'],
   },
 };
 

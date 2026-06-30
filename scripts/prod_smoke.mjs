@@ -25,8 +25,12 @@ for (const [name, browserType] of browsers) {
   if (!hasAdAfter) throw new Error(`${name}: post-result sponsored slot missing`);
   const jsonLd = await page.locator('script[type="application/ld+json"]').first().textContent();
   if (!jsonLd?.includes('WebApplication') || !jsonLd.includes('FAQPage')) throw new Error(`${name}: JSON-LD missing`);
+  const ogImage = await page.locator('meta[property="og:image"]').getAttribute('content');
+  if (!ogImage?.includes('/og.svg')) throw new Error(`${name}: OG image missing`);
   await page.goto(`${baseURL}/calculadora-de-sueno?mode=wake&wake=06:00&latency=15&cycle=90&format=24h`, { waitUntil: 'networkidle' });
   await page.getByText('20:45').waitFor({ state: 'visible' });
+  const siesta = await page.request.get(`${baseURL}/siesta`);
+  if (!siesta.ok()) throw new Error(`${name}: /siesta failed`);
   const title = await page.title();
   const manifestOk = (await page.request.get(`${baseURL}/manifest.webmanifest`)).ok();
   const sitemapOk = (await page.request.get(`${baseURL}/sitemap.xml`)).ok();

@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Sueño Claro — private sleep calculator</title>
+  <desc id="desc">Dark blue social preview card for Sueño Claro.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#07111f"/>
+      <stop offset="1" stop-color="#0e2238"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.78" cy="0.22" r="0.55">
+      <stop offset="0" stop-color="#7dd3fc" stop-opacity="0.38"/>
+      <stop offset="1" stop-color="#7dd3fc" stop-opacity="0"/>
+    </radialGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <rect width="1200" height="630" fill="url(#glow)"/>
+  <circle cx="930" cy="170" r="86" fill="none" stroke="#e5f4ff" stroke-width="26"/>
+  <circle cx="970" cy="132" r="91" fill="#0d2034"/>
+  <text x="96" y="140" fill="#8bd5ff" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="34" font-weight="700" letter-spacing="4">SUEÑO CLARO</text>
+  <text x="96" y="260" fill="#f8fbff" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="72" font-weight="800">Sleep cycle calculator</text>
+  <text x="96" y="348" fill="#f8fbff" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="72" font-weight="800">without sleep surveillance.</text>
+  <text x="96" y="430" fill="#c4d7e8" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="34">No account · No microphone · No tracking</text>
+  <rect x="96" y="500" width="386" height="64" rx="32" fill="#8bd5ff"/>
+  <text x="130" y="542" fill="#07111f" font-family="Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, Segoe UI, sans-serif" font-size="28" font-weight="800">sueno-claro.vercel.app</text>
+</svg>

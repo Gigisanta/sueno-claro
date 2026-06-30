@@ -30,6 +30,7 @@ test.describe('Sueño Claro calculator', () => {
     const jsonLd = await page.locator('script[type="application/ld+json"]').first().textContent();
     expect(jsonLd).toContain('WebApplication');
     expect(jsonLd).toContain('FAQPage');
+    await expect(page.locator('meta[property="og:image"]')).toHaveAttribute('content', /og\.svg/);
     const manifest = await page.request.get('/manifest.webmanifest');
     expect(manifest.ok()).toBe(true);
     const robots = await page.request.get('/robots.txt');
@@ -38,6 +39,8 @@ test.describe('Sueño Claro calculator', () => {
     expect(sitemap.ok()).toBe(true);
     const sw = await page.request.get('/sw.js');
     expect(sw.ok()).toBe(true);
+    const siesta = await page.request.get('/siesta');
+    expect(siesta.ok()).toBe(true);
   });
 
   test('opens shareable wake URL and preserves result assumptions', async ({ page }) => {

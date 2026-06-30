@@ -2,7 +2,7 @@ import type { MetadataRoute } from 'next';
 
 export const dynamic = 'force-static';
 
-const routes = ['', '/sleep-calculator', '/bedtime-calculator', '/nap-calculator', '/calculadora-de-sueno', '/ciclos-de-sueno'];
+const routes = ['', '/sleep-calculator', '/bedtime-calculator', '/nap-calculator', '/calculadora-de-sueno', '/siesta', '/ciclos-de-sueno'];
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return routes.map((route) => ({
