@@ -1,4 +1,7 @@
-# PRD — Sueño Claro / REMinder
+# PRD — sleeplike / REMinder
+
+> **Note:** App was renamed from "Sueño Claro" to "sleeplike" mid-2026.
+> The product concept below remains accurate.
 
 ## Status
 

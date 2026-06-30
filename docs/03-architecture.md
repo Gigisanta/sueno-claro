@@ -1,5 +1,8 @@
 # Architecture
 
+> **Note:** App was renamed from "Sueño Claro" to "sleeplike" mid-2026.
+> Domain: `sleeplike.maat.work`. Stack unchanged (Next.js 16, static, zero-backend).
+
 ## Architecture decision
 
 Build web/PWA first with zero backend. Keep sleep calculation as a pure library that can later be ported or mirrored in Swift.

@@ -96,12 +96,12 @@ Avoid:
 
 Shortlist:
 
-- Sueño Claro — best Spanish identity.
+- sleeplike — current brand.
 - REMinder — best global pun, but less clear in Spanish.
 - WakeWell — clean but generic.
 - Ciclo — strong Spanish but possibly broad.
 
-Repo uses Sueño Claro as working name. App Store can use `REMinder: Sleep Calculator` if English SEO wins.
+Repo used Sueño Claro as working name; renamed to sleeplike mid-2026.
 
 ## Delegated UX additions
 

@@ -2,7 +2,7 @@
 
 ## Product stance
 
-Sueño Claro is a wellness/educational timing calculator. It is not a medical device and must not claim to diagnose, treat, cure, or prevent sleep disorders.
+sleeplike is a wellness/educational timing calculator. It is not a medical device and must not claim to diagnose, treat, cure, or prevent sleep disorders.
 
 ## Calculation assumptions
 

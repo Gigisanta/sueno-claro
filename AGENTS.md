@@ -1,8 +1,8 @@
-# AGENTS.md — Sueño Claro autonomous execution contract
+# AGENTS.md — sleeplike autonomous execution contract
 
 ## Mission
 
-Build Sueño Claro / REMinder: a privacy-first sleep cycle calculator, web/PWA first, iOS premium later via RevenueCat.
+Maintain and evolve sleeplike: a privacy-first sleep cycle calculator, web/PWA first, iOS premium later via RevenueCat.
 
 ## Mandatory reading order
 
@@ -14,6 +14,14 @@ Build Sueño Claro / REMinder: a privacy-first sleep cycle calculator, web/PWA f
 6. `docs/11-autonomous-hermes-runbook.md`
 7. `docs/12-backlog.md`
 
+## Current state (2026-06-30)
+
+- **Domain:** https://sleeplike.maat.work
+- **App name:** sleeplike (was "Sueño Claro")
+- **Design:** iOS-native dark with gold accent (#f5c842)
+- **Monetization:** Ad slot, Amazon affiliates, Ko-fi donate — all configurable via `lib/monetization/config.ts`
+- **Zero backend:** pure static Next.js export on Vercel
+
 ## Execution rules
 
 - Keep v1 zero-backend.
@@ -22,20 +30,18 @@ Build Sueño Claro / REMinder: a privacy-first sleep cycle calculator, web/PWA f
 - Do not block the core calculator behind a paywall.
 - Ads are allowed only after the result or in clearly separated content areas.
 - All health copy must be wellness/educational and include a non-medical disclaimer.
-- Any source-specific implementation must use official docs where available.
-- If Context7 quota is unavailable, use official web docs and cite the docs gap in the report.
+- Monetization toggles live in `lib/monetization/config.ts` — do not hardcode revenue hooks in components.
 
 ## Verification gates before claiming done
 
 - Typecheck passes.
 - Unit tests for sleep calculation pass.
 - Build/export passes.
-- Lighthouse or equivalent verifies performance/accessibility/SEO target.
-- Browser smoke tests cover all calculator modes.
+- Production smoke test passes (Chromium + WebKit).
 - No ad appears before a user gets a result.
 - No network call is required for the core calculator.
 - Git status is clean after commit.
 
 ## Communication
 
-Report concrete files changed and real command output. Do not say “done” without verification evidence.
+Report concrete files changed and real command output. Do not say "done" without verification evidence.

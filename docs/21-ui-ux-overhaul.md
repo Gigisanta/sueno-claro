@@ -4,7 +4,7 @@ Date: 2026-06-30
 
 ## Direction
 
-Sueño Claro moved from a generic dark landing page to a calculator-first calm wellness interface.
+sleeplike moved from a generic dark landing page to a calculator-first calm wellness interface.
 
 Design principles applied:
 

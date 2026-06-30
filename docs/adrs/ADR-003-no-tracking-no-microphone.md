@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-Full sleep trackers already exist and compete on sensor data. Sueño Claro's differentiation is simple private planning.
+Full sleep trackers already exist and compete on sensor data. sleeplike's differentiation is simple private planning.
 
 ## Decision
 

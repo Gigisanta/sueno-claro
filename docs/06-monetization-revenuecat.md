@@ -92,7 +92,7 @@ No raw bedtime history should be sent without explicit analytics decision; prefe
 
 ## Delegated monetization corrections
 
-The async monetization research confirmed RevenueCat hard-paywall strength in subscription apps, but those benchmarks are not blindly portable to this product. Sueño Claro is SEO-first and trust-first; the basic calculator remains free.
+The async monetization research confirmed RevenueCat hard-paywall strength in subscription apps, but those benchmarks are not blindly portable to this product. sleeplike is SEO-first and trust-first; the basic calculator remains free.
 
 Rejected for v1:
 

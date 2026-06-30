@@ -9,7 +9,7 @@ Do not position as a medical sleep tracker. Position as a private sleep calculat
 | Name | Pros | Cons |
 |---|---|---|
 | REMinder | Memorable English pun | Less obvious in Spanish |
-| Sueño Claro | Strong Spanish/LatAm identity | Less global |
+| sleeplike | English brand, global reach | No Spanish identity |
 | SleepCue | Clear, short | Generic |
 | WakeWell | Friendly | Broad/wellness saturated |
 
