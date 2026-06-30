@@ -21,6 +21,18 @@ for (const [name, browserType] of browsers) {
   await page.getByRole('button', { name: /^Calculate$/ }).click();
   await page.getByText('22:15').waitFor({ state: 'visible' });
 
+  // Ad slot visible after result
+  const adSlot = await page.locator('[data-ad-slot="true"]').count();
+  if (adSlot !== 1) throw new Error(`${name}: ad slot missing after calculation`);
+
+  // Donate link in footer
+  const donate = await page.locator('.donate-link').count();
+  if (donate !== 1) throw new Error(`${name}: donate link missing`);
+
+  // Affiliate disclosure present
+  const affiliate = await page.locator('.affiliate').count();
+  if (affiliate !== 1) throw new Error(`${name}: affiliate disclosure missing`);
+
   // No horizontal overflow
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   if (overflow) throw new Error(`${name}: horizontal overflow`);

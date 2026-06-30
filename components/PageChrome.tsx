@@ -17,7 +17,10 @@ export function PageChrome({ children, lang = 'en' }: { children: ReactNode; lan
           </nav>
         </header>
         {children}
-        <footer className="footer">Wellness tool · No medical advice</footer>
+        <footer className="footer">
+          <a className="donate-link" href="https://ko-fi.com/sleeplike" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+          <span>Wellness tool · No medical advice</span>
+        </footer>
       </main>
     </>
   );

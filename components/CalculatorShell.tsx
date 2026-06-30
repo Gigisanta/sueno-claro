@@ -26,6 +26,10 @@ const copy = {
     best: 'Best',
     cycles: 'cycles',
     disclaimer: 'Educational tool. Sleep cycles vary (70–120 min).',
+    sponsored: 'Sponsored',
+    support: 'Support sleeplike',
+    donate: 'Buy me a coffee',
+    affiliate: 'As an Amazon Associate we earn from qualifying purchases.',
     copy: 'Copy',
     share: 'Share',
     copied: '✓',
@@ -48,6 +52,10 @@ const copy = {
     best: 'Mejor',
     cycles: 'ciclos',
     disclaimer: 'Herramienta educativa. Los ciclos varían (70–120 min).',
+    sponsored: 'Patrocinado',
+    support: 'Apoyá sleeplike',
+    donate: 'Invitame un café',
+    affiliate: 'Como Asociado de Amazon ganamos con compras calificadas.',
     copy: 'Copiar',
     share: 'Compartir',
     copied: '✓',
@@ -228,34 +236,42 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
       {/* Results — iOS grouped list style */}
       <div className="result-zone" aria-live="polite">
         {hasCalculated ? (
-          <div className="results-section">
-            <div className="results-header">{c.results}</div>
-            {results.map((result, index) => (
-              <div key={result.id} className={`result-item ${result.quality === 'best' ? 'best' : ''}`}>
-                <div className="result-rank">
-                  {index === 0 && result.quality === 'best' ? '★' : String(index + 1).padStart(2, '0')}
-                </div>
-                <div className="result-info">
-                  <div className="result-time">{result.time}</div>
-                  <div className="result-meta">
-                    {result.quality === 'best' ? <><span className="result-label">{c.best}</span> · </> : null}
-                    {formatDuration(result.timeInBedMinutes)} · {result.cycles ?? '?'} {c.cycles}
+          <>
+            <div className="results-section">
+              <div className="results-header">{c.results}</div>
+              {results.map((result, index) => (
+                <div key={result.id} className={`result-item ${result.quality === 'best' ? 'best' : ''}`}>
+                  <div className="result-rank">
+                    {index === 0 && result.quality === 'best' ? '★' : String(index + 1).padStart(2, '0')}
+                  </div>
+                  <div className="result-info">
+                    <div className="result-time">{result.time}</div>
+                    <div className="result-meta">
+                      {result.quality === 'best' ? <><span className="result-label">{c.best}</span> · </> : null}
+                      {formatDuration(result.timeInBedMinutes)} · {result.cycles ?? '?'} {c.cycles}
+                    </div>
+                  </div>
+                  <div className="result-actions">
+                    <button type="button" className="icon-btn" onClick={() => void copyResult(result)} aria-label={`${c.copy} ${result.time}`}>{copied === result.id ? c.copied : '⧉'}</button>
+                    <a className="icon-btn" href={currentShareUrl(result)} aria-label={`${c.share} ${result.time}`}>↗</a>
+                    <a className="icon-btn" href={createCalendarHref(result, lang)} download={`sleeplike-${result.id}.ics`} aria-label="Calendar">+</a>
                   </div>
                 </div>
-                <div className="result-actions">
-                  <button type="button" className="icon-btn" onClick={() => void copyResult(result)} aria-label={`${c.copy} ${result.time}`}>{copied === result.id ? c.copied : '⧉'}</button>
-                  <a className="icon-btn" href={currentShareUrl(result)} aria-label={`${c.share} ${result.time}`}>↗</a>
-                  <a className="icon-btn" href={createCalendarHref(result, lang)} download={`sleeplike-${result.id}.ics`} aria-label="Calendar">+</a>
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+            {/* Ad slot — visible only after result */}
+            <div className="ad-slot" data-ad-slot="true">
+              <span className="ad-label">{c.sponsored}</span>
+              <div className="ad-placeholder">Ad</div>
+            </div>
+          </>
         ) : (
           <div className="pre-result">{c.beforePrompt}</div>
         )}
       </div>
 
       <p className="disclaimer">{c.disclaimer}</p>
+      <p className="affiliate">{c.affiliate}</p>
     </section>
   );
 }
