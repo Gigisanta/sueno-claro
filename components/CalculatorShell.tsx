@@ -4,7 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { calculateBedtimes, calculateNaps, calculateWakeTimes, calculateWindow, safeSettings } from '../lib/sleep/calculate';
 import type { CalculatorMode, SleepResult } from '../lib/sleep/types';
 import { formatDuration } from '../lib/sleep/format';
-import { monetization, carbonAdsUrl, amazonUrl, sleepProducts } from '../lib/monetization/config';
+import { monetization, carbonAdsUrl, amazonUrl, productsForMode } from '../lib/monetization/config';
 
 type Mode = CalculatorMode;
 
@@ -269,22 +269,32 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
                 </div>
               ) : (
                 <div className="ad-placeholder">
-                  {monetization.adNetwork === null ? 'Ad' : 'Ad'}
+                  <span>📢</span>
                 </div>
               )}
             </div>
-            {/* Affiliate product links */}
+            {/* Affiliate product links — contextual per mode */}
             {monetization.showAffiliateLinks && (
               <div className="affiliate-products">
                 <span className="ad-label">{c.support}</span>
                 <div className="product-links">
-                  {sleepProducts[lang === 'es' ? 'es' : 'en'].map((p) => (
+                  {productsForMode(mode, lang as 'en' | 'es').map((p) => (
                     <a key={p.asin} className="product-link" href={amazonUrl(p.asin)} target="_blank" rel="nofollow sponsored">
                       <span>{p.emoji}</span>
                       <span>{p.label}</span>
                     </a>
                   ))}
                 </div>
+              </div>
+            )}
+            {/* Email capture — newsletter signup for sleep tips */}
+            {monetization.showEmailCapture && (
+              <div className="email-capture">
+                <span className="ad-label">{lang === 'es' ? 'Tips de sueño' : 'Sleep tips'}</span>
+                <form className="email-form" action={`https://convertkit.com/forms/${monetization.convertKitFormId}/subscriptions`} method="post" target="_blank">
+                  <input className="email-input" type="email" name="email" placeholder={lang === 'es' ? 'tu@email.com' : 'your@email.com'} required />
+                  <button type="submit" className="email-submit">{lang === 'es' ? 'Suscribirme' : 'Subscribe'}</button>
+                </form>
               </div>
             )}
           </>

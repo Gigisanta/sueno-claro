@@ -5,6 +5,8 @@
  * or change affiliate tags without touching component code.
  */
 
+import type { CalculatorMode } from '../sleep/types';
+
 export interface MonetizationConfig {
   /** Ad network — set to 'carbon', 'ethicalads', or null to disable */
   adNetwork: 'carbon' | 'ethicalads' | null;
@@ -20,53 +22,72 @@ export interface MonetizationConfig {
   kofiUsername: string;
   /** Show contextual affiliate product links after results */
   showAffiliateLinks: boolean;
+  /** Show email capture form (ConvertKit / Mailchimp) */
+  showEmailCapture: boolean;
+  /** ConvertKit form ID (from your CK dashboard) */
+  convertKitFormId: string;
 }
 
 export const monetization: MonetizationConfig = {
-  adNetwork: null,           // ← Set to 'carbon' or 'ethicalads' when you register
-  carbonServe: 'CESIVK5Y',   // ← Replace with your Carbon Ads serve ID
-  carbonPlacement: 'sleeplikemaatwork', // ← Replace with your placement
-  ethicalAdsId: '',          // ← Set when you register
-  amazonTag: 'sleeplike-20', // ← Replace with your Amazon tag
-  kofiUsername: 'sleeplike', // ← Replace with your Ko-fi username
-  showAffiliateLinks: true,  // ← Toggle contextual product links
+  adNetwork: null,
+  carbonServe: 'CESIVK5Y',
+  carbonPlacement: 'sleeplikemaatwork',
+  ethicalAdsId: '',
+  amazonTag: 'sleeplike-20',
+  kofiUsername: 'sleeplike',
+  showAffiliateLinks: true,
+  showEmailCapture: false,
+  convertKitFormId: '',
 };
 
-/**
- * Returns the Amazon affiliate URL for a given product ASIN.
- */
-export function amazonUrl(asins: string): string {
-  return `https://www.amazon.com/dp/${asins}?tag=${monetization.amazonTag}`;
+export function amazonUrl(asin: string): string {
+  return `https://www.amazon.com/dp/${asin}?tag=${monetization.amazonTag}`;
 }
 
-/**
- * Returns the Ko-fi donate URL.
- */
 export function kofiUrl(): string {
   return `https://ko-fi.com/${monetization.kofiUsername}`;
 }
 
-/**
- * Returns the Carbon Ads script URL.
- */
 export function carbonAdsUrl(): string | null {
   if (!monetization.adNetwork || monetization.adNetwork !== 'carbon') return null;
   return `//cdn.carbonads.com/carbon.js?serve=${monetization.carbonServe}&placement=${monetization.carbonPlacement}`;
 }
 
-/**
- * Sleep-related products for contextual affiliate links.
- * Shown after the user gets their sleep results.
- */
-export const sleepProducts = {
-  en: [
-    { asin: 'B0BXXX', label: 'Weighted blanket for better sleep', emoji: '🛏' },
-    { asin: 'B0CYYY', label: 'White noise machine', emoji: '🔊' },
-    { asin: 'B0AZZZ', label: 'Smart alarm clock with sunrise', emoji: '⏰' },
+/* ─── Contextual products by mode ─── */
+
+export interface AffiliateProduct {
+  asin: string;
+  label: string;
+  labelEs: string;
+  emoji: string;
+}
+
+const products: Record<CalculatorMode, AffiliateProduct[]> = {
+  wake: [
+    { asin: 'B0BXXX', label: 'Weighted blanket for deep sleep',       labelEs: 'Manta con peso para sueño profundo', emoji: '🛏' },
+    { asin: 'B0CYYY', label: 'Blue light blocking glasses',           labelEs: 'Lentes bloqueadores de luz azul',     emoji: '👓' },
+    { asin: 'B0AZZZ', label: 'Melatonin gummies for sleep aid',       labelEs: 'Gomitas de melatonina',               emoji: '💊' },
   ],
-  es: [
-    { asin: 'B0BXXX', label: 'Manta con peso para dormir mejor', emoji: '🛏' },
-    { asin: 'B0CYYY', label: 'Máquina de ruido blanco', emoji: '🔊' },
-    { asin: 'B0AZZZ', label: 'Despertador inteligente con amanecer', emoji: '⏰' },
+  sleepNow: [
+    { asin: 'B0CYYY', label: 'White noise machine',                   labelEs: 'Máquina de ruido blanco',             emoji: '🔊' },
+    { asin: 'B0AZZZ', label: 'Smart alarm clock with sunrise',        labelEs: 'Despertador con amanecer simulado',   emoji: '⏰' },
+    { asin: 'B0BXXX', label: 'Blackout sleep mask',                   labelEs: 'Antifaz para dormir',                 emoji: '😴' },
+  ],
+  nap: [
+    { asin: 'B0AZZZ', label: 'Travel sleep mask',                     labelEs: 'Antifaz de viaje',                    emoji: '😴' },
+    { asin: 'B0BXXX', label: 'Neck pillow for power naps',            labelEs: 'Almohada de viaje para siestas',      emoji: '🛏' },
+    { asin: 'B0CYYY', label: 'White noise machine (travel size)',     labelEs: 'Máquina de ruido blanco portátil',    emoji: '🔊' },
+  ],
+  window: [
+    { asin: 'B0BXXX', label: 'Premium mattress topper',               labelEs: 'Cubrecolchón premium',                emoji: '🛏' },
+    { asin: 'B0CYYY', label: 'Cooling gel pillow',                    labelEs: 'Almohada de gel refrigerante',        emoji: '🛌' },
+    { asin: 'B0AZZZ', label: 'Sleep tracking smart ring',             labelEs: 'Anillo inteligente de sueño',         emoji: '💍' },
   ],
 };
+
+export function productsForMode(mode: CalculatorMode, lang: 'en' | 'es'): AffiliateProduct[] {
+  return products[mode].map(p => ({
+    ...p,
+    label: lang === 'es' ? p.labelEs : p.label,
+  }));
+}

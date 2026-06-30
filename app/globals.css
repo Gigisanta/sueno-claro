@@ -437,6 +437,53 @@
   }
   .product-link span:first-child { font-size: 18px; }
 
+  /* ─── Email capture ─── */
+  .email-capture {
+    background: var(--surface-primary);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+  }
+  .email-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+  }
+  .email-input {
+    flex: 1;
+    min-height: 40px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: 1px solid var(--separator);
+    background: var(--surface-secondary);
+    color: var(--label);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.12s ease;
+  }
+  .email-input:focus {
+    border-color: var(--accent);
+  }
+  .email-input::placeholder {
+    color: var(--label-tertiary);
+  }
+  .email-submit {
+    min-height: 40px;
+    padding: 0 16px;
+    border-radius: 8px;
+    background: var(--accent);
+    color: #171007;
+    font-size: 14px;
+    font-weight: 600;
+    white-space: nowrap;
+    transition: opacity 0.12s ease;
+  }
+  .email-submit:active { opacity: 0.7; }
+
   /* ─── Footer ─── */
   .footer {
     display: flex;
