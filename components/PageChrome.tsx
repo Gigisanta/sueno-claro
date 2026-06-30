@@ -10,7 +10,7 @@ export function PageChrome({ children, lang = 'en' }: { children: ReactNode; lan
       <a className="skip-link" href="#main-content">Skip to calculator</a>
       <main id="main-content" className="page-shell">
         <header className="topbar">
-          <Link className="brand" href="/" aria-label="Sueño Claro home">
+          <Link className="brand" href="/" aria-label="sleeplike home">
             <span className="brand-mark" aria-hidden="true">☾</span>
           </Link>
           <nav className="nav" aria-label="Primary navigation">

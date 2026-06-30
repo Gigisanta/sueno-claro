@@ -1,4 +1,4 @@
-const CACHE_NAME = 'sueno-claro-v1';
+const CACHE_NAME = 'sleeplike-v1';
 const APP_SHELL = [
   '/',
   '/sleep-calculator',

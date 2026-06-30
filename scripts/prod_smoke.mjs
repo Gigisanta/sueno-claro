@@ -1,6 +1,6 @@
 import { chromium, webkit } from '@playwright/test';
 
-const baseURL = process.argv[2] ?? 'https://sueno-claro.vercel.app';
+const baseURL = process.argv[2] ?? 'https://sleeplike.maat.work';
 const browsers = [
   ['chromium', chromium],
   ['webkit', webkit],

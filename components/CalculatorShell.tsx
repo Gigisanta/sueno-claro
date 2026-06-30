@@ -21,11 +21,11 @@ const copy = {
     latency: 'Latency',
     cycle: 'Cycle',
     calculate: 'Calculate',
-    beforePrompt: 'Select your time and tap Calculate',
+    beforePrompt: 'Set your time and calculate',
     results: 'Results',
     best: 'Best',
     cycles: 'cycles',
-    disclaimer: 'Educational wellness tool. Sleep cycles vary (70–120 min). Not medical advice.',
+    disclaimer: 'Educational tool. Sleep cycles vary (70–120 min).',
     copy: 'Copy',
     share: 'Share',
     copied: '✓',
@@ -39,7 +39,7 @@ const copy = {
     },
     wakeLabel: 'Despertar',
     bedLabel: 'Acostarse',
-    napLabel: 'Siesta a las',
+    napLabel: 'Siesta',
     latency: 'Latencia',
     cycle: 'Ciclo',
     calculate: 'Calcular',
@@ -47,7 +47,7 @@ const copy = {
     results: 'Resultados',
     best: 'Mejor',
     cycles: 'ciclos',
-    disclaimer: 'Herramienta educativa. Los ciclos varían (70–120 min). No reemplaza consejo médico.',
+    disclaimer: 'Herramienta educativa. Los ciclos varían (70–120 min).',
     copy: 'Copiar',
     share: 'Compartir',
     copied: '✓',
@@ -156,32 +156,12 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
     window.setTimeout(() => setCopied(null), 1400);
   }
 
-  function timeInputValue(): string {
-    if (mode === 'sleepNow') return nowTime();
-    if (mode === 'nap') return napTime;
-    if (mode === 'window') return wakeTime;
-    return wakeTime;
-  }
-
-  function timeInputLabel(): string {
-    if (mode === 'wake') return c.wakeLabel;
-    if (mode === 'sleepNow') return c.wakeLabel;
-    if (mode === 'nap') return c.napLabel;
-    return c.wakeLabel;
-  }
-
-  function handleTimeChange(value: string) {
-    if (mode === 'nap') setNapTime(value);
-    else setWakeTime(value);
-  }
-
-  function showBedField(): boolean {
-    return mode === 'window';
-  }
+  const timeValue = mode === 'nap' ? napTime : wakeTime;
+  const showBedField = mode === 'window';
 
   return (
     <section id="calculator" aria-label="Sleep calculator">
-      {/* Mode selector */}
+      {/* Mode selector — iOS segmented control style */}
       <div className="mode-grid" role="group" aria-label="Calculator mode">
         {(Object.keys(c.modes) as Mode[]).map((item) => (
           <button key={item} type="button" className="mode-button" aria-pressed={mode === item} onClick={() => setMode(item)}>
@@ -191,90 +171,86 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
         ))}
       </div>
 
-      {/* Inputs */}
-      <div className="form-grid">
-        <div className="field">
-          <label htmlFor="primary-time">{timeInputLabel()}</label>
+      {/* iOS-style grouped form */}
+      <div className="form-group">
+        <div className="form-row">
+          <label>{mode === 'nap' ? c.napLabel : c.wakeLabel}</label>
           <input
-            id="primary-time"
             autoComplete="off"
-            className="input time-input"
+            className="time-input"
             type="time"
-            value={timeInputValue()}
+            value={timeValue}
             suppressHydrationWarning
-            onChange={(e) => handleTimeChange(e.target.value)}
+            onChange={(e) => {
+              if (mode === 'nap') setNapTime(e.target.value);
+              else setWakeTime(e.target.value);
+            }}
           />
         </div>
 
-        {showBedField() ? (
-          <div className="field">
-            <label htmlFor="bed-time">{c.bedLabel}</label>
-            <input id="bed-time" autoComplete="off" className="input time-input" type="time" value={bedTime} suppressHydrationWarning onChange={(e) => setBedTime(e.target.value)} />
+        {showBedField ? (
+          <div className="form-row">
+            <label>{c.bedLabel}</label>
+            <input autoComplete="off" className="time-input" type="time" value={bedTime} suppressHydrationWarning onChange={(e) => setBedTime(e.target.value)} />
           </div>
         ) : null}
 
-        <div className="settings-row">
-          <div className="field">
-            <label htmlFor="latency">{c.latency}</label>
-            <select id="latency" className="select" value={latency} onChange={(e) => setLatency(Number(e.target.value))}>
-              {[0, 5, 10, 15, 20, 30, 45, 60].map((v) => <option key={v} value={v}>{v}m</option>)}
-            </select>
-          </div>
-          <div className="field">
-            <label htmlFor="cycle">{c.cycle}</label>
-            <select id="cycle" className="select" value={cycleLength} onChange={(e) => setCycleLength(Number(e.target.value))}>
-              {[70, 80, 90, 100, 110, 120].map((v) => <option key={v} value={v}>{v}m</option>)}
-            </select>
-          </div>
+        <div className="form-row">
+          <label>{c.latency}</label>
+          <select className="select" value={latency} onChange={(e) => setLatency(Number(e.target.value))}>
+            {[0, 5, 10, 15, 20, 30, 45, 60].map((v) => <option key={v} value={v}>{v} min</option>)}
+          </select>
         </div>
 
-        <div className="field">
+        <div className="form-row">
+          <label>{c.cycle}</label>
+          <select className="select" value={cycleLength} onChange={(e) => setCycleLength(Number(e.target.value))}>
+            {[70, 80, 90, 100, 110, 120].map((v) => <option key={v} value={v}>{v} min</option>)}
+          </select>
+        </div>
+
+        <div className="form-row format-row" onClick={() => setTimeFormat(timeFormat === '24h' ? '12h' : '24h')}>
           <label>Format</label>
-          <div className="format-toggle" role="group" aria-label="Time format">
-            {(['24h', '12h'] as const).map((fmt) => (
-              <button key={fmt} type="button" className="format-btn" aria-pressed={timeFormat === fmt} onClick={() => setTimeFormat(fmt)}>{fmt}</button>
-            ))}
-          </div>
+          <span className="format-value">{timeFormat === '24h' ? '24-Hour' : '12-Hour'}</span>
         </div>
       </div>
 
-      {/* Calculate */}
+      {/* Calculate button */}
       <div className="actions">
         <button type="button" className="btn btn-primary" onClick={calculate}>{c.calculate}</button>
       </div>
 
-      {/* Results */}
+      {/* Results — iOS grouped list style */}
       <div className="result-zone" aria-live="polite">
         {hasCalculated ? (
-          <>
-            <span className="result-section-title">{c.results}</span>
-            <div className="result-list">
-              {results.map((result, index) => (
-                <article key={result.id} className={`result-card ${result.quality === 'best' ? 'best' : ''}`}>
-                  <div className="result-rank">{index === 0 && result.quality === 'best' ? '★' : String(index + 1).padStart(2, '0')}</div>
-                  <div className="result-info">
-                    <div className="result-time">{result.time}</div>
-                    <div className="result-meta">
-                      {result.quality === 'best' ? <><span className="result-label">{c.best}</span> · </> : null}
-                      {formatDuration(result.timeInBedMinutes)} · {result.cycles ?? '?'} {c.cycles}
-                    </div>
+          <div className="results-section">
+            <div className="results-header">{c.results}</div>
+            {results.map((result, index) => (
+              <div key={result.id} className={`result-item ${result.quality === 'best' ? 'best' : ''}`}>
+                <div className="result-rank">
+                  {index === 0 && result.quality === 'best' ? '★' : String(index + 1).padStart(2, '0')}
+                </div>
+                <div className="result-info">
+                  <div className="result-time">{result.time}</div>
+                  <div className="result-meta">
+                    {result.quality === 'best' ? <><span className="result-label">{c.best}</span> · </> : null}
+                    {formatDuration(result.timeInBedMinutes)} · {result.cycles ?? '?'} {c.cycles}
                   </div>
-                  <div className="result-actions">
-                    <button type="button" className="icon-btn" onClick={() => void copyResult(result)} aria-label={`${c.copy} ${result.time}`}>{copied === result.id ? c.copied : '⧉'}</button>
-                    <a className="icon-btn" href={currentShareUrl(result)} aria-label={`${c.share} ${result.time}`}>↗</a>
-                    <a className="icon-btn" href={createCalendarHref(result, lang)} download={`sueno-claro-${result.id}.ics`} aria-label="Calendar">+</a>
-                  </div>
-                </article>
-              ))}
-            </div>
-            <p className="disclaimer">{c.disclaimer}</p>
-          </>
-        ) : (
-          <div className="pre-result">
-            {c.beforePrompt}
+                </div>
+                <div className="result-actions">
+                  <button type="button" className="icon-btn" onClick={() => void copyResult(result)} aria-label={`${c.copy} ${result.time}`}>{copied === result.id ? c.copied : '⧉'}</button>
+                  <a className="icon-btn" href={currentShareUrl(result)} aria-label={`${c.share} ${result.time}`}>↗</a>
+                  <a className="icon-btn" href={createCalendarHref(result, lang)} download={`sleeplike-${result.id}.ics`} aria-label="Calendar">+</a>
+                </div>
+              </div>
+            ))}
           </div>
+        ) : (
+          <div className="pre-result">{c.beforePrompt}</div>
         )}
       </div>
+
+      <p className="disclaimer">{c.disclaimer}</p>
     </section>
   );
 }

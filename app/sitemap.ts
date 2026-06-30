@@ -6,7 +6,7 @@ const routes = ['', '/sleep-calculator', '/bedtime-calculator', '/nap-calculator
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return routes.map((route) => ({
-    url: `https://sueno-claro.vercel.app${route}`,
+    url: `https://sleeplike.maat.work${route}`,
     lastModified: new Date('2026-06-30'),
     changeFrequency: 'weekly',
     priority: route === '' ? 1 : 0.8,

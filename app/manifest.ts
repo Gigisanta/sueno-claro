@@ -4,8 +4,8 @@ export const dynamic = 'force-static';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'Sueño Claro',
-    short_name: 'Sueño Claro',
+    name: 'sleeplike',
+    short_name: 'sleeplike',
     description: 'Private sleep cycle calculator for bedtime, wake-up times and naps.',
     start_url: '/',
     display: 'standalone',

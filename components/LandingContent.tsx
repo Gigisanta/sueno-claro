@@ -2,11 +2,11 @@ import { CalculatorShell } from './CalculatorShell';
 import { PageChrome } from './PageChrome';
 
 export function LandingContent({ lang = 'en' }: { lang?: 'en' | 'es' }) {
-  const baseUrl = lang === 'es' ? 'https://sueno-claro.vercel.app/calculadora-de-sueno' : 'https://sueno-claro.vercel.app/sleep-calculator';
+  const baseUrl = lang === 'es' ? 'https://sleeplike.maat.work/calculadora-de-sueno' : 'https://sleeplike.maat.work/sleep-calculator';
   const structuredData = [{
     '@context': 'https://schema.org',
     '@type': 'WebApplication',
-    name: 'Sueño Claro',
+    name: 'sleeplike',
     url: baseUrl,
     applicationCategory: 'HealthApplication',
     operatingSystem: 'Any',

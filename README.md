@@ -1,14 +1,14 @@
-# Sueño Claro / REMinder
+# sleeplike
 
 Privacy-first sleep cycle calculator: web/PWA first, iOS premium later via RevenueCat.
 
-- Production: https://sueno-claro.vercel.app
+- Production: https://sleeplike.maat.work
 - GitHub: https://github.com/Gigisanta/sueno-claro
 - Core promise: no account, no microphone, no tracking, no backend in v1.
 
 ## What is live
 
-Sueño Claro is a static Next.js 16 PWA that calculates practical sleep windows locally in the browser.
+sleeplike is a static Next.js 16 PWA that calculates practical sleep windows locally in the browser.
 
 Modes:
 
@@ -28,7 +28,7 @@ SEO routes:
 
 ## Product wedge
 
-Existing sleep calculators prove search intent, but many are visually dated, affiliate-heavy, generic, or not app-first. Full sleep trackers are heavier and permission-heavy. Sueño Claro wins by being instant, calm, private, bilingual, and useful before asking for anything.
+Existing sleep calculators prove search intent, but many are visually dated, affiliate-heavy, generic, or not app-first. Full sleep trackers are heavier and permission-heavy. sleeplike wins by being instant, calm, private, bilingual, and useful before asking for anything.
 
 ## MVP scope
 
