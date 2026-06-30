@@ -55,6 +55,8 @@ const copy = {
 } as const;
 
 const modeIcons: Record<Mode, string> = { wake: '☀', sleepNow: '☾', nap: '◐', window: '⌁' };
+const modeLabels: Record<Mode, string> = { wake: 'Wake', sleepNow: 'Sleep', nap: 'Nap', window: 'Window' };
+const modeLabelsEs: Record<Mode, string> = { wake: 'Despertar', sleepNow: 'Dormir', nap: 'Siesta', window: 'Ventana' };
 const defaultSettings = safeSettings({ sleepLatencyMinutes: 15, cycleLengthMinutes: 90, timeFormat: '24h' });
 
 function nowTime() {
@@ -161,12 +163,15 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
 
   return (
     <section id="calculator" aria-label="Sleep calculator">
+      {/* App title */}
+      <div className="app-title">sleeplike</div>
+
       {/* Mode selector — iOS segmented control style */}
       <div className="mode-grid" role="group" aria-label="Calculator mode">
-        {(Object.keys(c.modes) as Mode[]).map((item) => (
+        {(Object.keys(modeIcons) as Mode[]).map((item) => (
           <button key={item} type="button" className="mode-button" aria-pressed={mode === item} onClick={() => setMode(item)}>
             <span aria-hidden="true">{modeIcons[item]}</span>
-            <span>{c.modes[item][1]}</span>
+            <span>{(lang === 'es' ? modeLabelsEs : modeLabels)[item]}</span>
           </button>
         ))}
       </div>
