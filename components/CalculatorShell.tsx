@@ -1,6 +1,6 @@
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { calculateBedtimes, calculateNaps, calculateWakeTimes, calculateWindow, safeSettings } from '../lib/sleep/calculate';
 import type { CalculatorMode, SleepResult } from '../lib/sleep/types';
 import { formatDuration } from '../lib/sleep/format';
@@ -26,6 +26,7 @@ const copy = {
     disclaimer: 'Educational wellness tool only. Real sleep cycles vary by person and night, often roughly 70–120 minutes. If you have persistent insomnia, excessive daytime sleepiness, loud snoring, gasping or breathing pauses, talk to a qualified clinician.',
     sponsored: 'Sponsored space appears only after you receive your result. Core calculator stays free.',
     copy: 'Copy',
+    share: 'Share',
     calendar: 'Calendar',
     copied: 'Copied',
   },
@@ -47,6 +48,7 @@ const copy = {
     disclaimer: 'Herramienta educativa de bienestar. Los ciclos reales varían por persona y noche, muchas veces alrededor de 70–120 minutos. Si tenés insomnio persistente, somnolencia excesiva, ronquidos fuertes, jadeos o pausas respiratorias, consultá a un profesional.',
     sponsored: 'El espacio patrocinado aparece recién después del resultado. La calculadora core sigue gratis.',
     copy: 'Copiar',
+    share: 'Compartir',
     calendar: 'Calendario',
     copied: 'Copiado',
   },
@@ -65,6 +67,14 @@ function createCalendarHref(result: SleepResult, lang: 'en' | 'es') {
   return `data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ASUMMARY:${title}%0ADESCRIPTION:${details}%0AEND:VEVENT%0AEND:VCALENDAR`;
 }
 
+function validTime(value: string | null): value is string {
+  return /^\d{2}:\d{2}$/.test(value ?? '');
+}
+
+function parseMode(value: string | null): Mode | null {
+  return value === 'wake' || value === 'sleepNow' || value === 'nap' || value === 'window' ? value : null;
+}
+
 export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
   const c = copy[lang];
   const [mode, setMode] = useState<Mode>('wake');
@@ -76,6 +86,26 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
   const [timeFormat, setTimeFormat] = useState<'24h' | '12h'>('24h');
   const [hasCalculated, setHasCalculated] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const queryMode = parseMode(params.get('mode'));
+    const wake = params.get('wake');
+    const bed = params.get('bed');
+    const nap = params.get('nap');
+    const queryLatency = params.has('latency') ? Number(params.get('latency')) : Number.NaN;
+    const queryCycle = params.has('cycle') ? Number(params.get('cycle')) : Number.NaN;
+    const queryFormat = params.get('format');
+
+    if (queryMode) setMode(queryMode);
+    if (validTime(wake)) setWakeTime(wake);
+    if (validTime(bed)) setBedTime(bed);
+    if (validTime(nap)) setNapTime(nap);
+    if (Number.isFinite(queryLatency)) setLatency(queryLatency);
+    if (Number.isFinite(queryCycle)) setCycleLength(queryCycle);
+    if (queryFormat === '12h' || queryFormat === '24h') setTimeFormat(queryFormat);
+    if (queryMode || validTime(wake) || validTime(bed) || validTime(nap)) setHasCalculated(true);
+  }, []);
 
   const settings = useMemo(() => safeSettings({ sleepLatencyMinutes: latency, cycleLengthMinutes: cycleLength, timeFormat }), [latency, cycleLength, timeFormat]);
   const results = useMemo(() => {
@@ -89,13 +119,37 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
     }
   }, [bedTime, mode, napTime, settings, wakeTime]);
 
+  function currentShareUrl(result?: SleepResult) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('mode', mode);
+    if (mode !== 'sleepNow' && mode !== 'nap') url.searchParams.set('wake', wakeTime);
+    if (mode === 'window') url.searchParams.set('bed', bedTime);
+    if (mode === 'nap') url.searchParams.set('nap', napTime);
+    url.searchParams.set('latency', String(settings.sleepLatencyMinutes));
+    url.searchParams.set('cycle', String(settings.cycleLengthMinutes));
+    url.searchParams.set('format', settings.timeFormat);
+    if (result) url.searchParams.set('result', result.time);
+    return url.toString();
+  }
+
   function calculate() {
-    if (mode === 'sleepNow') setBedTime(nowTime());
+    const nextBedTime = mode === 'sleepNow' ? nowTime() : bedTime;
+    if (mode === 'sleepNow') setBedTime(nextBedTime);
     setHasCalculated(true);
+    const url = new URL(window.location.href);
+    url.searchParams.set('mode', mode);
+    if (mode !== 'sleepNow' && mode !== 'nap') url.searchParams.set('wake', wakeTime);
+    if (mode === 'window') url.searchParams.set('bed', nextBedTime);
+    if (mode === 'nap') url.searchParams.set('nap', napTime);
+    url.searchParams.set('latency', String(settings.sleepLatencyMinutes));
+    url.searchParams.set('cycle', String(settings.cycleLengthMinutes));
+    url.searchParams.set('format', settings.timeFormat);
+    window.history.replaceState(null, '', url);
   }
 
   async function copyResult(result: SleepResult) {
-    const text = `${result.time} — ${result.title}. ${result.description}`;
+    const shareUrl = currentShareUrl(result);
+    const text = `${result.time} — ${result.title}. ${result.description} ${shareUrl}`;
     await navigator.clipboard?.writeText(text).catch(() => undefined);
     setCopied(result.id);
     window.setTimeout(() => setCopied(null), 1400);
@@ -180,7 +234,8 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
                   </div>
                   <div className="result-actions">
                     <button type="button" className="icon-button" onClick={() => void copyResult(result)} aria-label={`${c.copy} ${result.time}`}>{copied === result.id ? '✓' : '⧉'}</button>
-                    <a className="icon-button" href={createCalendarHref(result, lang)} download={`sueno-claro-${result.id}.ics`} aria-label={`${c.calendar} ${result.time}`}>↗</a>
+                    <a className="icon-button" href={currentShareUrl(result)} aria-label={`${c.share} ${result.time}`}>↗</a>
+                    <a className="icon-button" href={createCalendarHref(result, lang)} download={`sueno-claro-${result.id}.ics`} aria-label={`${c.calendar} ${result.time}`}>＋</a>
                   </div>
                 </article>
               ))}

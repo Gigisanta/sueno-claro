@@ -17,6 +17,12 @@ const content = {
       ['Privacy-first', 'No microphone, no accelerometer, no tracking pixels and no medical claims. Just transparent assumptions.'],
     ],
     side: ['What it does', 'Calculates wake/bed times from cycle length and fall-asleep latency.', 'What it does not do', 'It does not diagnose sleep problems or detect sleep stages.'],
+    trust: ['No account', 'No microphone', 'No tracking', 'Free core calculator'],
+    faq: [
+      ['How long is a sleep cycle?', 'We use 90 minutes as a practical default. Real cycles vary by person and night, often roughly 70–120 minutes.'],
+      ['Is this medical advice?', 'No. Sueño Claro is an educational wellness calculator and does not diagnose, treat or track sleep disorders.'],
+      ['Can I share a result?', 'Yes. After calculating, the share button copies a URL with your selected wake time, latency and cycle assumptions.'],
+    ],
   },
   es: {
     eyebrow: 'Sueño sin tracking',
@@ -33,23 +39,49 @@ const content = {
       ['Privacidad primero', 'Sin micrófono, acelerómetro, píxeles de tracking ni promesas médicas. Supuestos claros.'],
     ],
     side: ['Qué hace', 'Calcula horarios a partir de duración de ciclo y latencia para dormir.', 'Qué no hace', 'No diagnostica problemas de sueño ni detecta etapas reales.'],
+    trust: ['Sin cuenta', 'Sin micrófono', 'Sin tracking', 'Calculadora gratis'],
+    faq: [
+      ['¿Cuánto dura un ciclo de sueño?', 'Usamos 90 minutos como default práctico. Los ciclos reales varían por persona y noche, muchas veces alrededor de 70–120 minutos.'],
+      ['¿Esto es consejo médico?', 'No. Sueño Claro es una calculadora educativa de bienestar y no diagnostica, trata ni monitorea trastornos del sueño.'],
+      ['¿Puedo compartir un resultado?', 'Sí. Después de calcular, el botón de compartir copia una URL con tu hora, latencia y supuestos de ciclo.'],
+    ],
   },
 } as const;
 
 export function LandingContent({ lang = 'en' }: { lang?: 'en' | 'es' }) {
   const c = content[lang];
+  const baseUrl = lang === 'es' ? 'https://sueno-claro.vercel.app/calculadora-de-sueno' : 'https://sueno-claro.vercel.app/sleep-calculator';
+  const structuredData = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'WebApplication',
+      name: 'Sueño Claro',
+      url: baseUrl,
+      applicationCategory: 'HealthApplication',
+      operatingSystem: 'Any',
+      offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' },
+      description: c.lead,
+    },
+    {
+      '@context': 'https://schema.org',
+      '@type': 'FAQPage',
+      mainEntity: c.faq.map(([question, answer]) => ({
+        '@type': 'Question',
+        name: question,
+        acceptedAnswer: { '@type': 'Answer', text: answer },
+      })),
+    },
+  ];
   return (
     <PageChrome lang={lang}>
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }} />
       <section className="hero" aria-labelledby="hero-title">
         <div className="hero-copy">
           <p className="eyebrow">{c.eyebrow}</p>
           <h1 id="hero-title">{c.title}</h1>
           <p className="lead">{c.lead}</p>
           <div className="trust-row" aria-label="Trust guarantees">
-            <span className="pill">No account</span>
-            <span className="pill">No microphone</span>
-            <span className="pill">No tracking</span>
-            <span className="pill">Free core calculator</span>
+            {c.trust.map((item) => <span key={item} className="pill">{item}</span>)}
           </div>
         </div>
         <aside className="hero-card" aria-label="Product facts">
@@ -69,6 +101,10 @@ export function LandingContent({ lang = 'en' }: { lang?: 'en' | 'es' }) {
 
       <section className="content-grid" aria-label="Sleep calculator features">
         {c.cards.map(([title, text]) => <article key={title} className="content-card"><h3>{title}</h3><p>{text}</p></article>)}
+      </section>
+
+      <section className="content-grid" aria-label="Frequently asked questions">
+        {c.faq.map(([question, answer]) => <article key={question} className="content-card"><h3>{question}</h3><p>{answer}</p></article>)}
       </section>
     </PageChrome>
   );

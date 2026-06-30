@@ -25,6 +25,11 @@ test.describe('Sueño Claro calculator', () => {
     await page.goto('/sleep-calculator');
     await expect(page).toHaveTitle(/Sleep Calculator/);
     await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /90-minute sleep cycles/i);
+    await expect(page.locator('link[rel="canonical"]')).toHaveAttribute('href', /sueno-claro\.vercel\.app/);
+    await expect(page.locator('link[rel="alternate"][hrefLang="es"]')).toHaveAttribute('href', /calculadora-de-sueno/);
+    const jsonLd = await page.locator('script[type="application/ld+json"]').first().textContent();
+    expect(jsonLd).toContain('WebApplication');
+    expect(jsonLd).toContain('FAQPage');
     const manifest = await page.request.get('/manifest.webmanifest');
     expect(manifest.ok()).toBe(true);
     const robots = await page.request.get('/robots.txt');
@@ -33,5 +38,12 @@ test.describe('Sueño Claro calculator', () => {
     expect(sitemap.ok()).toBe(true);
     const sw = await page.request.get('/sw.js');
     expect(sw.ok()).toBe(true);
+  });
+
+  test('opens shareable wake URL and preserves result assumptions', async ({ page }) => {
+    await page.goto('/calculadora-de-sueno?mode=wake&wake=06:00&latency=15&cycle=90&format=24h');
+    await expect(page.getByText('20:45')).toBeVisible();
+    await expect(page.getByText('22:15')).toBeVisible();
+    await expect(page.getByTestId('post-result-ad')).toBeVisible();
   });
 });

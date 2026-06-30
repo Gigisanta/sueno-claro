@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   },
   description: 'A private sleep cycle calculator for bedtime, wake-up times and naps. No account, no microphone, no tracking.',
   applicationName: 'Sueño Claro',
+  alternates: {
+    canonical: '/',
+    languages: {
+      en: '/sleep-calculator',
+      es: '/calculadora-de-sueno',
+    },
+  },
   keywords: ['sleep calculator', 'bedtime calculator', 'wake up calculator', 'calculadora de sueño', 'ciclos de sueño'],
   openGraph: {
     title: 'Sueño Claro — Sleep Cycle Calculator',
