@@ -7,7 +7,6 @@ export function PageChrome({ children, lang = 'en' }: { children: ReactNode; lan
     : [{ href: '/sleep-calculator', label: 'Calc' }, { href: '/nap-calculator', label: 'Nap' }, { href: '/calculadora-de-sueno', label: 'ES' }];
   return (
     <>
-      <a className="skip-link" href="#main-content">Skip to calculator</a>
       <main id="main-content" className="page-shell">
         <header className="topbar">
           <Link className="brand" href="/" aria-label="sleeplike home">
