@@ -17,7 +17,7 @@ for (const [name, browserType] of browsers) {
   await page.goto(baseURL, { waitUntil: 'networkidle' });
   const adBefore = await page.getByTestId('post-result-ad').count();
   if (adBefore !== 0) throw new Error(`${name}: ad visible before result`);
-  await page.getByRole('button', { name: /Calculate times|Calcular horarios/ }).click();
+  await page.getByRole('button', { name: /Calculate windows|Calcular ventanas/ }).click();
   await page.getByText('22:15').waitFor({ state: 'visible' });
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   if (overflow) throw new Error(`${name}: horizontal overflow`);

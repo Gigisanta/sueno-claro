@@ -21,4 +21,5 @@
 | `18-delegated-research-addendum.md` | Integrated findings from six delegated research agents |
 | `19-launch-assets.md` | Launch copy, zero-cost distribution checklist, and IndexNow notes |
 | `20-launch-followup-audit.md` | Post-launch delegated findings audit and integrated production deltas |
+| `21-ui-ux-overhaul.md` | Major calculator-first UI/UX overhaul rationale, constraints, and verification |
 | `../plans/` | Runnable phase plans and prompts |

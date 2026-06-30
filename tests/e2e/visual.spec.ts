@@ -27,7 +27,7 @@ async function layoutSnapshot(page: import('@playwright/test').Page) {
       bodyText: document.body.innerText,
       h1: pick('h1'),
       calculator: pick('.calculator-card'),
-      heroCard: pick('.hero-card'),
+      heroCard: pick('.hero-calculator'),
       resultCard: pick('.result-card'),
       buttons,
     };
@@ -39,7 +39,7 @@ test.describe('visual QA captures', () => {
     await page.setViewportSize({ width: 1440, height: 1100 });
     await page.goto('/');
     await page.screenshot({ path: 'artifacts/visual-qa/desktop-home.png', fullPage: true });
-    await page.getByRole('button', { name: 'Calculate times' }).click();
+    await page.getByRole('button', { name: 'Calculate windows' }).click();
     await expect(page.getByText('22:15')).toBeVisible();
     await page.screenshot({ path: 'artifacts/visual-qa/desktop-results.png', fullPage: true });
     const snap = await layoutSnapshot(page);
@@ -53,7 +53,7 @@ test.describe('visual QA captures', () => {
   test('mobile Spanish result screen has no overflow and readable hierarchy', async ({ page }) => {
     await page.setViewportSize({ width: 390, height: 844 });
     await page.goto('/calculadora-de-sueno');
-    await page.getByRole('button', { name: 'Calcular horarios' }).click();
+    await page.getByRole('button', { name: 'Calcular ventanas' }).click();
     await expect(page.getByText('22:15')).toBeVisible();
     await page.screenshot({ path: 'artifacts/visual-qa/mobile-es-results.png', fullPage: true });
     const snap = await layoutSnapshot(page);

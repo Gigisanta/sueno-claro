@@ -9,44 +9,60 @@ type Mode = CalculatorMode;
 
 const copy = {
   en: {
-    eyebrow: 'Private sleep-cycle calculator',
-    title: 'Wake between cycles, not in the middle of one.',
-    lead: 'Plan bedtime, wake-up time, naps and tight sleep windows with a fast calculator that needs no account, microphone or tracking.',
-    modes: { wake: 'Wake up at', sleepNow: 'Sleep now', nap: 'Nap', window: 'Fixed window' },
+    eyebrow: 'Sleep window planner',
+    title: 'Your sleep windows',
+    lead: 'Answer one timing question. Adjust assumptions only if you need to. Results appear with the trade-off clearly labeled.',
+    modes: {
+      wake: ['Wake up at', 'Find bedtimes that land between cycles'],
+      sleepNow: ['Sleep now', 'Calculate wake-up options from this moment'],
+      nap: ['Nap', 'Choose a short or full-cycle nap'],
+      window: ['Fixed window', 'Estimate cycles inside limited time'],
+    },
     wakeLabel: 'I want to wake up at',
     bedLabel: 'I can go to bed at',
     napLabel: 'Nap starts at',
     latency: 'Fall-asleep time',
     cycle: 'Cycle length',
     format: 'Time format',
-    calculate: 'Calculate times',
-    results: 'Your sleep windows',
-    assumptions: 'Assumes approximate sleep cycles, not medical sleep-stage tracking.',
-    regularity: 'A consistent sleep/wake schedule matters at least as much as one calculated time.',
+    calculate: 'Calculate windows',
+    beforeTitle: 'Ready when you are',
+    beforeBody: 'Pick a mode and tap calculate. Sponsored space is hidden until after you get a useful result.',
+    results: 'Recommended windows',
+    best: 'Best fit',
+    assumptions: 'Approximate cycles only — not medical sleep-stage tracking.',
+    regularity: 'Choose the earliest realistic option you can repeat. Regularity beats a perfect one-off bedtime.',
     disclaimer: 'Educational wellness tool only. Real sleep cycles vary by person and night, often roughly 70–120 minutes. If you have persistent insomnia, excessive daytime sleepiness, loud snoring, gasping or breathing pauses, talk to a qualified clinician.',
-    sponsored: 'Sponsored space appears only after you receive your result. Core calculator stays free.',
+    sponsored: 'Sponsored space — shown only after the result. Core calculator stays free.',
     copy: 'Copy',
     share: 'Share',
     calendar: 'Calendar',
     copied: 'Copied',
   },
   es: {
-    eyebrow: 'Calculadora privada de ciclos de sueño',
-    title: 'Despertate entre ciclos, no en el medio.',
-    lead: 'Planificá cuándo dormir, despertar, hacer siesta o encajar una ventana corta sin cuenta, micrófono ni tracking.',
-    modes: { wake: 'Despertar a', sleepNow: 'Dormir ahora', nap: 'Siesta', window: 'Ventana fija' },
+    eyebrow: 'Planificador de sueño',
+    title: 'Tus ventanas de sueño',
+    lead: 'Respondé una pregunta horaria. Ajustá supuestos solo si hace falta. Los resultados muestran el trade-off sin humo.',
+    modes: {
+      wake: ['Despertar a', 'Encontrá horarios para acostarte entre ciclos'],
+      sleepNow: ['Dormir ahora', 'Calculá opciones para despertar desde ahora'],
+      nap: ['Siesta', 'Elegí una siesta corta o de ciclo completo'],
+      window: ['Ventana fija', 'Estimá ciclos dentro de poco tiempo'],
+    },
     wakeLabel: 'Quiero despertarme a las',
     bedLabel: 'Puedo acostarme a las',
     napLabel: 'La siesta empieza a las',
     latency: 'Tiempo para dormirme',
     cycle: 'Duración del ciclo',
     format: 'Formato horario',
-    calculate: 'Calcular horarios',
-    results: 'Tus ventanas de sueño',
-    assumptions: 'Usa ciclos aproximados, no tracking médico de etapas de sueño.',
-    regularity: 'La regularidad al dormir y despertar importa tanto como un horario calculado.',
+    calculate: 'Calcular ventanas',
+    beforeTitle: 'Listo cuando vos quieras',
+    beforeBody: 'Elegí un modo y calculá. El espacio patrocinado queda oculto hasta después de darte un resultado útil.',
+    results: 'Ventanas recomendadas',
+    best: 'Mejor opción',
+    assumptions: 'Ciclos aproximados — no tracking médico de etapas de sueño.',
+    regularity: 'Elegí la opción realista más temprana que puedas repetir. La regularidad gana a una hora perfecta aislada.',
     disclaimer: 'Herramienta educativa de bienestar. Los ciclos reales varían por persona y noche, muchas veces alrededor de 70–120 minutos. Si tenés insomnio persistente, somnolencia excesiva, ronquidos fuertes, jadeos o pausas respiratorias, consultá a un profesional.',
-    sponsored: 'El espacio patrocinado aparece recién después del resultado. La calculadora core sigue gratis.',
+    sponsored: 'Espacio patrocinado — aparece solo después del resultado. La calculadora core sigue gratis.',
     copy: 'Copiar',
     share: 'Compartir',
     calendar: 'Calendario',
@@ -54,6 +70,7 @@ const copy = {
   },
 } as const;
 
+const modeIcons: Record<Mode, string> = { wake: '☀', sleepNow: '☾', nap: '◐', window: '⌁' };
 const defaultSettings = safeSettings({ sleepLatencyMinutes: 15, cycleLengthMinutes: 90, timeFormat: '24h' });
 
 function nowTime() {
@@ -157,52 +174,59 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
 
   return (
     <section id="calculator" className="calculator-card" aria-labelledby="calculator-title">
-      <p className="eyebrow">{c.eyebrow}</p>
-      <h2 id="calculator-title" className="section-title">{c.results}</h2>
-      <p className="section-copy">{c.lead}</p>
+      <div className="calculator-head">
+        <div>
+          <p className="eyebrow"><span aria-hidden="true">✦</span>{c.eyebrow}</p>
+          <h2 id="calculator-title" className="section-title">{c.title}</h2>
+          <p className="section-copy">{c.lead}</p>
+        </div>
+        <div className="cycle-badge" aria-label={`${settings.cycleLengthMinutes} minute cycles`}>{settings.cycleLengthMinutes}m<br /><span>cycles</span></div>
+      </div>
 
       <div className="mode-grid" role="group" aria-label="Calculator mode">
         {(Object.keys(c.modes) as Mode[]).map((item) => (
           <button key={item} type="button" className="mode-button" aria-pressed={mode === item} onClick={() => setMode(item)}>
-            {c.modes[item]}
+            <span aria-hidden="true">{modeIcons[item]}</span>
+            <strong>{c.modes[item][0]}</strong>
+            <small>{c.modes[item][1]}</small>
           </button>
         ))}
       </div>
 
       <div className="form-grid">
         {mode !== 'sleepNow' && mode !== 'nap' ? (
-          <div className="field">
+          <div className="field featured-field">
             <label htmlFor="wake-time">{c.wakeLabel}</label>
-            <input id="wake-time" className="input" type="time" value={wakeTime} suppressHydrationWarning onChange={(event) => setWakeTime(event.target.value)} />
+            <input id="wake-time" name="wake-time" autoComplete="off" className="input time-input" type="time" value={wakeTime} suppressHydrationWarning onChange={(event) => setWakeTime(event.target.value)} />
           </div>
         ) : null}
         {mode === 'window' ? (
-          <div className="field">
+          <div className="field featured-field">
             <label htmlFor="bed-time">{c.bedLabel}</label>
-            <input id="bed-time" className="input" type="time" value={bedTime} suppressHydrationWarning onChange={(event) => setBedTime(event.target.value)} />
+            <input id="bed-time" name="bed-time" autoComplete="off" className="input time-input" type="time" value={bedTime} suppressHydrationWarning onChange={(event) => setBedTime(event.target.value)} />
           </div>
         ) : null}
         {mode === 'nap' ? (
-          <div className="field">
+          <div className="field featured-field">
             <label htmlFor="nap-time">{c.napLabel}</label>
-            <input id="nap-time" className="input" type="time" value={napTime} suppressHydrationWarning onChange={(event) => setNapTime(event.target.value)} />
+            <input id="nap-time" name="nap-time" autoComplete="off" className="input time-input" type="time" value={napTime} suppressHydrationWarning onChange={(event) => setNapTime(event.target.value)} />
           </div>
         ) : null}
         <div className="field">
           <label htmlFor="latency">{c.latency}</label>
-          <select id="latency" className="select" value={latency} onChange={(event) => setLatency(Number(event.target.value))}>
+          <select id="latency" name="latency" autoComplete="off" className="select" value={latency} onChange={(event) => setLatency(Number(event.target.value))}>
             {[0, 5, 10, 15, 20, 30, 45, 60].map((value) => <option key={value} value={value}>{value} min</option>)}
           </select>
         </div>
         <div className="field">
           <label htmlFor="cycle">{c.cycle}</label>
-          <select id="cycle" className="select" value={cycleLength} onChange={(event) => setCycleLength(Number(event.target.value))}>
+          <select id="cycle" name="cycle" autoComplete="off" className="select" value={cycleLength} onChange={(event) => setCycleLength(Number(event.target.value))}>
             {[70, 80, 90, 100, 110, 120].map((value) => <option key={value} value={value}>{value} min</option>)}
           </select>
         </div>
         <div className="field">
           <label htmlFor="format">{c.format}</label>
-          <select id="format" className="select" value={timeFormat} onChange={(event) => setTimeFormat(event.target.value as '24h' | '12h')}>
+          <select id="format" name="format" autoComplete="off" className="select" value={timeFormat} onChange={(event) => setTimeFormat(event.target.value as '24h' | '12h')}>
             <option value="24h">24h</option>
             <option value="12h">12h AM/PM</option>
           </select>
@@ -210,7 +234,7 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
       </div>
 
       <div className="actions">
-        <button type="button" className="button primary" onClick={calculate}>{c.calculate}</button>
+        <button type="button" className="button primary calculate-button" onClick={calculate}>{c.calculate}</button>
         <span className="helper">{c.assumptions}</span>
       </div>
 
@@ -225,13 +249,14 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
               <p>{settings.cycleLengthMinutes}m cycles · {settings.sleepLatencyMinutes}m latency</p>
             </div>
             <div className="result-list">
-              {results.map((result) => (
+              {results.map((result, index) => (
                 <article key={result.id} className={`result-card ${result.quality === 'best' ? 'best' : ''}`}>
-                  <div className="result-time">{result.time}</div>
-                  <div>
-                    <span className="result-label">{result.quality === 'best' ? 'Best' : result.quality === 'nap' ? 'Nap' : result.quality}</span>
-                    <div className="result-detail"><strong>{result.title}</strong><br />{result.description} · {formatDuration(result.timeInBedMinutes)} total.</div>
+                  <div className="result-rank">{String(index + 1).padStart(2, '0')}</div>
+                  <div className="result-main">
+                    <div className="result-time">{result.time}</div>
+                    <span className="result-label">{result.quality === 'best' ? c.best : result.quality === 'nap' ? 'Nap' : result.quality}</span>
                   </div>
+                  <div className="result-detail"><strong>{result.title}</strong><br />{result.description} · {formatDuration(result.timeInBedMinutes)} total.</div>
                   <div className="result-actions">
                     <button type="button" className="icon-button" onClick={() => void copyResult(result)} aria-label={`${c.copy} ${result.time}`}>{copied === result.id ? '✓' : '⧉'}</button>
                     <a className="icon-button" href={currentShareUrl(result)} aria-label={`${c.share} ${result.time}`}>↗</a>
@@ -244,7 +269,11 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
             <div className="ad-slot" data-testid="post-result-ad">{c.sponsored}</div>
           </>
         ) : (
-          <p className="disclaimer">{c.disclaimer}</p>
+          <div className="pre-result-card">
+            <strong>{c.beforeTitle}</strong>
+            <p>{c.beforeBody}</p>
+            <p className="disclaimer">{c.disclaimer}</p>
+          </div>
         )}
       </div>
     </section>
