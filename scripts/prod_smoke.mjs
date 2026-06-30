@@ -25,6 +25,10 @@ for (const [name, browserType] of browsers) {
   const adSlot = await page.locator('[data-ad-slot="true"]').count();
   if (adSlot !== 1) throw new Error(`${name}: ad slot missing after calculation`);
 
+  // Affiliate product links visible after result
+  const products = await page.locator('.product-link').count();
+  if (products < 1) throw new Error(`${name}: affiliate products missing`);
+
   // Donate link in footer
   const donate = await page.locator('.donate-link').count();
   if (donate !== 1) throw new Error(`${name}: donate link missing`);

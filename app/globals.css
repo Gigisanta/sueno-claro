@@ -404,6 +404,39 @@
     border: 1px dashed var(--separator);
   }
 
+  /* ─── Affiliate product links ─── */
+  .affiliate-products {
+    background: var(--surface-primary);
+    border-radius: 12px;
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+  }
+  .product-links {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .product-link {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 400;
+    color: var(--label-secondary);
+    padding: 6px 8px;
+    border-radius: 8px;
+    transition: background 0.12s ease, color 0.12s ease;
+  }
+  .product-link:active {
+    background: var(--surface-tertiary);
+    color: var(--label);
+  }
+  .product-link span:first-child { font-size: 18px; }
+
   /* ─── Footer ─── */
   .footer {
     display: flex;

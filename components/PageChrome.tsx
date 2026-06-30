@@ -1,10 +1,12 @@
 import Link from 'next/link';
 import type { ReactNode } from 'react';
+import { monetization, kofiUrl } from '../lib/monetization/config';
 
 export function PageChrome({ children, lang = 'en' }: { children: ReactNode; lang?: 'en' | 'es' }) {
   const nav = lang === 'es'
     ? [{ href: '/calculadora-de-sueno', label: 'Calculadora' }, { href: '/siesta', label: 'Siesta' }, { href: '/sleep-calculator', label: 'EN' }]
     : [{ href: '/sleep-calculator', label: 'Calc' }, { href: '/nap-calculator', label: 'Nap' }, { href: '/calculadora-de-sueno', label: 'ES' }];
+  const donateLabel = lang === 'es' ? '☕ Invitame un café' : '☕ Buy me a coffee';
   return (
     <>
       <main id="main-content" className="page-shell">
@@ -18,7 +20,7 @@ export function PageChrome({ children, lang = 'en' }: { children: ReactNode; lan
         </header>
         {children}
         <footer className="footer">
-          <a className="donate-link" href="https://ko-fi.com/sleeplike" target="_blank" rel="noopener">☕ Buy me a coffee</a>
+          <a className="donate-link" href={kofiUrl()} target="_blank" rel="noopener">{donateLabel}</a>
           <span>Wellness tool · No medical advice</span>
         </footer>
       </main>

@@ -4,6 +4,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { calculateBedtimes, calculateNaps, calculateWakeTimes, calculateWindow, safeSettings } from '../lib/sleep/calculate';
 import type { CalculatorMode, SleepResult } from '../lib/sleep/types';
 import { formatDuration } from '../lib/sleep/format';
+import { monetization, carbonAdsUrl, amazonUrl, sleepProducts } from '../lib/monetization/config';
 
 type Mode = CalculatorMode;
 
@@ -259,11 +260,33 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
                 </div>
               ))}
             </div>
-            {/* Ad slot — visible only after result */}
+            {/* Ad slot — post-result only */}
             <div className="ad-slot" data-ad-slot="true">
               <span className="ad-label">{c.sponsored}</span>
-              <div className="ad-placeholder">Ad</div>
+              {monetization.adNetwork === 'carbon' ? (
+                <div id="_carbonads_js">
+                  <script async type="text/javascript" src={carbonAdsUrl()!} />
+                </div>
+              ) : (
+                <div className="ad-placeholder">
+                  {monetization.adNetwork === null ? 'Ad' : 'Ad'}
+                </div>
+              )}
             </div>
+            {/* Affiliate product links */}
+            {monetization.showAffiliateLinks && (
+              <div className="affiliate-products">
+                <span className="ad-label">{c.support}</span>
+                <div className="product-links">
+                  {sleepProducts[lang === 'es' ? 'es' : 'en'].map((p) => (
+                    <a key={p.asin} className="product-link" href={amazonUrl(p.asin)} target="_blank" rel="nofollow sponsored">
+                      <span>{p.emoji}</span>
+                      <span>{p.label}</span>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
           </>
         ) : (
           <div className="pre-result">{c.beforePrompt}</div>
