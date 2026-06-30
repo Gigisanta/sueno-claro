@@ -15,17 +15,21 @@ for (const [name, browserType] of browsers) {
   });
   page.on('pageerror', (error) => errors.push(error.message));
 
-  await page.goto(baseURL, { waitUntil: 'networkidle' });
+  // Load page with URL params — auto-calculates on mount
+  await page.goto(`${baseURL}?mode=wake&wake=06:00&latency=15&cycle=90&format=24h`, { waitUntil: 'networkidle' });
 
-  // Click Calculate and verify results appear
-  await page.getByRole('button', { name: /^Calculate$/ }).click();
-  await page.getByText('22:15').waitFor({ state: 'visible' });
+  // Results auto-calculate — should show bedtimes
+  await page.getByText('20:45').waitFor({ state: 'visible', timeout: 5000 });
 
-  // Ad slot visible after result
+  // Mode description visible
+  const modeDesc = await page.locator('.mode-desc').count();
+  if (modeDesc !== 1) throw new Error(`${name}: mode description missing`);
+
+  // Ad slot present
   const adSlot = await page.locator('[data-ad-slot="true"]').count();
-  if (adSlot !== 1) throw new Error(`${name}: ad slot missing after calculation`);
+  if (adSlot !== 1) throw new Error(`${name}: ad slot missing`);
 
-  // Affiliate product links visible after result
+  // Affiliate product links
   const products = await page.locator('.product-link').count();
   if (products < 1) throw new Error(`${name}: affiliate products missing`);
 
@@ -41,7 +45,7 @@ for (const [name, browserType] of browsers) {
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth > window.innerWidth + 1);
   if (overflow) throw new Error(`${name}: horizontal overflow`);
 
-  // JSON-LD present (WebApplication, no FAQPage in minimalist version)
+  // JSON-LD present
   const jsonLd = await page.locator('script[type="application/ld+json"]').first().textContent();
   if (!jsonLd?.includes('WebApplication')) throw new Error(`${name}: JSON-LD missing WebApplication`);
 
@@ -49,9 +53,18 @@ for (const [name, browserType] of browsers) {
   const ogImage = await page.locator('meta[property="og:image"]').getAttribute('content');
   if (!ogImage?.includes('/og.svg')) throw new Error(`${name}: OG image missing`);
 
-  // Spanish page with URL params — loads and calculates results
+  // Switch to sleepNow mode — verify auto-time and NOW label
+  await page.getByRole('button', { name: /^Sleep$/ }).click();
+  await page.waitForTimeout(300);
+  const nowLabel = await page.locator('.time-now').count();
+  if (nowLabel !== 1) throw new Error(`${name}: 'now' label missing in sleep mode`);
+
+  // Spanish page with URL params
   await page.goto(`${baseURL}/calculadora-de-sueno?mode=wake&wake=06:00&latency=15&cycle=90&format=24h`, { waitUntil: 'networkidle' });
-  await page.getByText('20:45').waitFor({ state: 'visible' });
+  const esTitle = await page.title();
+  if (!esTitle?.includes('sleeplike')) throw new Error(`${name}: Spanish page title missing sleeplike`);
+  const esResults = await page.locator('.result-item').count();
+  if (esResults < 2) throw new Error(`${name}: Spanish page missing results`);
 
   // All SEO/PWA endpoints return 200
   const siesta = await page.request.get(`${baseURL}/siesta`);

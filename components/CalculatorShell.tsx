@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { calculateBedtimes, calculateNaps, calculateWakeTimes, calculateWindow, safeSettings } from '../lib/sleep/calculate';
 import type { CalculatorMode, SleepResult } from '../lib/sleep/types';
 import { formatDuration } from '../lib/sleep/format';
@@ -16,14 +16,17 @@ const copy = {
       nap: ['◐', 'Nap'],
       window: ['⌁', 'Window'],
     },
+    modeDesc: {
+      wake: 'What time do you want to wake up?',
+      sleepNow: 'Calculates your ideal wake-up times if you go to bed now.',
+      nap: 'How long should you nap for optimal rest?',
+      window: 'Finds restful sleep windows within your available time.',
+    },
     wakeLabel: 'Wake at',
     bedLabel: 'Bed at',
     napLabel: 'Nap at',
-    latency: 'Latency',
+    latency: 'Fall asleep',
     cycle: 'Cycle',
-    calculate: 'Calculate',
-    beforePrompt: 'Set your time and calculate',
-    results: 'Results',
     best: 'Best',
     cycles: 'cycles',
     disclaimer: 'Educational tool. Sleep cycles vary (70–120 min).',
@@ -34,6 +37,7 @@ const copy = {
     copy: 'Copy',
     share: 'Share',
     copied: '✓',
+    now: 'now',
   },
   es: {
     modes: {
@@ -42,14 +46,17 @@ const copy = {
       nap: ['◐', 'Siesta'],
       window: ['⌁', 'Ventana'],
     },
+    modeDesc: {
+      wake: '¿A qué hora querés despertarte?',
+      sleepNow: 'Calculá a qué hora te despertás si te dormís ahora.',
+      nap: '¿Cuánto deberías dormir la siesta?',
+      window: 'Encontrá ventanas de sueño en tu tiempo disponible.',
+    },
     wakeLabel: 'Despertar',
     bedLabel: 'Acostarse',
     napLabel: 'Siesta',
-    latency: 'Latencia',
+    latency: 'Dormirse',
     cycle: 'Ciclo',
-    calculate: 'Calcular',
-    beforePrompt: 'Elegí tu horario y calculá',
-    results: 'Resultados',
     best: 'Mejor',
     cycles: 'ciclos',
     disclaimer: 'Herramienta educativa. Los ciclos varían (70–120 min).',
@@ -60,6 +67,7 @@ const copy = {
     copy: 'Copiar',
     share: 'Compartir',
     copied: '✓',
+    now: 'ahora',
   },
 } as const;
 
@@ -90,15 +98,27 @@ function parseMode(value: string | null): Mode | null {
 export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
   const c = copy[lang];
   const [mode, setMode] = useState<Mode>('wake');
-  const [wakeTime, setWakeTime] = useState('07:30');
-  const [bedTime, setBedTime] = useState('23:00');
-  const [napTime, setNapTime] = useState('14:00');
+  const [wakeTime, setWakeTime] = useState('--:--');
+  const [bedTime, setBedTime] = useState('--:--');
+  const [napTime, setNapTime] = useState('--:--');
   const [latency, setLatency] = useState(defaultSettings.sleepLatencyMinutes);
   const [cycleLength, setCycleLength] = useState(defaultSettings.cycleLengthMinutes);
   const [timeFormat, setTimeFormat] = useState<'24h' | '12h'>('24h');
-  const [hasCalculated, setHasCalculated] = useState(false);
-  const [copied, setCopied] = useState<string | null>(null);
+  const [mounted, setMounted] = useState(false);
 
+  // Set real time once mounted (avoids hydration mismatch)
+  useEffect(() => {
+    const now = nowTime();
+    setWakeTime(now);
+    setNapTime(now);
+    setBedTime(() => {
+      const h = new Date().getHours();
+      return `${String(h < 12 ? 23 : h).padStart(2, '0')}:00`;
+    });
+    setMounted(true);
+  }, []);
+
+  // Read URL params on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const queryMode = parseMode(params.get('mode'));
@@ -116,8 +136,27 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
     if (Number.isFinite(queryLatency)) setLatency(queryLatency);
     if (Number.isFinite(queryCycle)) setCycleLength(queryCycle);
     if (queryFormat === '12h' || queryFormat === '24h') setTimeFormat(queryFormat);
-    if (queryMode || validTime(wake) || validTime(bed) || validTime(nap)) setHasCalculated(true);
   }, []);
+
+  // Reset to "now" when switching to sleepNow mode
+  useEffect(() => {
+    if (mode === 'sleepNow') {
+      setWakeTime(nowTime());
+    }
+  }, [mode]);
+
+  // Keep URL in sync with state
+  useEffect(() => {
+    const url = new URL(window.location.href);
+    url.searchParams.set('mode', mode);
+    if (mode !== 'sleepNow') url.searchParams.set('wake', wakeTime);
+    if (mode === 'window') url.searchParams.set('bed', bedTime);
+    if (mode === 'nap') url.searchParams.set('nap', napTime);
+    url.searchParams.set('latency', String(latency));
+    url.searchParams.set('cycle', String(cycleLength));
+    url.searchParams.set('format', timeFormat);
+    window.history.replaceState(null, '', url);
+  }, [mode, wakeTime, bedTime, napTime, latency, cycleLength, timeFormat]);
 
   const settings = useMemo(() => safeSettings({ sleepLatencyMinutes: latency, cycleLengthMinutes: cycleLength, timeFormat }), [latency, cycleLength, timeFormat]);
   const results = useMemo(() => {
@@ -131,51 +170,28 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
     }
   }, [bedTime, mode, napTime, settings, wakeTime]);
 
-  function currentShareUrl(result?: SleepResult) {
-    const url = new URL(window.location.href);
-    url.searchParams.set('mode', mode);
-    if (mode !== 'sleepNow' && mode !== 'nap') url.searchParams.set('wake', wakeTime);
-    if (mode === 'window') url.searchParams.set('bed', bedTime);
-    if (mode === 'nap') url.searchParams.set('nap', napTime);
-    url.searchParams.set('latency', String(settings.sleepLatencyMinutes));
-    url.searchParams.set('cycle', String(settings.cycleLengthMinutes));
-    url.searchParams.set('format', settings.timeFormat);
-    if (result) url.searchParams.set('result', result.time);
-    return url.toString();
-  }
+  const displayTime = mode === 'sleepNow' ? nowTime() : (mode === 'nap' ? napTime : wakeTime);
 
-  function calculate() {
-    const nextBedTime = mode === 'sleepNow' ? nowTime() : bedTime;
-    if (mode === 'sleepNow') setBedTime(nextBedTime);
-    setHasCalculated(true);
-    const url = new URL(window.location.href);
-    url.searchParams.set('mode', mode);
-    if (mode !== 'sleepNow' && mode !== 'nap') url.searchParams.set('wake', wakeTime);
-    if (mode === 'window') url.searchParams.set('bed', nextBedTime);
-    if (mode === 'nap') url.searchParams.set('nap', napTime);
-    url.searchParams.set('latency', String(settings.sleepLatencyMinutes));
-    url.searchParams.set('cycle', String(settings.cycleLengthMinutes));
-    url.searchParams.set('format', settings.timeFormat);
-    window.history.replaceState(null, '', url);
+  function handleTimeChange(value: string) {
+    if (mode === 'nap') setNapTime(value);
+    else setWakeTime(value);
   }
 
   async function copyResult(result: SleepResult) {
-    const shareUrl = currentShareUrl(result);
+    const shareUrl = window.location.href;
     const text = `${result.time} — ${result.title}. ${result.description} ${shareUrl}`;
     await navigator.clipboard?.writeText(text).catch(() => undefined);
     setCopied(result.id);
     window.setTimeout(() => setCopied(null), 1400);
   }
-
-  const timeValue = mode === 'nap' ? napTime : wakeTime;
-  const showBedField = mode === 'window';
+  const [copied, setCopied] = useState<string | null>(null);
 
   return (
     <section id="calculator" aria-label="Sleep calculator">
       {/* App title */}
       <div className="app-title">sleeplike</div>
 
-      {/* Mode selector — iOS segmented control style */}
+      {/* Mode selector — iOS segmented control */}
       <div className="mode-grid" role="group" aria-label="Calculator mode">
         {(Object.keys(modeIcons) as Mode[]).map((item) => (
           <button key={item} type="button" className="mode-button" aria-pressed={mode === item} onClick={() => setMode(item)}>
@@ -185,7 +201,10 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
         ))}
       </div>
 
-      {/* iOS-style grouped form */}
+      {/* Mode description — live-updating */}
+      <div className="mode-desc">{c.modeDesc[mode]}</div>
+
+      {/* iOS grouped form — always visible */}
       <div className="form-group">
         <div className="form-row">
           <label>{mode === 'nap' ? c.napLabel : c.wakeLabel}</label>
@@ -193,16 +212,14 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
             autoComplete="off"
             className="time-input"
             type="time"
-            value={timeValue}
+            value={displayTime}
             suppressHydrationWarning
-            onChange={(e) => {
-              if (mode === 'nap') setNapTime(e.target.value);
-              else setWakeTime(e.target.value);
-            }}
+            onChange={(e) => handleTimeChange(e.target.value)}
           />
+          {mode === 'sleepNow' && <span className="time-now">{c.now}</span>}
         </div>
 
-        {showBedField ? (
+        {mode === 'window' ? (
           <div className="form-row">
             <label>{c.bedLabel}</label>
             <input autoComplete="off" className="time-input" type="time" value={bedTime} suppressHydrationWarning onChange={(e) => setBedTime(e.target.value)} />
@@ -229,15 +246,10 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
         </div>
       </div>
 
-      {/* Calculate button */}
-      <div className="actions">
-        <button type="button" className="btn btn-primary" onClick={calculate}>{c.calculate}</button>
-      </div>
-
-      {/* Results — iOS grouped list style */}
-      <div className="result-zone" aria-live="polite">
-        {hasCalculated ? (
-          <>
+      {/* Results + monetization — only after mount (avoids hydration mismatch) */}
+      {mounted && (
+        <>
+          <div className="result-zone" aria-live="polite">
             <div className="results-section">
               {results.map((result, index) => (
                 <div key={result.id} className={`result-item ${result.quality === 'best' ? 'best' : ''}`}>
@@ -253,13 +265,13 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
                   </div>
                   <div className="result-actions">
                     <button type="button" className="icon-btn" onClick={() => void copyResult(result)} aria-label={`${c.copy} ${result.time}`}>{copied === result.id ? c.copied : '⧉'}</button>
-                    <a className="icon-btn" href={currentShareUrl(result)} aria-label={`${c.share} ${result.time}`}>↗</a>
+                    <a className="icon-btn" href={`#share-${result.id}`} onClick={(e) => { e.preventDefault(); window.open(window.location.href, '_blank'); }} aria-label={`${c.share} ${result.time}`}>↗</a>
                     <a className="icon-btn" href={createCalendarHref(result, lang)} download={`sleeplike-${result.id}.ics`} aria-label="Calendar">+</a>
                   </div>
                 </div>
               ))}
             </div>
-            {/* Ad slot — post-result only */}
+
             <div className="ad-slot" data-ad-slot="true">
               <span className="ad-label">{c.sponsored}</span>
               {monetization.adNetwork === 'carbon' ? (
@@ -267,12 +279,10 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
                   <script async type="text/javascript" src={carbonAdsUrl()!} />
                 </div>
               ) : (
-                <div className="ad-placeholder">
-                  <span>📢</span>
-                </div>
+                <div className="ad-placeholder"><span>📢</span></div>
               )}
             </div>
-            {/* Affiliate product links — contextual per mode */}
+
             {monetization.showAffiliateLinks && (
               <div className="affiliate-products">
                 <span className="ad-label">{c.support}</span>
@@ -286,7 +296,7 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
                 </div>
               </div>
             )}
-            {/* Email capture — newsletter signup for sleep tips */}
+
             {monetization.showEmailCapture && (
               <div className="email-capture">
                 <span className="ad-label">{lang === 'es' ? 'Tips de sueño' : 'Sleep tips'}</span>
@@ -296,17 +306,12 @@ export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
                 </form>
               </div>
             )}
-          </>
-        ) : (
-          <div className="pre-result">
-            <span>☾</span>
-            {c.beforePrompt}
           </div>
-        )}
-      </div>
 
-      <p className="disclaimer">{c.disclaimer}</p>
-      <p className="affiliate">{c.affiliate}</p>
+          <p className="disclaimer">{c.disclaimer}</p>
+          <p className="affiliate">{c.affiliate}</p>
+        </>
+      )}
     </section>
   );
 }
