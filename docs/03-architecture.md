@@ -157,3 +157,11 @@ No PII required.
 - No large icon pack.
 - Fonts: system stack or one self-hosted variable font.
 - Calculator interaction must feel instant on low-end mobile.
+
+## Delegated technical clarifications
+
+- Static export remains the default deployment target. If a future feature requires server behavior, write a new ADR first.
+- Do not add IndexedDB until history/profiles require structured storage; use localStorage for simple preferences first.
+- Do not add Serwist/Workbox until the implementation needs offline caching beyond a basic manifest; justify the dependency in the implementation PR/commit.
+- Programmatic SEO pages should be generated from typed static data/templates and tested for thin-content risk.
+- Third-party ads must be lazy-loaded and isolated from the calculator result path.

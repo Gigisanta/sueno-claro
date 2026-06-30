@@ -126,3 +126,37 @@ Acceptance:
 - App Store copy.
 - Screenshots.
 - Support URL.
+
+## P6 — Delegated research follow-ups
+
+### B-015: Programmatic SEO pilot
+
+Acceptance:
+
+- 20-40 high-intent EN/ES programmatic pages generated from templates.
+- No page ships without unique title/H1/meta, computed table, internal links, and visible disclaimer.
+- Search Console indexing monitored before expansion.
+
+### B-016: Stronger medical/legal copy pass
+
+Acceptance:
+
+- Cycle range 70-120 min caveat included.
+- Regularity message appears near results.
+- Clinician escalation copy exists for persistent symptoms.
+- No forbidden medical claim terms in production copy.
+
+### B-017: Progressive personalization
+
+Acceptance:
+
+- Core calculator has no mandatory onboarding.
+- Optional latency/age/profile prompts appear only after value.
+- Native/system time input accessibility verified.
+
+### B-018: Monetization guardrail test
+
+Acceptance:
+
+- Automated/browser check proves no ad or paywall appears before the first result.
+- Premium prompts are contextual to premium features only.

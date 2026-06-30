@@ -63,3 +63,21 @@ Date: 2026-06-30
 ## Tooling gap
 
 Context7 quota was exhausted during setup. Official web docs were used instead. Future implementation agents should retry Context7 for exact package/version docs when coding begins.
+
+## Delegated-research secondary sources to verify before production use
+
+These sources were surfaced by async research agents. Use them for lead generation and competitive context, not as final authority until rechecked in-browser during implementation.
+
+- SimilarWeb sleepcalculator.com traffic page: https://www.similarweb.com/website/sleepcalculator.com/
+- Backlinko programmatic SEO guide: https://backlinko.com/programmatic-seo
+- Schema.org WebApplication: https://schema.org/WebApplication
+- Schema.org MedicalWebPage: https://schema.org/MedicalWebPage
+- Google Software App structured data: https://developers.google.com/search/docs/appearance/structured-data/software-app
+- NCBI/NIH Sleep physiology: https://www.ncbi.nlm.nih.gov/books/NBK526132/ and https://www.ncbi.nlm.nih.gov/books/NBK19956/
+- FDA General Wellness low-risk devices policy: https://www.fda.gov/regulatory-information/search-fda-guidance-documents/general-wellness-policy-low-risk-devices
+- Mayo Clinic insomnia overview: https://www.mayoclinic.org/diseases-conditions/insomnia/symptoms-causes/syc-20355167
+- AASM sleep education insomnia: https://sleepeducation.org/sleep-disorders/insomnia/
+- The Rectangle / Sleepyti.me cautionary story: https://therectangle.substack.com/p/superb-sleep-app-swallowed-by-online
+- Qonversion paywall A/B examples: https://qonversion.io/blog/a-b-experiments-paywalls-meditation-sleep-apps
+
+Caveat: delegated estimates such as competitor revenue, traffic, or CPM are secondary and should not be presented as verified facts without fresh source inspection.

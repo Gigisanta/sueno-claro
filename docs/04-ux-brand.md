@@ -102,3 +102,32 @@ Shortlist:
 - Ciclo — strong Spanish but possibly broad.
 
 Repo uses Sueño Claro as working name. App Store can use `REMinder: Sleep Calculator` if English SEO wins.
+
+## Delegated UX additions
+
+### Progressive personalization
+
+The calculator must work without onboarding. Ask optional questions only after value:
+
+1. After first result: custom fall-asleep time.
+2. When saving a routine: age band and weekday/weekend profile.
+3. When enabling reminders: notification permission.
+
+### Inputs
+
+Prefer native time inputs/pickers for accessibility. Custom wheels require keyboard, screen-reader, and mobile QA before use.
+
+### Result visual hierarchy
+
+- Biggest element: recommended time.
+- Second: cycle count and time in bed.
+- Third: assumption/disclaimer.
+- Optional: timeline visualization.
+
+### Accessibility acceptance
+
+- Touch targets >= 44px.
+- Visible labels; placeholders are not labels.
+- Result updates announced with `aria-live=polite`.
+- Reduced motion respected.
+- Long Spanish strings tested on 375px width.

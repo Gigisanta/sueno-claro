@@ -17,4 +17,6 @@
 | `12-backlog.md` | Ordered backlog and acceptance criteria |
 | `13-copy-and-content-system.md` | Product copy and SEO content templates |
 | `adrs/` | Architecture Decision Records |
+| `17-design-inspiration-brief.md` | UI inspiration brief and visual QA constraints |
+| `18-delegated-research-addendum.md` | Integrated findings from six delegated research agents |
 | `../plans/` | Runnable phase plans and prompts |

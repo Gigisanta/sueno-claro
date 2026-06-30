@@ -85,3 +85,38 @@ Build small, high-quality explainers tied to the calculator:
 - PWA install prompt acceptance.
 - App CTA click-through.
 - Ad revenue per 1,000 sessions after result.
+
+## Delegated research additions
+
+### Programmatic SEO pilot
+
+Do not generate hundreds of pages on day one. Use a staged approach:
+
+1. Pilot 20-40 pages for highest-intent wake/bedtime queries in EN and ES.
+2. Confirm indexing and impressions in Search Console.
+3. Expand to 96 wake-time pages and 96 bedtime pages only if pages are not thin and internal linking performs.
+4. Cap v1 programmatic pages at roughly 250 until there is evidence of crawl/index quality.
+
+Template requirements:
+
+- Unique title/H1/meta per time.
+- Computed table for 4-6 cycles.
+- Nearby-time internal links.
+- Visible FAQ before adding FAQ schema.
+- Educational disclaimer and source links.
+
+### Future calculator clusters
+
+Backlog only until core MVP is proven:
+
+- Caffeine cutoff calculator.
+- Sleep debt calculator.
+- Chronotype quiz.
+- Jet lag planner.
+- Shift-work caveat/planner.
+
+### Linkable assets
+
+- Embeddable calculator widget for blogs.
+- Downloadable sleep/wake-time table.
+- Public anonymous aggregate report after enough privacy-safe usage.

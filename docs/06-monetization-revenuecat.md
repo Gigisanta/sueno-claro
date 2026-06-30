@@ -89,3 +89,23 @@ No raw bedtime history should be sent without explicit analytics decision; prefe
 3. App CTA on web: after second calculation vs footer only.
 4. Ad density: result-only card vs result card + footer.
 5. Premium naming: Plus vs Calm vs Pro.
+
+## Delegated monetization corrections
+
+The async monetization research confirmed RevenueCat hard-paywall strength in subscription apps, but those benchmarks are not blindly portable to this product. Sueño Claro is SEO-first and trust-first; the basic calculator remains free.
+
+Rejected for v1:
+
+- Hard paywall before calculation.
+- Interstitial ads in the core calculator flow.
+- Auto-playing video ads.
+- High annual pricing copied from full sleep trackers.
+- Web billing/account setup before traffic validation.
+
+Allowed later:
+
+- Contextual paywall when user tries premium convenience features.
+- Web Purchase Links if cross-platform premium becomes necessary.
+- Opt-in rewarded unlock only for non-core extras, and only after explicit UX review.
+
+Pricing should start closer to simple utility pricing than full meditation/tracker pricing. Keep `$9.99-14.99/year` as the initial annual range unless real conversion data supports more.

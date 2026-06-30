@@ -63,3 +63,29 @@ Do not shame users for short sleep. If only short options are possible, label th
 - “Try to recover with a consistent schedule when possible”
 
 Do not say “bad”, “dangerous”, or “you failed”.
+
+## Delegated science/legal additions
+
+### Cycle range copy
+
+Use this wording near assumptions:
+
+> We use 90 minutes as a practical average. Real sleep cycles vary by person and night, often roughly 70-120 minutes, and later-night cycles can differ from early-night cycles.
+
+### Regularity copy
+
+Every result screen should include a short consistency reminder:
+
+> Timing your alarm can help, but a consistent sleep/wake schedule matters at least as much as one calculated bedtime.
+
+### Stronger escalation copy
+
+Show a clinician suggestion if educational content mentions persistent symptoms:
+
+> If you have persistent trouble sleeping, excessive daytime sleepiness, loud snoring, gasping, breathing pauses, or safety concerns while driving/working, talk to a qualified clinician.
+
+### Words to avoid
+
+Avoid: perfect, guaranteed, cure, treat, prevent, diagnose, medically optimized, scientifically proven to wake refreshed.
+
+Prefer: estimated, approximate, may help, planning guide, educational, wellness.
