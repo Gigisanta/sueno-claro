@@ -19,4 +19,5 @@
 | `adrs/` | Architecture Decision Records |
 | `17-design-inspiration-brief.md` | UI inspiration brief and visual QA constraints |
 | `18-delegated-research-addendum.md` | Integrated findings from six delegated research agents |
+| `19-launch-assets.md` | Launch copy, zero-cost distribution checklist, and IndexNow notes |
 | `../plans/` | Runnable phase plans and prompts |
