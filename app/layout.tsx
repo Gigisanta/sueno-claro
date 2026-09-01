@@ -41,6 +41,36 @@ export const viewport: Viewport = {
   initialScale: 1,
 };
 
+
+/** maatwork-brand-metadata: maatwork-mw-20260901 */
+const maatWorkBrandMetadata: Metadata = {
+  metadataBase: new URL("https://sleeplike.maat.work"),
+  icons: {
+    icon: [
+      { url: '/icon-mw.svg?v=maatwork-mw-20260901', type: 'image/svg+xml' },
+      { url: '/favicon-mw-32.png?v=maatwork-mw-20260901', type: 'image/png', sizes: '32x32' },
+      { url: '/favicon-mw.ico?v=maatwork-mw-20260901', type: 'image/x-icon' },
+    ],
+    shortcut: ['/favicon-mw.ico?v=maatwork-mw-20260901'],
+    apple: [{ url: '/apple-touch-mw.png?v=maatwork-mw-20260901', sizes: '180x180', type: 'image/png' }],
+    other: [{ rel: 'mask-icon', url: '/mask-mw.svg?v=maatwork-mw-20260901', color: '#0A0A11' }],
+  },
+  manifest: '/manifest.webmanifest?v=maatwork-mw-20260901',
+  openGraph: {
+    type: 'website',
+    siteName: 'MaatWork',
+    title: "sleeplike",
+    description: "Experiencia de descanso y bienestar",
+    images: [{ url: '/og-image.png?v=maatwork-mw-20260901', width: 1200, height: 630, alt: "sleeplike · MaatWork" }],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: "sleeplike",
+    description: "Experiencia de descanso y bienestar",
+    images: ['/twitter-image.png?v=maatwork-mw-20260901'],
+  },
+}
+Object.assign(metadata, maatWorkBrandMetadata)
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">

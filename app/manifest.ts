@@ -1,18 +1,20 @@
-import type { MetadataRoute } from 'next';
+import type { MetadataRoute } from 'next'
 
-export const dynamic = 'force-static';
+const BRAND_ASSET_VERSION = 'maatwork-mw-20260901'
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'sleeplike',
-    short_name: 'sleeplike',
-    description: 'Private sleep cycle calculator for bedtime, wake-up times and naps.',
+    name: "sleeplike · MaatWork",
+    short_name: "sleeplike",
+    description: "Experiencia de descanso y bienestar",
     start_url: '/',
     display: 'standalone',
-    background_color: '#07111f',
-    theme_color: '#07111f',
+    background_color: '#FFFFFF',
+    theme_color: '#0A0A11',
     icons: [
-      { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
+      { src: `/icon-mw.svg?v=${BRAND_ASSET_VERSION}`, sizes: '512x512', type: 'image/svg+xml', purpose: 'any' },
+      { src: `/icon-mw-192.png?v=${BRAND_ASSET_VERSION}`, sizes: '192x192', type: 'image/png', purpose: 'maskable' },
+      { src: `/apple-touch-mw.png?v=${BRAND_ASSET_VERSION}`, sizes: '180x180', type: 'image/png', purpose: 'any' },
     ],
-  };
+  }
 }
