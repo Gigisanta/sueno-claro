@@ -45,6 +45,7 @@ export const viewport: Viewport = {
 /** maatwork-brand-metadata: maatwork-mw-20260901 */
 const maatWorkBrandMetadata: Metadata = {
   metadataBase: new URL("https://sleeplike.maat.work"),
+  alternates: { canonical: '/' },
   icons: {
     icon: [
       { url: '/icon-mw.svg?v=maatwork-mw-20260901', type: 'image/svg+xml' },
