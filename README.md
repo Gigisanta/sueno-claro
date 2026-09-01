@@ -1,3 +1,8 @@
+<!-- maatwork-brand:maatwork-mw-20260901 -->
+<p align="center"><img src="docs/brand/sueno-claro-cover.png" alt="sleeplike · MaatWork" width="1200"></p>
+
+> Experiencia de descanso y bienestar
+
 # sleeplike
 
 Privacy-first sleep cycle calculator. Web/PWA. iOS later via RevenueCat.
