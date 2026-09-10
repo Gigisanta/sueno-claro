@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "next dev",
-    "build": "next build && node scripts/social-images.mjs && node scripts/postbuild.mjs",
+    "build": "next build && node scripts/social-images.mjs && node scripts/verify-seo.mjs && node scripts/postbuild.mjs",
     "start": "node scripts/serve.mjs",
     "lint": "tsc --noEmit",
     "test": "vitest run",
