@@ -13,6 +13,7 @@ await walk("out");
 const assets = files.filter(
   (p) =>
     /\.(html|js|css|woff2|png|svg|webmanifest)$/.test(p) &&
+    !p.startsWith("out/social/") &&
     !p.endsWith("/sw.js") &&
     !p.endsWith("/404.html"),
 );

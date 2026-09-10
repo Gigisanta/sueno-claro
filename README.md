@@ -2,12 +2,12 @@
 
 # sleeplike
 
-Privacy-first sleep cycle calculator. Web/PWA. iOS later via RevenueCat.
+Sleep planning calculator for adults. Bilingual static web app/PWA.
 
 **Production:** https://sleeplike.maat.work  
 **GitHub:** https://github.com/Gigisanta/sueno-claro
 
-No account, no microphone, no tracking, no backend in v1.
+No account, microphone or application backend. Calculations stay in the browser. Aggregate analytics are optional; advertising remains disabled pending approval and consent validation. See [organic discovery and automated SEO checks](docs/15-organic-discovery.md).
 
 ## What it does
 

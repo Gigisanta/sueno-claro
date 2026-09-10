@@ -4,6 +4,7 @@ import { homePath } from "../lib/site";
 import { CalculatorShell } from "./CalculatorShell";
 import { PageChrome } from "./PageChrome";
 import { AdSlot } from "./AdSlot";
+import { SharePage } from "./SharePage";
 export function SitePage({ path }: { path: string }) {
   const page = getPage(path)!;
   const es = page.locale === "es";
@@ -146,6 +147,7 @@ export function SitePage({ path }: { path: string }) {
             </section>
           )}
         </article>
+        {page.kind === "guide" && <SharePage path={page.path} title={page.title} locale={page.locale} />}
         {page.related.length > 0 && (
           <aside className="related">
             <h2>{es ? "Sigue explorando" : "Keep exploring"}</h2>

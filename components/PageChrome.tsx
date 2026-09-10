@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { homePath, type Locale } from "../lib/site";
+import { pages } from "../lib/content/pages";
 export function PageChrome({
   children,
   lang,
@@ -45,7 +46,7 @@ export function PageChrome({
           <a href={es ? "/siesta" : "/nap-calculator"}>
             {es ? "Siestas" : "Naps"}
           </a>
-          <a href={es ? "/ciclos-de-sueno" : "/sleep-cycles"}>
+          <a href="#sleep-resources">
             {es ? "Guías" : "Guides"}
           </a>
           <a
@@ -61,6 +62,16 @@ export function PageChrome({
       </header>
       <main id="main-content">{children}</main>
       <footer className="footer">
+        <nav id="sleep-resources" className="resource-directory" aria-label={es ? "Calculadoras y guías de sueño" : "Sleep calculators and guides"}>
+          {(["tool", "guide"] as const).map((kind) => (
+            <div key={kind}>
+              <h2>{kind === "tool" ? (es ? "Planifica tu descanso" : "Plan your rest") : (es ? "Entiende tu sueño" : "Understand your sleep")}</h2>
+              {pages.filter((page) => page.locale === lang && page.kind === kind).map((page) => (
+                <a key={page.path} href={page.path}>{page.title}</a>
+              ))}
+            </div>
+          ))}
+        </nav>
         <div>
           <a className="brand" href={homePath(lang)}>
             SleepLike<span className="brand-dot">.</span>

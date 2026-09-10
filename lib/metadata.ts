@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getPage, type ContentPage } from "./content/pages";
 import { SITE_URL, isPreview, homePath } from "./site";
+import { socialImagePath } from "./social";
 export function pageMetadata(path: string): Metadata {
   const page = getPage(path)!;
   const en = page.locale === "en" ? page.path : page.pairPath;
@@ -27,7 +28,7 @@ export function pageMetadata(path: string): Metadata {
       type: page.kind === "guide" ? "article" : "website",
       images: [
         {
-          url: `/og-${page.locale}.png`,
+          url: socialImagePath(page.path),
           width: 1200,
           height: 630,
           alt: page.title,
@@ -38,7 +39,7 @@ export function pageMetadata(path: string): Metadata {
       card: "summary_large_image",
       title: page.title,
       description: page.description,
-      images: [`/og-${page.locale}.png`],
+      images: [socialImagePath(page.path)],
     },
     other: { referrer: "no-referrer" },
   };
@@ -47,6 +48,7 @@ export function structuredData(page: ContentPage) {
   const url = SITE_URL + page.path;
   const author = {
     "@type": "Organization",
+    "@id": SITE_URL + "/#organization",
     name: "SleepLike",
     url: SITE_URL + (page.locale === "es" ? "/acerca-de" : "/about"),
   };
@@ -73,7 +75,7 @@ export function structuredData(page: ContentPage) {
             author,
             publisher: author,
             dateModified: page.updated,
-            image: SITE_URL + `/og-${page.locale}.png`,
+            image: SITE_URL + socialImagePath(page.path),
             citation: page.sources.map((s) => s.url),
           }
         : {
@@ -97,6 +99,17 @@ export function structuredData(page: ContentPage) {
   }));
   return {
     "@context": "https://schema.org",
-    "@graph": [primary, { "@type": "BreadcrumbList", itemListElement: items }],
+    "@graph": [
+      { ...primary, "@id": url + "#content" },
+      { "@type": "BreadcrumbList", "@id": url + "#breadcrumb", itemListElement: items },
+      ...(page.path === "/" ? [{
+        "@type": "WebSite",
+        "@id": SITE_URL + "/#website",
+        name: "SleepLike",
+        url: SITE_URL + "/",
+        inLanguage: ["en", "es"],
+        publisher: author,
+      }] : []),
+    ],
   };
 }
