@@ -122,3 +122,43 @@ test("privacy revocation synchronizes already open tabs", async ({
     other.getByRole("checkbox", { name: "Allow aggregate usage statistics" }),
   ).not.toBeChecked();
 });
+
+test("calculator is immediately reachable on narrow phones and uses desktop result space", async ({ page }) => {
+  for (const width of [320, 390, 768, 1440]) {
+    await page.setViewportSize({ width, height: width < 640 ? 844 : 1000 });
+    await page.goto("/calculadora-de-sueno");
+    const calculate = page.getByRole("button", { name: "Calcular", exact: true });
+    const bounds = await calculate.boundingBox();
+    expect(bounds!.y + bounds!.height).toBeLessThan(width < 640 ? 740 : 1000);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await calculate.click();
+    await expect(page.locator(".result-time")).toHaveCount(4);
+    const [first, second] = await page.locator(".result").evaluateAll(nodes => nodes.slice(0, 2).map(node => ({ y: node.getBoundingClientRect().y })));
+    if (width >= 640) expect(Math.abs(first!.y - second!.y)).toBeLessThan(2);
+    else {
+      expect(second!.y).toBeGreaterThan(first!.y);
+      await expect(page.getByRole("link", { name: "Editar horario" })).toBeVisible();
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+  }
+});
+
+
+test("12-hour results do not overlap their duration on narrow phones", async ({ page }) => {
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  for (const width of [320, 390]) {
+    await page.setViewportSize({ width, height: 844 });
+    for (const path of ["/", "/calculadora-de-sueno"]) {
+      await page.goto(path + "#sleep=format=12h");
+      await page.getByRole("button", { name: path === "/" ? "Calculate" : "Calcular", exact: true }).click();
+      await expect(page.locator(".result-time")).toHaveCount(4);
+      const overlaps = await page.locator(".result-body").evaluateAll(nodes => nodes.some(node => {
+        const time = node.querySelector(".result-time")!;
+        const range = document.createRange(); range.selectNodeContents(time);
+        const duration = node.querySelector(".result-duration")!.getBoundingClientRect();
+        return Array.from(range.getClientRects()).some(rect => rect.right > duration.left && rect.left < duration.right && rect.bottom > duration.top && rect.top < duration.bottom);
+      }));
+      expect(overlaps).toBe(false);
+    }
+  }
+});

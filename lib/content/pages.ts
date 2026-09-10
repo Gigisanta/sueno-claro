@@ -32,21 +32,21 @@ export interface ContentPage {
 
 const sleepSources: ContentSource[] = [
   {
-    title: 'NHLBI — Sleep Phases and Stages',
+    title: 'NHLBI · Sleep Phases and Stages',
     url: 'https://www.nhlbi.nih.gov/health/sleep/stages-of-sleep',
   },
   {
-    title: 'NHLBI — Healthy Sleep',
+    title: 'NHLBI · Healthy Sleep',
     url: 'https://www.nhlbi.nih.gov/health/sleep/healthy-sleep',
   },
   {
-    title: 'CDC — About Sleep',
+    title: 'CDC · About Sleep',
     url: 'https://www.cdc.gov/sleep/about/',
   },
 ];
 
 const contactSource: ContentSource = {
-  title: 'MaatWork — sitio público',
+  title: 'MaatWork · sitio público',
   url: 'https://maat.work',
 };
 
@@ -58,7 +58,7 @@ export const pages: ContentPage[] = [
     pairPath: '/calculadora-de-sueno',
     title: 'Sleep Cycle Calculator',
     description: 'Plan a practical bedtime around your wake-up time with a private, educational sleep cycle calculator.',
-    heading: 'Plan your night around a wake-up time',
+    heading: 'Sleep calculator',
     intro: 'Enter when you need to wake up and use the estimates to choose a practical bedtime.',
     mode: 'wake',
     sections: [
@@ -103,7 +103,7 @@ export const pages: ContentPage[] = [
     pairPath: '/hora-de-dormir',
     title: 'Bedtime Calculator',
     description: 'Find estimated bedtimes from a wake-up target, with an explicit allowance for falling asleep.',
-    heading: 'Find a bedtime from your morning target',
+    heading: 'Find your bedtime',
     intro: 'Choose the time you need to get up, then compare estimated bedtimes that fit your night.',
     mode: 'wake',
     sections: [
@@ -148,7 +148,7 @@ export const pages: ContentPage[] = [
     pairPath: '/siesta',
     title: 'Nap Calculator',
     description: 'Plan a short or full-cycle nap with simple local estimates and clear sleep-cycle caveats.',
-    heading: 'Plan a nap that fits the rest of your day',
+    heading: 'Find time for a nap',
     intro: 'Choose a short or full-cycle nap, then use the estimate to protect your afternoon and evening.',
     mode: 'nap',
     sections: [
@@ -265,7 +265,7 @@ export const pages: ContentPage[] = [
     pairPath: '/',
     title: 'Calculadora de ciclos de sueño',
     description: 'Planifica una hora práctica para dormir según tu hora de despertar con una calculadora privada y educativa.',
-    heading: 'Planifica tu noche según la hora de despertar',
+    heading: 'Calculadora de sueño',
     intro: 'Indica a qué hora necesitas levantarte y compara horarios estimados para acostarte.',
     mode: 'wake',
     sections: [
@@ -310,7 +310,7 @@ export const pages: ContentPage[] = [
     pairPath: '/bedtime-calculator',
     title: 'Calculadora de hora de dormir',
     description: 'Calcula horarios estimados para acostarte a partir de una hora de despertar y un margen para dormirte.',
-    heading: 'Encuentra una hora de dormir desde tu mañana',
+    heading: 'Encuentra tu hora de dormir',
     intro: 'Elige cuándo necesitas levantarte y compara horarios estimados que puedan encajar en tu noche.',
     mode: 'wake',
     sections: [
@@ -355,7 +355,7 @@ export const pages: ContentPage[] = [
     pairPath: '/nap-calculator',
     title: 'Calculadora de siesta',
     description: 'Planifica una siesta corta o de ciclo completo con estimaciones simples y advertencias claras sobre la variación del sueño.',
-    heading: 'Planifica una siesta que encaje en tu día',
+    heading: 'Haz tiempo para una siesta',
     intro: 'Elige una siesta corta o de ciclo completo y considera también cómo afectará tu noche.',
     mode: 'nap',
     sections: [

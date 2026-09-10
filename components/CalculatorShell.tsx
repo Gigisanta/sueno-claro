@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useState, type FormEvent } from "react";
+import { ArrowRightIcon, CalendarIcon, ClockIcon, MoonIcon, SunIcon, TimerIcon } from "@radix-ui/react-icons";
 import { track } from "@vercel/analytics";
 import { calculate, safeSettings } from "../lib/sleep/calculate";
 import { createCalendar } from "../lib/sleep/calendar";
@@ -347,6 +348,13 @@ export function CalculatorShell({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     event("reminder_download");
   }
+  useEffect(() => {
+    if (!outcome?.results.length || !window.matchMedia("(max-width: 1023px)").matches) return;
+    document.getElementById("results-heading")?.scrollIntoView({
+      block: "start",
+      behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
+    });
+  }, [outcome]);
   function input(field: Field) {
     const issue = outcome?.issues.find((item) => item.field === field);
     return (
@@ -403,9 +411,10 @@ export function CalculatorShell({
   return (
     <section
       id="calculator"
-      className="calculator"
+      className={`calculator ${outcome?.results.length ? "has-results" : "awaiting-results"}`}
       aria-label={lang === "es" ? "Calculadora de sueño" : "Sleep calculator"}
     >
+      <div className="calculator-controls">
       <div
         className="mode-grid"
         role="group"
@@ -421,7 +430,8 @@ export function CalculatorShell({
               setMode(item);
             }}
           >
-            {c.modes[index]}
+            {index === 0 ? <SunIcon aria-hidden="true" /> : index === 1 ? <MoonIcon aria-hidden="true" /> : index === 2 ? <TimerIcon aria-hidden="true" /> : <ClockIcon aria-hidden="true" />}
+            <span>{c.modes[index]}</span>
           </button>
         ))}
       </div>
@@ -492,20 +502,33 @@ export function CalculatorShell({
         )}
         <button type="submit" className="calculate-button">
           {c.calculate}
-          <span aria-hidden="true">↗</span>
+          <ArrowRightIcon aria-hidden="true" />
         </button>
       </form>
       <p className="calculation-note">{c.note}</p>
       <p className="timezone">
-        {c.zone} {zone || "—"}
+        {c.zone} {zone}
       </p>
       <p role="status" className="status-message">
         {status}
       </p>
+      </div>
+      {(!outcome || outcome.results.length === 0) && (
+        <aside className="results-preview" aria-label={lang === "es" ? "Cómo se calcula" : "How it works"}>
+          <MoonIcon className="preview-moon" aria-hidden="true" />
+          <h2>{lang === "es" ? "Dale tiempo a tu descanso." : "Make room for rest."}</h2>
+          <p>{lang === "es" ? "Elige tu horario y compara las opciones para tu próxima noche o siesta." : "Set your schedule and compare options for your next night or nap."}</p>
+          <dl className="estimate-summary">
+            <div><dt>{lang === "es" ? "Para conciliar el sueño" : "To fall asleep"}</dt><dd>{latency || "0"}<span> min</span></dd></div>
+            <div><dt>{lang === "es" ? "Por ciclo estimado" : "Per estimated cycle"}</dt><dd>{cycle || "0"}<span> min</span></dd></div>
+          </dl>
+          <p className="preview-footnote">{lang === "es" ? "Son estimaciones ajustables. Cada noche es diferente." : "Adjustable estimates. Every night is different."}</p>
+        </aside>
+      )}
       {outcome && outcome.results.length > 0 && (
         <section className="results" aria-labelledby="results-heading">
           <div className="results-heading">
-            <h2 id="results-heading">{c.results}</h2>
+            <div className="results-title-row"><h2 id="results-heading">{c.results}</h2><a className="edit-calculation" href="#calculator">{lang === "es" ? "Editar horario" : "Edit schedule"}</a></div>
             <p>
               {c.calculated}{" "}
               <time dateTime={outcome.calculatedAt}>
@@ -521,16 +544,18 @@ export function CalculatorShell({
           )}
           <ol className="results-list">
             {outcome.results.map((option, index) => (
-              <li className="result" key={option.id}>
+              <li className={`result ${mode !== "nap" && option.sleepMinutes < 420 ? "result-short" : ""}`} key={option.id}>
                 <span className="result-number" aria-hidden="true">
                   {String(index + 1).padStart(2, "0")}
                 </span>
                 <div className="result-body">
-                  <p className="eyebrow">
+                  <p className="result-label">
                     {option.kind === "bedtime" ? c.bed : c.wake}
                   </p>
                   <time className="result-time" dateTime={option.target}>
-                    {time(option.target)}
+                    {new Intl.DateTimeFormat(lang, { hour: "2-digit", minute: "2-digit", hour12: format === "12h" }).formatToParts(new Date(option.target)).map((part, i) =>
+                      part.type === "dayPeriod" ? <small key={i}>{part.value}</small> : <span key={i}>{part.value}</span>
+                    )}
                   </time>
                   <p className="result-date">{date(option.target)}</p>
                   <p className="result-duration">
@@ -557,8 +582,8 @@ export function CalculatorShell({
                     type="button"
                     onClick={() => calendar(option)}
                   >
+                    <CalendarIcon aria-hidden="true" />
                     {c.calendar}
-                    <span aria-hidden="true"> ↓</span>
                   </button>
                 </div>
               </li>

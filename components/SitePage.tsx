@@ -40,15 +40,7 @@ export function SitePage({ path }: { path: string }) {
           </p>
           <h1>{page.heading}</h1>
           <p className="intro-text">{page.intro}</p>
-          {page.kind === "tool" ? (
-            <div className="intro-facts">
-              <span>{es ? "Sin registro" : "No account"}</span>
-              <span>
-                {es ? "Cálculo en tu dispositivo" : "Calculated on your device"}
-              </span>
-              <span>{es ? "Gratis" : "Free to use"}</span>
-            </div>
-          ) : (
+          {page.kind !== "tool" && (
             <p className="byline">
               {es
                 ? "Por el equipo de SleepLike · Revisado el"
