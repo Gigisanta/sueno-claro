@@ -8,7 +8,8 @@ const sitemap = await readFile("out/sitemap.xml", "utf8");
 const uniqueTitles = new Set();
 for (const page of pages) {
   const html = await readFile(page.path === "/" ? "out/index.html" : `out${page.path}.html`, "utf8");
-  assert(html.includes(`<html lang="${page.locale}"`), `Language: ${page.path}`);
+  const documentTag = html.match(/<html\b[^>]*>/)?.[0];
+  assert.equal(documentTag?.match(/\blang="([^"]+)"/)?.[1], page.locale, `Language: ${page.path}`);
   const canonical = html.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
   assert(canonical, `Missing canonical: ${page.path}`);
   assert.equal(new URL(canonical, SITE_URL).href, new URL(page.path, SITE_URL).href, `Canonical: ${page.path}`);
