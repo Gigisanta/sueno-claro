@@ -25,3 +25,7 @@ Initial local Lighthouse: performance 98, accessibility 100, SEO 100, LCP 2.3 se
 
 
 Measured against the preceding production release at 390px: Calculate bottom moved from 906px to 589px; the four-result list from 1040px to 815px. At 1440px the result list changed from 1040px to 591px. Independent final UI review: 16 EN/ES, Chromium/WebKit, 320/390/1024/1440 combinations and 64 result cards without overlap; 24 focused visual/SEO/privacy tests passed after the correction.
+
+UI release: commit `c5d677a`, production deployment `dpl_2QgSfxiMD4Wsh2aDJDWW2qi1J57C`, READY at https://sleeplike.maat.work. Production smoke passed Chromium and WebKit, with no active ads. Both root-domain landings and ad approval configuration remain unchanged.
+
+Final integrated verification: gate PASS (typecheck/lint, 28 unit tests, static build); 76/76 E2E cases passed across desktop/mobile Chromium/WebKit. Independent review approved the revised paused SDK after reproducing immediate rejection/error/revocation/offline behavior with all network calls intercepted. No real ads or impressions were tested; approval and real CMP/CSP/global-consent validation remain pending.

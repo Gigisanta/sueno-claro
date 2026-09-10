@@ -22,15 +22,34 @@ declare global {
     __tcfapi?: (
       command: string,
       version: number,
-      callback: (data: TcfData, success: boolean) => void,
+      callback: (data: TcfData | null, success: boolean) => void,
       parameter?: number,
     ) => void;
+    adsbygoogle?: Array<Record<string, unknown>> & {
+      pauseAdRequests?: number;
+      requestNonPersonalizedAds?: number;
+    };
     googlefc?: {
-      callbackQueue?: Array<unknown>;
+      callbackQueue?: { push: (data: unknown) => number };
       showRevocationMessage?: () => void;
     };
   }
 }
+
+const adsenseBootstrap = `
+  window.adsbygoogle = window.adsbygoogle || [];
+  window.adsbygoogle.pauseAdRequests = 1;
+  window.adsbygoogle.requestNonPersonalizedAds = 1;
+  window.googlefc = window.googlefc || {};
+  window.googlefc.callbackQueue = window.googlefc.callbackQueue || [];
+`;
+
+function setAdRequestPaused(paused: boolean) {
+  window.adsbygoogle = window.adsbygoogle || [];
+  window.adsbygoogle.requestNonPersonalizedAds = 1;
+  window.adsbygoogle.pauseAdRequests = paused ? 1 : 0;
+}
+
 const PrivacyContext = createContext({
   ready: false,
   adsAllowed: false,
@@ -48,10 +67,13 @@ export function PrivacyProvider({
   const [production, setProduction] = useState(false);
   const [online, setOnline] = useState(true);
   const [adsAllowed, setAdsAllowed] = useState(false);
+  const [adsenseReady, setAdsenseReady] = useState(false);
   const [analyticsAllowed, setAnalyticsAllowed] = useState(false);
   const [open, setOpen] = useState(false);
   const es = locale === "es";
   const analyticsPermission = useRef(false);
+  const adsenseReadyRef = useRef(false);
+  const adConsentRef = useRef(false);
   const beforeSend = useCallback(
     (event: { type: "pageview" | "event"; url: string }) =>
       analyticsPermission.current
@@ -81,8 +103,19 @@ export function PrivacyProvider({
     } catch {}
     setReady(true);
     const update = () => {
-      setOnline(navigator.onLine);
-      if (!navigator.onLine) setAdsAllowed(false);
+      const connected = navigator.onLine;
+      setOnline(connected);
+      if (!connected) {
+        if (monetization.enabled) {
+          try {
+            setAdRequestPaused(true);
+          } catch {}
+        }
+        adConsentRef.current = false;
+        adsenseReadyRef.current = false;
+        setAdsAllowed(false);
+        setAdsenseReady(false);
+      }
     };
     update();
     const storage = (event: StorageEvent) => {
@@ -102,30 +135,83 @@ export function PrivacyProvider({
     };
   }, []);
   useEffect(() => {
+    if (!monetization.enabled) return;
+    try {
+      setAdRequestPaused(
+        !(production && navigator.onLine && adsenseReadyRef.current && adConsentRef.current),
+      );
+    } catch {
+      setAdsenseReady(false);
+      setAdsAllowed(false);
+    }
+  }, [adsAllowed, adsenseReady, online, production]);
+  useEffect(() => {
     if (!production || !online || !monetization.enabled) return;
     let listenerId: number | undefined;
     let subscribed = false;
     let active = true;
-    const subscribe = () => {
-      if (!window.__tcfapi || subscribed) return;
-      subscribed = true;
-      window.__tcfapi("addEventListener", 2, (data, success) => {
-        if (!active) return;
-        listenerId = data?.listenerId;
-        setAdsAllowed(permitsNonPersonalizedAds(data, success));
-      });
+
+    const deny = () => {
+      if (!active) return;
+      adConsentRef.current = false;
+      try {
+        setAdRequestPaused(true);
+      } catch {}
+      setAdsAllowed(false);
     };
+    const onConsent = (data: TcfData | null, success: boolean) => {
+      if (!active) return;
+      if (data?.listenerId !== undefined) listenerId = data.listenerId;
+      try {
+        const allowed = !!data && permitsNonPersonalizedAds(data, success);
+        adConsentRef.current = allowed;
+        setAdRequestPaused(!allowed || !adsenseReadyRef.current);
+        setAdsAllowed(allowed);
+      } catch {
+        deny();
+      }
+    };
+    const subscribe = () => {
+      const queue = window.googlefc?.callbackQueue;
+      if (!queue || typeof queue.push !== "function" || subscribed) return;
+      subscribed = true;
+      try {
+        queue.push({
+          CONSENT_DATA_READY: () => {
+            if (!active) return;
+            const tcfapi = window.__tcfapi;
+            if (typeof tcfapi !== "function") {
+              deny();
+              return;
+            }
+            try {
+              tcfapi("addEventListener", 2, onConsent);
+            } catch {
+              deny();
+            }
+          },
+        });
+      } catch {
+        subscribed = false;
+        deny();
+      }
+    };
+
+    deny();
     subscribe();
-    const timer = window.setInterval(subscribe, 500);
+    const timer = window.setInterval(subscribe, 250);
     const timeout = window.setTimeout(() => clearInterval(timer), 15000);
     return () => {
       active = false;
       clearInterval(timer);
       clearTimeout(timeout);
-      if (listenerId !== undefined)
-        window.__tcfapi?.("removeEventListener", 2, () => {}, listenerId);
+      if (listenerId !== undefined) {
+        try {
+          window.__tcfapi?.("removeEventListener", 2, () => {}, listenerId);
+        } catch {}
+      }
     };
-  }, [production, online]);
+  }, [online, production]);
   function setAnalytics(value: boolean) {
     analyticsPermission.current = value;
     setAnalyticsAllowed(value);
@@ -133,11 +219,33 @@ export function PrivacyProvider({
       localStorage.setItem("sleeplike-analytics", value ? "yes" : "no");
     } catch {}
   }
+  function queueRevocationMessage() {
+    adConsentRef.current = false;
+    try {
+      setAdRequestPaused(true);
+    } catch {}
+    setAdsAllowed(false);
+    const queue = window.googlefc?.callbackQueue;
+    if (!queue || typeof queue.push !== "function") return;
+    try {
+      queue.push({
+        CONSENT_API_READY: () => {
+          try {
+            window.googlefc?.showRevocationMessage?.();
+          } catch {
+            setAdsAllowed(false);
+          }
+        },
+      });
+    } catch {
+      setAdsAllowed(false);
+    }
+  }
   return (
     <PrivacyContext.Provider
       value={{
         ready,
-        adsAllowed: ready && production && online && adsAllowed,
+        adsAllowed: ready && production && online && adsenseReady && adsAllowed,
         analyticsAllowed: ready && production && analyticsAllowed,
       }}
     >
@@ -146,12 +254,41 @@ export function PrivacyProvider({
         <Analytics beforeSend={beforeSend} />
       )}
       {ready && production && online && monetization.enabled && (
-        <Script
-          id="google-consent"
-          src={monetization.cmpSrc}
-          strategy="afterInteractive"
-          onError={() => setAdsAllowed(false)}
-        />
+        <>
+          <Script id="adsense-bootstrap" strategy="afterInteractive">
+            {adsenseBootstrap}
+          </Script>
+          <Script
+            id="adsense-sdk"
+            src={monetization.adsenseSrc}
+            strategy="afterInteractive"
+            crossOrigin="anonymous"
+            onReady={() => {
+              try {
+                adsenseReadyRef.current = true;
+                setAdRequestPaused(!adConsentRef.current);
+                setAdsenseReady(true);
+              } catch {
+                adConsentRef.current = false;
+                adsenseReadyRef.current = false;
+                try {
+                  setAdRequestPaused(true);
+                } catch {}
+                setAdsenseReady(false);
+                setAdsAllowed(false);
+              }
+            }}
+            onError={() => {
+              adConsentRef.current = false;
+              adsenseReadyRef.current = false;
+              try {
+                setAdRequestPaused(true);
+              } catch {}
+              setAdsenseReady(false);
+              setAdsAllowed(false);
+            }}
+          />
+        </>
       )}
       <div className="privacy-access">
         <button
@@ -201,10 +338,7 @@ export function PrivacyProvider({
             <button
               type="button"
               className="secondary-button"
-              onClick={() => {
-                setAdsAllowed(false);
-                window.googlefc?.showRevocationMessage?.();
-              }}
+              onClick={queueRevocationMessage}
             >
               {es
                 ? "Revisar consentimiento de anuncios"

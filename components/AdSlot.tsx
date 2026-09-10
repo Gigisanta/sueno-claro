@@ -1,12 +1,12 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import Script from "next/script";
 import { monetization } from "../lib/monetization/config";
 import { usePrivacy } from "./PrivacyProvider";
 import type { Locale } from "../lib/site";
 declare global {
   interface Window {
     adsbygoogle?: Array<Record<string, unknown>> & {
+      pauseAdRequests?: number;
       requestNonPersonalizedAds?: number;
     };
   }
@@ -26,7 +26,6 @@ export function AdSlot({
 }) {
   const { adsAllowed } = usePrivacy();
   const [near, setNear] = useState(false);
-  const [loaded, setLoaded] = useState(false);
   const [failed, setFailed] = useState(false);
   const [filled, setFilled] = useState(false);
   const container = useRef<HTMLDivElement>(null);
@@ -50,7 +49,7 @@ export function AdSlot({
     return () => observer.disconnect();
   }, [active]);
   useEffect(() => {
-    if (!active || !near || !loaded || requested.current || !element.current)
+    if (!active || !near || requested.current || !element.current || window.adsbygoogle?.pauseAdRequests !== 0)
       return;
     if (requests[placement] >= (placement === "result" ? 1 : 2)) {
       setFailed(true);
@@ -76,7 +75,7 @@ export function AdSlot({
       setFailed(true);
     }
     return () => observer.disconnect();
-  }, [active, near, loaded, placement]);
+  }, [active, near, placement]);
   if (!active) return null;
   return (
     <div
@@ -87,17 +86,6 @@ export function AdSlot({
     >
       {near && !failed && (
         <>
-          <Script
-            id="adsense"
-            src={
-              "https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=" +
-              monetization.publisherId
-            }
-            crossOrigin="anonymous"
-            strategy="afterInteractive"
-            onReady={() => setLoaded(true)}
-            onError={() => setFailed(true)}
-          />
           {filled && (
             <span className="ad-label">
               {locale === "es" ? "Publicidad" : "Advertisement"}

@@ -2,29 +2,18 @@
 const publisherId = process.env.NEXT_PUBLIC_ADSENSE_PUBLISHER_ID ?? "";
 const result = process.env.NEXT_PUBLIC_ADSENSE_RESULT_SLOT ?? "";
 const article = process.env.NEXT_PUBLIC_ADSENSE_ARTICLE_SLOT ?? "";
-const cmpSrc = process.env.NEXT_PUBLIC_GOOGLE_CMP_SRC ?? "";
-function validCmp(): boolean {
-  try {
-    const u = new URL(cmpSrc);
-    return (
-      u.protocol === "https:" &&
-      u.hostname === "fundingchoicesmessages.google.com" &&
-      u.pathname === "/i/" + publisherId.replace("ca-", "")
-    );
-  } catch {
-    return false;
-  }
-}
+const adsenseSrc = publisherId
+  ? `https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${encodeURIComponent(publisherId)}`
+  : "";
 export const monetization = {
   publisherId,
-  cmpSrc,
+  adsenseSrc,
   slots: { result, article },
   enabled:
     process.env.NEXT_PUBLIC_ADS_APPROVED === "true" &&
     /^ca-pub-\d{16}$/.test(publisherId) &&
     /^\d+$/.test(result) &&
-    /^\d+$/.test(article) &&
-    validCmp(),
+    /^\d+$/.test(article),
 };
 export const isPublicProduction = (host: string) =>
   process.env.NEXT_PUBLIC_VERCEL_ENV !== "preview" &&
