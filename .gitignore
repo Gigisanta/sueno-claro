@@ -12,3 +12,8 @@ tsconfig.tsbuildinfo
 .env.*
 !.env.example
 .omh/
+
+.serena/
+artifacts/qa/
+.vercel
+!.env.example

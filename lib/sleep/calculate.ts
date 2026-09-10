@@ -1,125 +1,402 @@
-import { formatDuration, formatMinutes, minutesUntil, normalizeMinutes, parseTimeToMinutes } from './format';
-import type { NapInput, SleepNowInput, SleepResult, WakeCalculationInput, WindowInput } from './types';
+import type {
+  CalculationInput,
+  CalculationOutcome,
+  InputIssue,
+  LocalTime,
+  SleepOption,
+  SleepSettings,
+} from './types';
 
-const CORE_CYCLES = [6, 5, 4, 3] as const;
-const NAP_OPTIONS = [20, 90, 110] as const;
+const CYCLE_COUNTS = [6, 5, 4, 3] as const;
+const NAP_SLEEP_MINUTES = [20, 90] as const;
 
-function resultQuality(cycles: number): SleepResult['quality'] {
-  if (cycles >= 6) return 'best';
-  if (cycles >= 5) return 'good';
-  return 'minimum';
+const DEFAULT_SLEEP_LATENCY_MINUTES = 15;
+const DEFAULT_CYCLE_LENGTH_MINUTES = 90;
+const MIN_SLEEP_LATENCY_MINUTES = 0;
+const MAX_SLEEP_LATENCY_MINUTES = 60;
+const MIN_CYCLE_LENGTH_MINUTES = 70;
+const MAX_CYCLE_LENGTH_MINUTES = 120;
+
+const MINUTES_PER_HOUR = 60;
+const MINUTES_PER_DAY = 24 * MINUTES_PER_HOUR;
+const MILLISECONDS_PER_MINUTE = 60_000;
+const MILLISECONDS_PER_DAY = MINUTES_PER_DAY * MILLISECONDS_PER_MINUTE;
+const OFFSET_SCAN_RADIUS = 3 * MILLISECONDS_PER_DAY;
+const OFFSET_SCAN_STEP = 15 * MILLISECONDS_PER_MINUTE;
+
+type LocalTimeField = 'wakeAt' | 'bedAt' | 'napAt';
+
+interface DateParts {
+  year: number;
+  month: number;
+  day: number;
+  hour: number;
+  minute: number;
 }
 
-function makeResult(params: {
-  id: string;
-  minutes: number;
-  cycles: number;
-  timeInBedMinutes: number;
-  quality?: SleepResult['quality'];
-  format: '24h' | '12h';
-  title: string;
-  description: string;
-}): SleepResult {
+interface ParsedLocalTime {
+  date?: Date;
+  issue?: InputIssue;
+}
+
+/**
+ * Keep user-controlled settings in the range supported by the calculator.
+ * The calculator also applies this normalization internally so direct callers
+ * cannot produce negative durations or divide by an unsafe cycle length.
+ */
+export function safeSettings(partial: Partial<SleepSettings> = {}): SleepSettings {
+  const sleepLatencyMinutes = Number.isFinite(partial.sleepLatencyMinutes)
+    ? Math.round(partial.sleepLatencyMinutes as number)
+    : DEFAULT_SLEEP_LATENCY_MINUTES;
+  const cycleLengthMinutes = Number.isFinite(partial.cycleLengthMinutes)
+    ? Math.round(partial.cycleLengthMinutes as number)
+    : DEFAULT_CYCLE_LENGTH_MINUTES;
+
   return {
-    id: params.id,
-    time: formatMinutes(params.minutes, params.format),
-    minutesFromMidnight: normalizeMinutes(params.minutes),
-    cycles: params.cycles,
-    timeInBedMinutes: params.timeInBedMinutes,
-    quality: params.quality ?? resultQuality(params.cycles),
-    title: params.title,
-    description: params.description,
+    sleepLatencyMinutes: clamp(
+      sleepLatencyMinutes,
+      MIN_SLEEP_LATENCY_MINUTES,
+      MAX_SLEEP_LATENCY_MINUTES,
+    ),
+    cycleLengthMinutes: clamp(
+      cycleLengthMinutes,
+      MIN_CYCLE_LENGTH_MINUTES,
+      MAX_CYCLE_LENGTH_MINUTES,
+    ),
+    timeFormat: partial.timeFormat === '12h' ? '12h' : '24h',
   };
 }
 
-export function calculateBedtimes({ wakeTime, settings }: WakeCalculationInput): SleepResult[] {
-  const wakeMinutes = parseTimeToMinutes(wakeTime);
-  return CORE_CYCLES.map((cycles) => {
+export function calculate(input: CalculationInput): CalculationOutcome {
+  const calculatedAt = toIsoOrEpoch(input.now);
+  if (!(input.now instanceof Date) || !Number.isFinite(input.now.getTime())) {
+    return withCalculatedAt(calculatedAt, emptyCalculation({ field: 'settings', code: 'invalid' }));
+  }
+
+  const settingsIssue = validateSettings(input.settings);
+  if (settingsIssue) {
+    return withCalculatedAt(calculatedAt, emptyCalculation(settingsIssue));
+  }
+
+  const settings = safeSettings(input.settings);
+
+  switch (input.mode) {
+    case 'wake':
+      return withCalculatedAt(calculatedAt, calculateWake(input.wakeAt, settings));
+    case 'sleepNow':
+      return withCalculatedAt(calculatedAt, calculateSleepNow(input.now, settings));
+    case 'nap':
+      return withCalculatedAt(calculatedAt, calculateNap(input.napAt, settings));
+    case 'window':
+      return withCalculatedAt(calculatedAt, calculateWindow(input.bedAt, input.wakeAt, settings));
+    default:
+      return withCalculatedAt(calculatedAt, {
+        results: [],
+        issues: [{ field: 'settings', code: 'invalid' }],
+      });
+  }
+}
+
+function calculateWake(
+  wakeAt: LocalTime | undefined,
+  settings: SleepSettings,
+): Pick<CalculationOutcome, 'results' | 'issues'> {
+  const parsedWake = parseLocalTime(wakeAt, 'wakeAt');
+  if (parsedWake.issue || !parsedWake.date) return emptyCalculation(parsedWake.issue!);
+
+  const wakeTime = parsedWake.date;
+  const results = CYCLE_COUNTS.map((cycles) => {
     const sleepMinutes = cycles * settings.cycleLengthMinutes;
-    const bedtime = wakeMinutes - sleepMinutes - settings.sleepLatencyMinutes;
-    return makeResult({
+    const inBedMinutes = sleepMinutes + settings.sleepLatencyMinutes;
+    const bedtime = addMinutes(wakeTime, -inBedMinutes);
+
+    return makeOption({
       id: `wake-${cycles}`,
-      minutes: bedtime,
+      target: bedtime,
+      bedtime,
+      wakeTime,
+      sleepMinutes,
+      inBedMinutes,
       cycles,
-      timeInBedMinutes: sleepMinutes + settings.sleepLatencyMinutes,
-      format: settings.timeFormat,
-      title: cycles >= 6 ? 'Best recovery window' : cycles === 5 ? 'Strong practical option' : 'Shorter night option',
-      description: `${formatDuration(sleepMinutes + settings.sleepLatencyMinutes)} in bed including ${settings.sleepLatencyMinutes}m to fall asleep.`,
+      kind: 'bedtime',
     });
   });
+
+  return { results, issues: [] };
 }
 
-export function calculateWakeTimes({ now = new Date(), settings }: SleepNowInput): SleepResult[] {
-  const currentMinutes = now.getHours() * 60 + now.getMinutes();
-  return CORE_CYCLES.map((cycles) => {
+function calculateSleepNow(
+  now: Date,
+  settings: SleepSettings,
+): Pick<CalculationOutcome, 'results' | 'issues'> {
+  if (!(now instanceof Date) || !Number.isFinite(now.getTime())) {
+    return emptyCalculation({ field: 'settings', code: 'invalid' });
+  }
+
+  const bedtime = new Date(now.getTime());
+  const results = CYCLE_COUNTS.map((cycles) => {
     const sleepMinutes = cycles * settings.cycleLengthMinutes;
-    const wake = currentMinutes + settings.sleepLatencyMinutes + sleepMinutes;
-    return makeResult({
-      id: `now-${cycles}`,
-      minutes: wake,
+    const inBedMinutes = sleepMinutes + settings.sleepLatencyMinutes;
+    const wakeTime = addMinutes(bedtime, inBedMinutes);
+
+    return makeOption({
+      id: `sleep-now-${cycles}`,
+      target: wakeTime,
+      bedtime,
+      wakeTime,
+      sleepMinutes,
+      inBedMinutes,
       cycles,
-      timeInBedMinutes: sleepMinutes + settings.sleepLatencyMinutes,
-      format: settings.timeFormat,
-      title: cycles >= 6 ? 'Best wake-up target' : cycles === 5 ? 'Good wake-up target' : 'Minimum wake-up target',
-      description: `If you start now, this allows ${cycles} full estimated cycles.`,
+      kind: 'wake',
     });
   });
+
+  return { results, issues: [] };
 }
 
-export function calculateNaps({ startTime, settings }: NapInput): SleepResult[] {
-  const startMinutes = parseTimeToMinutes(startTime);
-  return NAP_OPTIONS.map((duration) => {
-    const includesLatency = duration !== 20;
-    const wake = startMinutes + duration + (includesLatency ? settings.sleepLatencyMinutes : 0);
-    const cycles = duration >= settings.cycleLengthMinutes ? Math.round(duration / settings.cycleLengthMinutes) : 0;
-    return makeResult({
-      id: `nap-${duration}`,
-      minutes: wake,
+function calculateNap(
+  napAt: LocalTime | undefined,
+  settings: SleepSettings,
+): Pick<CalculationOutcome, 'results' | 'issues'> {
+  const parsedNap = parseLocalTime(napAt, 'napAt');
+  if (parsedNap.issue || !parsedNap.date) return emptyCalculation(parsedNap.issue!);
+
+  const bedtime = parsedNap.date;
+  const results = NAP_SLEEP_MINUTES.map((sleepMinutes) => {
+    // The 20-minute policy is explicitly time-in-bed-only: it has no latency.
+    const includesLatency = sleepMinutes !== 20;
+    const inBedMinutes = sleepMinutes + (includesLatency ? settings.sleepLatencyMinutes : 0);
+    const wakeTime = addMinutes(bedtime, inBedMinutes);
+    const cycles = sleepMinutes < settings.cycleLengthMinutes
+      ? 0
+      : Math.round(sleepMinutes / settings.cycleLengthMinutes);
+
+    return makeOption({
+      id: `nap-${sleepMinutes}`,
+      target: wakeTime,
+      bedtime,
+      wakeTime,
+      sleepMinutes,
+      inBedMinutes,
       cycles,
-      timeInBedMinutes: duration + (includesLatency ? settings.sleepLatencyMinutes : 0),
-      quality: 'nap',
-      format: settings.timeFormat,
-      title: duration === 20 ? 'Power nap' : duration === 90 ? 'Full-cycle nap' : 'Long recovery nap',
-      description: duration === 20 ? 'Short enough to reduce grogginess risk for many people.' : `Includes ${duration}m of sleep time plus ${settings.sleepLatencyMinutes}m to fall asleep.`,
+      kind: 'nap',
     });
   });
+
+  return { results, issues: [] };
 }
 
-export function calculateWindow({ bedTime, wakeTime, settings }: WindowInput): SleepResult[] {
-  const bed = parseTimeToMinutes(bedTime);
-  const wake = parseTimeToMinutes(wakeTime);
-  const available = Math.max(0, minutesUntil(bed, wake) - settings.sleepLatencyMinutes);
-  const cycles = Math.floor(available / settings.cycleLengthMinutes);
-  const idealWake = bed + settings.sleepLatencyMinutes + cycles * settings.cycleLengthMinutes;
-  const nextCycleWake = bed + settings.sleepLatencyMinutes + (cycles + 1) * settings.cycleLengthMinutes;
-  return [
-    makeResult({
-      id: 'window-fit',
-      minutes: idealWake,
-      cycles,
-      timeInBedMinutes: settings.sleepLatencyMinutes + cycles * settings.cycleLengthMinutes,
-      format: settings.timeFormat,
-      title: cycles >= 5 ? 'Best fit inside your window' : 'Best fit, but short',
-      description: `${cycles} estimated cycles fit before your target wake time.`,
-    }),
-    makeResult({
-      id: 'window-next',
-      minutes: nextCycleWake,
-      cycles: cycles + 1,
-      timeInBedMinutes: settings.sleepLatencyMinutes + (cycles + 1) * settings.cycleLengthMinutes,
-      format: settings.timeFormat,
-      title: 'Next full cycle',
-      description: 'Use this if your schedule can move later.',
-    }),
-  ];
-}
+function calculateWindow(
+  bedAt: LocalTime | undefined,
+  wakeAt: LocalTime | undefined,
+  settings: SleepSettings,
+): Pick<CalculationOutcome, 'results' | 'issues'> {
+  const parsedBed = parseLocalTime(bedAt, 'bedAt');
+  const parsedWake = parseLocalTime(wakeAt, 'wakeAt');
+  const inputIssues = [parsedBed.issue, parsedWake.issue].filter(
+    (issue): issue is InputIssue => Boolean(issue),
+  );
+  if (inputIssues.length > 0 || !parsedBed.date || !parsedWake.date) {
+    return { results: [], issues: inputIssues };
+  }
 
-export function safeSettings(settings: Partial<{ sleepLatencyMinutes: number; cycleLengthMinutes: number; timeFormat: '24h' | '12h' }>) {
-  const latency = Number.isFinite(settings.sleepLatencyMinutes) ? Number(settings.sleepLatencyMinutes) : 15;
-  const cycle = Number.isFinite(settings.cycleLengthMinutes) ? Number(settings.cycleLengthMinutes) : 90;
+  const bedTime = parsedBed.date;
+  const wakeLimit = parsedWake.date;
+  const windowMinutes = elapsedMinutes(bedTime, wakeLimit);
+
+  if (windowMinutes <= 0 || windowMinutes <= settings.sleepLatencyMinutes) {
+    return emptyCalculation({ field: 'wakeAt', code: 'window-too-short' });
+  }
+  if (windowMinutes > MINUTES_PER_DAY) {
+    return emptyCalculation({ field: 'wakeAt', code: 'window-too-long' });
+  }
+
+  const cycles = Math.floor(
+    (windowMinutes - settings.sleepLatencyMinutes) / settings.cycleLengthMinutes,
+  );
+  if (cycles < 1) {
+    return emptyCalculation({ field: 'wakeAt', code: 'window-too-short' });
+  }
+
+  const sleepMinutes = cycles * settings.cycleLengthMinutes;
+  const inBedMinutes = settings.sleepLatencyMinutes + sleepMinutes;
+  const wakeTime = addMinutes(bedTime, inBedMinutes);
+  if (wakeTime.getTime() > wakeLimit.getTime()) {
+    return emptyCalculation({ field: 'wakeAt', code: 'window-too-short' });
+  }
+
   return {
-    sleepLatencyMinutes: Math.min(60, Math.max(0, Math.round(latency))),
-    cycleLengthMinutes: Math.min(120, Math.max(70, Math.round(cycle))),
-    timeFormat: settings.timeFormat === '12h' ? '12h' : '24h',
-  } as const;
+    results: [
+      makeOption({
+        id: `window-${cycles}`,
+        target: wakeTime,
+        bedtime: bedTime,
+        wakeTime,
+        sleepMinutes,
+        inBedMinutes,
+        cycles,
+        kind: 'wake',
+      }),
+    ],
+    issues: [],
+  };
+}
+
+function parseLocalTime(
+  value: LocalTime | undefined,
+  field: LocalTimeField,
+): ParsedLocalTime {
+  if (
+    !value ||
+    typeof value.date !== 'string' ||
+    typeof value.time !== 'string' ||
+    (value.occurrence !== undefined && value.occurrence !== 'earlier' && value.occurrence !== 'later')
+  ) {
+    return { issue: { field, code: 'invalid' } };
+  }
+
+  const dateMatch = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value.date);
+  const timeMatch = /^(\d{2}):(\d{2})$/.exec(value.time);
+  if (!dateMatch || !timeMatch) return { issue: { field, code: 'invalid' } };
+
+  const parts: DateParts = {
+    year: Number(dateMatch[1]),
+    month: Number(dateMatch[2]),
+    day: Number(dateMatch[3]),
+    hour: Number(timeMatch[1]),
+    minute: Number(timeMatch[2]),
+  };
+  const civilMilliseconds = createCivilMilliseconds(parts);
+  if (civilMilliseconds === undefined) return { issue: { field, code: 'invalid' } };
+
+  const candidates = findLocalCandidates(parts, civilMilliseconds);
+  if (candidates.length === 0) return { issue: { field, code: 'nonexistent' } };
+  if (candidates.length > 1 && value.occurrence === undefined) {
+    return {
+      issue: {
+        field,
+        code: 'ambiguous',
+        choices: candidates.map((candidate) => candidate.toISOString()),
+      },
+    };
+  }
+
+  const candidateIndex = value.occurrence === 'later' ? candidates.length - 1 : 0;
+  return { date: new Date(candidates[candidateIndex].getTime()) };
+}
+
+function createCivilMilliseconds(parts: DateParts): number | undefined {
+  const civil = new Date(0);
+  civil.setUTCFullYear(parts.year, parts.month - 1, parts.day);
+  civil.setUTCHours(parts.hour, parts.minute, 0, 0);
+
+  if (
+    civil.getUTCFullYear() !== parts.year ||
+    civil.getUTCMonth() !== parts.month - 1 ||
+    civil.getUTCDate() !== parts.day ||
+    civil.getUTCHours() !== parts.hour ||
+    civil.getUTCMinutes() !== parts.minute
+  ) {
+    return undefined;
+  }
+  return civil.getTime();
+}
+
+function findLocalCandidates(parts: DateParts, civilMilliseconds: number): Date[] {
+  const offsets = new Set<number>();
+  for (
+    let delta = -OFFSET_SCAN_RADIUS;
+    delta <= OFFSET_SCAN_RADIUS;
+    delta += OFFSET_SCAN_STEP
+  ) {
+    offsets.add(new Date(civilMilliseconds + delta).getTimezoneOffset());
+  }
+
+  const candidates = [...offsets]
+    .map((offset) => new Date(civilMilliseconds + offset * MILLISECONDS_PER_MINUTE))
+    .filter((candidate) => hasLocalParts(candidate, parts))
+    .sort((left, right) => left.getTime() - right.getTime());
+
+  return candidates.filter(
+    (candidate, index) => index === 0 || candidate.getTime() !== candidates[index - 1].getTime(),
+  );
+}
+
+function hasLocalParts(date: Date, parts: DateParts): boolean {
+  return (
+    date.getFullYear() === parts.year &&
+    date.getMonth() === parts.month - 1 &&
+    date.getDate() === parts.day &&
+    date.getHours() === parts.hour &&
+    date.getMinutes() === parts.minute &&
+    date.getSeconds() === 0 &&
+    date.getMilliseconds() === 0
+  );
+}
+
+function validateSettings(value: SleepSettings | undefined): InputIssue | undefined {
+  if (!value || typeof value !== 'object') return { field: 'settings', code: 'invalid' };
+  if (
+    !Number.isFinite(value.sleepLatencyMinutes) ||
+    value.sleepLatencyMinutes < MIN_SLEEP_LATENCY_MINUTES ||
+    value.sleepLatencyMinutes > MAX_SLEEP_LATENCY_MINUTES ||
+    !Number.isFinite(value.cycleLengthMinutes) ||
+    value.cycleLengthMinutes < MIN_CYCLE_LENGTH_MINUTES ||
+    value.cycleLengthMinutes > MAX_CYCLE_LENGTH_MINUTES ||
+    (value.timeFormat !== '24h' && value.timeFormat !== '12h')
+  ) {
+    return { field: 'settings', code: 'invalid' };
+  }
+  return undefined;
+}
+
+function makeOption(params: {
+  id: string;
+  target: Date;
+  bedtime: Date;
+  wakeTime: Date;
+  sleepMinutes: number;
+  inBedMinutes: number;
+  cycles: number;
+  kind: SleepOption['kind'];
+}): SleepOption {
+  return {
+    id: params.id,
+    target: params.target.toISOString(),
+    bedtime: params.bedtime.toISOString(),
+    wakeTime: params.wakeTime.toISOString(),
+    sleepMinutes: params.sleepMinutes,
+    inBedMinutes: params.inBedMinutes,
+    cycles: params.cycles,
+    kind: params.kind,
+  };
+}
+
+function addMinutes(date: Date, minutes: number): Date {
+  return new Date(date.getTime() + minutes * MILLISECONDS_PER_MINUTE);
+}
+
+function elapsedMinutes(start: Date, end: Date): number {
+  return (end.getTime() - start.getTime()) / MILLISECONDS_PER_MINUTE;
+}
+
+function clamp(value: number, minimum: number, maximum: number): number {
+  return Math.min(maximum, Math.max(minimum, value));
+}
+
+function emptyCalculation(issue: InputIssue): Pick<CalculationOutcome, 'results' | 'issues'> {
+  return { results: [], issues: [issue] };
+}
+
+function withCalculatedAt(
+  calculatedAt: string,
+  calculation: Pick<CalculationOutcome, 'results' | 'issues'>,
+): CalculationOutcome {
+  return { ...calculation, calculatedAt };
+}
+
+function toIsoOrEpoch(value: Date): string {
+  return value instanceof Date && Number.isFinite(value.getTime())
+    ? value.toISOString()
+    : new Date(0).toISOString();
 }

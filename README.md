@@ -1,3 +1,5 @@
+> **September 2026 rework:** the current implementation and release gates are documented in [docs/13-launch-2026-09.md](docs/13-launch-2026-09.md). Earlier roadmap sections below are historical.
+
 # sleeplike
 
 Privacy-first sleep cycle calculator. Web/PWA. iOS later via RevenueCat.

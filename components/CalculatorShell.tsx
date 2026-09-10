@@ -1,316 +1,591 @@
-'use client';
+"use client";
 
-import { useCallback, useEffect, useMemo, useState } from 'react';
-import { calculateBedtimes, calculateNaps, calculateWakeTimes, calculateWindow, safeSettings } from '../lib/sleep/calculate';
-import type { CalculatorMode, SleepResult } from '../lib/sleep/types';
-import { formatDuration } from '../lib/sleep/format';
-import { monetization, carbonAdsUrl, amazonUrl, productsForMode } from '../lib/monetization/config';
+import { useEffect, useLayoutEffect, useState, type FormEvent } from "react";
+import { track } from "@vercel/analytics";
+import { calculate, safeSettings } from "../lib/sleep/calculate";
+import { createCalendar } from "../lib/sleep/calendar";
+import type {
+  CalculatorMode,
+  CalculationOutcome,
+  LocalTime,
+  SleepOption,
+} from "../lib/sleep/types";
+import { readSharedSettings } from "../lib/privacy";
+import { usePrivacy } from "./PrivacyProvider";
+import { AdSlot } from "./AdSlot";
 
-type Mode = CalculatorMode;
-
+type Locale = "en" | "es";
+type Field = "wakeAt" | "bedAt" | "napAt";
+const modes: CalculatorMode[] = ["wake", "sleepNow", "nap", "window"];
 const copy = {
   en: {
-    modes: {
-      wake: ['☀', 'Wake up'],
-      sleepNow: ['☾', 'Sleep now'],
-      nap: ['◐', 'Nap'],
-      window: ['⌁', 'Window'],
-    },
-    modeDesc: {
-      wake: 'What time do you want to wake up?',
-      sleepNow: 'Calculates your ideal wake-up times if you go to bed now.',
-      nap: 'How long should you nap for optimal rest?',
-      window: 'Finds restful sleep windows within your available time.',
-    },
-    wakeLabel: 'Wake at',
-    bedLabel: 'Bed at',
-    napLabel: 'Nap at',
-    latency: 'Fall asleep',
-    cycle: 'Cycle',
-    best: 'Best',
-    cycles: 'cycles',
-    disclaimer: 'Educational tool. Sleep cycles vary (70–120 min).',
-    sponsored: 'Sponsored',
-    support: 'Support sleeplike',
-    donate: 'Buy me a coffee',
-    affiliate: 'As an Amazon Associate we earn from qualifying purchases.',
-    copy: 'Copy',
-    share: 'Share',
-    copied: '✓',
-    now: 'now',
+    modes: ["Wake up", "Sleep now", "Nap", "Time window"],
+    questions: [
+      "When do you need to wake up?",
+      "Heading to bed now?",
+      "When will your nap start?",
+      "How much time do you have?",
+    ],
+    wakeAt: "Wake up",
+    bedAt: "Go to bed",
+    napAt: "Start nap",
+    date: "Date",
+    time: "Time",
+    settings: "Adjust your estimates",
+    latency: "Time to fall asleep (minutes)",
+    cycle: "Estimated cycle (minutes)",
+    format: "Time format",
+    calculate: "Calculate",
+    results: "Your estimated times",
+    bed: "Go to bed at",
+    wake: "Wake up at",
+    sleep: "estimated sleep",
+    inBed: "in bed",
+    short: "Under 7 hours of sleep",
+    share: "Share plan",
+    copy: "Copy link",
+    calendar: "Calendar reminder",
+    calculated: "Calculated at",
+    refreshed: "Time has moved on. Update your calculation when you are ready.",
+    update: "Update to now",
+    earlier: "First occurrence",
+    later: "Second occurrence",
+    choose: "Choose an occurrence",
+    occurrence: "This time occurs twice",
+    now: "The current time is captured when you calculate.",
+    note: "Estimates for adults, not a guarantee of rest. Sleep cycles vary. Prioritize enough sleep and a regular schedule.",
+    copied: "Link copied.",
+    failed: "Automatic copying is unavailable. Copy the link below.",
+    manual: "Plan link",
+    ready: " options calculated.",
+    invalid: "Enter a valid date and time.",
+    nonexistent:
+      "This local time does not exist because the clocks change. Choose another time.",
+    ambiguous:
+      "Clocks go back at this time. Choose the first or second occurrence.",
+    "window-too-short":
+      "This window cannot fit a complete estimated cycle after time to fall asleep. Choose a longer window.",
+    "window-too-long": "Choose a window of 24 hours or less.",
+    settingError:
+      "Use 0–60 minutes to fall asleep and a cycle of 70–120 minutes.",
+    zone: "Times use your device’s time zone:",
+    reminder:
+      "Downloads a calendar event. Your calendar controls notifications; this website is not an alarm.",
+    napShort: "Short nap · 20 minutes in bed",
+    napLong: "Long nap · estimated cycle",
   },
   es: {
-    modes: {
-      wake: ['☀', 'Despertar'],
-      sleepNow: ['☾', 'Dormir'],
-      nap: ['◐', 'Siesta'],
-      window: ['⌁', 'Ventana'],
-    },
-    modeDesc: {
-      wake: '¿A qué hora querés despertarte?',
-      sleepNow: 'Calculá a qué hora te despertás si te dormís ahora.',
-      nap: '¿Cuánto deberías dormir la siesta?',
-      window: 'Encontrá ventanas de sueño en tu tiempo disponible.',
-    },
-    wakeLabel: 'Despertar',
-    bedLabel: 'Acostarse',
-    napLabel: 'Siesta',
-    latency: 'Dormirse',
-    cycle: 'Ciclo',
-    best: 'Mejor',
-    cycles: 'ciclos',
-    disclaimer: 'Herramienta educativa. Los ciclos varían (70–120 min).',
-    sponsored: 'Patrocinado',
-    support: 'Apoyá sleeplike',
-    donate: 'Invitame un café',
-    affiliate: 'Como Asociado de Amazon ganamos con compras calificadas.',
-    copy: 'Copiar',
-    share: 'Compartir',
-    copied: '✓',
-    now: 'ahora',
+    modes: ["Despertar", "Dormir ahora", "Siesta", "Ventana"],
+    questions: [
+      "¿A qué hora necesitas despertarte?",
+      "¿Te vas a acostar ahora?",
+      "¿Cuándo empieza tu siesta?",
+      "¿De cuánto tiempo dispones?",
+    ],
+    wakeAt: "Despertarse",
+    bedAt: "Acostarse",
+    napAt: "Empezar la siesta",
+    date: "Fecha",
+    time: "Hora",
+    settings: "Ajustar las estimaciones",
+    latency: "Tiempo para dormirte (minutos)",
+    cycle: "Ciclo estimado (minutos)",
+    format: "Formato de hora",
+    calculate: "Calcular",
+    results: "Tus horarios estimados",
+    bed: "Acostarse a las",
+    wake: "Despertarse a las",
+    sleep: "de sueño estimado",
+    inBed: "en cama",
+    short: "Menos de 7 horas de sueño",
+    share: "Compartir plan",
+    copy: "Copiar enlace",
+    calendar: "Recordatorio de calendario",
+    calculated: "Calculado a las",
+    refreshed: "Ha pasado tiempo. Actualiza el cálculo cuando estés listo.",
+    update: "Actualizar a ahora",
+    earlier: "Primera ocurrencia",
+    later: "Segunda ocurrencia",
+    choose: "Elige una ocurrencia",
+    occurrence: "Esta hora ocurre dos veces",
+    now: "La hora actual se toma al pulsar Calcular.",
+    note: "Estimaciones para adultos, sin garantía de descanso. Los ciclos varían. Prioriza dormir suficiente y mantener horarios regulares.",
+    copied: "Enlace copiado.",
+    failed: "No se pudo copiar automáticamente. Copia el enlace de abajo.",
+    manual: "Enlace del plan",
+    ready: " opciones calculadas.",
+    invalid: "Introduce una fecha y una hora válidas.",
+    nonexistent:
+      "Esta hora local no existe por el cambio horario. Elige otra hora.",
+    ambiguous:
+      "El reloj retrocede a esta hora. Elige la primera o segunda ocurrencia.",
+    "window-too-short":
+      "La ventana no permite un ciclo estimado completo después de la latencia. Elige una ventana más larga.",
+    "window-too-long": "Elige una ventana de 24 horas o menos.",
+    settingError:
+      "Usa entre 0 y 60 minutos para dormirte y ciclos de 70 a 120 minutos.",
+    zone: "Los horarios usan la zona horaria de tu dispositivo:",
+    reminder:
+      "Descarga un evento. Tu calendario controla las notificaciones; esta web no es una alarma.",
+    napShort: "Siesta corta · 20 minutos en cama",
+    napLong: "Siesta larga · ciclo estimado",
   },
-} as const;
+};
+const localDate = (d: Date) =>
+  `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+const localTime = (d: Date) =>
+  `${String(d.getHours()).padStart(2, "0")}:${String(d.getMinutes()).padStart(2, "0")}`;
+const empty: LocalTime = { date: "", time: "" };
 
-const modeIcons: Record<Mode, string> = { wake: '☀', sleepNow: '☾', nap: '◐', window: '⌁' };
-const modeLabels: Record<Mode, string> = { wake: 'Wake', sleepNow: 'Sleep', nap: 'Nap', window: 'Window' };
-const modeLabelsEs: Record<Mode, string> = { wake: 'Despertar', sleepNow: 'Dormir', nap: 'Siesta', window: 'Ventana' };
-const defaultSettings = safeSettings({ sleepLatencyMinutes: 15, cycleLengthMinutes: 90, timeFormat: '24h' });
-
-function nowTime() {
-  const now = new Date();
-  return `${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-}
-
-function createCalendarHref(result: SleepResult, lang: 'en' | 'es') {
-  const title = encodeURIComponent(lang === 'es' ? `Dormir: ${result.time}` : `Sleep: ${result.time}`);
-  const details = encodeURIComponent(result.description);
-  return `data:text/calendar;charset=utf8,BEGIN:VCALENDAR%0AVERSION:2.0%0ABEGIN:VEVENT%0ASUMMARY:${title}%0ADESCRIPTION:${details}%0AEND:VEVENT%0AEND:VCALENDAR`;
-}
-
-function validTime(value: string | null): value is string {
-  return /^\d{2}:\d{2}$/.test(value ?? '');
-}
-
-function parseMode(value: string | null): Mode | null {
-  return value === 'wake' || value === 'sleepNow' || value === 'nap' || value === 'window' ? value : null;
-}
-
-export function CalculatorShell({ lang = 'en' }: { lang?: 'en' | 'es' }) {
+export function CalculatorShell({
+  lang = "en",
+  initialMode = "wake",
+}: {
+  lang?: Locale;
+  initialMode?: CalculatorMode;
+}) {
   const c = copy[lang];
-  const [mode, setMode] = useState<Mode>('wake');
-  const [wakeTime, setWakeTime] = useState('--:--');
-  const [bedTime, setBedTime] = useState('--:--');
-  const [napTime, setNapTime] = useState('--:--');
-  const [latency, setLatency] = useState(defaultSettings.sleepLatencyMinutes);
-  const [cycleLength, setCycleLength] = useState(defaultSettings.cycleLengthMinutes);
-  const [timeFormat, setTimeFormat] = useState<'24h' | '12h'>('24h');
-  const [mounted, setMounted] = useState(false);
-
-  // Set real time once mounted (avoids hydration mismatch)
-  useEffect(() => {
-    const now = nowTime();
-    setWakeTime(now);
-    setNapTime(now);
-    setBedTime(() => {
-      const h = new Date().getHours();
-      return `${String(h < 12 ? 23 : h).padStart(2, '0')}:00`;
+  const privacy = usePrivacy();
+  const [mode, setMode] = useState<CalculatorMode>(initialMode);
+  const [fields, setFields] = useState<Record<Field, LocalTime>>({
+    wakeAt: empty,
+    bedAt: empty,
+    napAt: empty,
+  });
+  const [latency, setLatency] = useState("15");
+  const [cycle, setCycle] = useState("90");
+  const [format, setFormat] = useState<"24h" | "12h">("24h");
+  const [outcome, setOutcome] = useState<CalculationOutcome | null>(null);
+  const [stale, setStale] = useState(false);
+  const [zone, setZone] = useState("");
+  const [status, setStatus] = useState("");
+  const [manualLink, setManualLink] = useState("");
+  useLayoutEffect(() => {
+    const now = new Date();
+    const wake = new Date(now);
+    wake.setHours(7, 30, 0, 0);
+    if (wake <= now) wake.setDate(wake.getDate() + 1);
+    const bed = new Date(now);
+    bed.setHours(23, 0, 0, 0);
+    const params = readSharedSettings(location.href);
+    const defaults: Record<Field, LocalTime> = {
+      wakeAt: { date: localDate(wake), time: "07:30" },
+      bedAt: { date: localDate(bed), time: "23:00" },
+      napAt: { date: localDate(now), time: localTime(now) },
+    };
+    for (const [field, key] of [
+      ["wakeAt", "wake"],
+      ["bedAt", "bed"],
+      ["napAt", "nap"],
+    ] as const) {
+      if (params.has(key)) defaults[field].time = params.get(key)!;
+      const date = params.get(`${key}Date`) ?? params.get("date");
+      if (date) defaults[field].date = date;
+      const occurrence = params.get(`${key}Occurrence`);
+      if (occurrence === "earlier" || occurrence === "later")
+        defaults[field].occurrence = occurrence;
+    }
+    // Old links contained wall times only. Interpret an overnight window as the next day,
+    // while keeping explicit dates strict (including an intentionally insufficient window).
+    if (
+      params.get("mode") === "window" &&
+      !params.has("wakeDate") &&
+      !params.has("bedDate") &&
+      !params.has("date")
+    ) {
+      defaults.bedAt.date = localDate(now);
+      defaults.wakeAt.date = localDate(now);
+      if (defaults.wakeAt.time <= defaults.bedAt.time) {
+        const tomorrow = new Date(now);
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        defaults.wakeAt.date = localDate(tomorrow);
+      }
+    }
+    setFields(defaults);
+    const sharedMode = params.get("mode");
+    if (modes.includes(sharedMode as CalculatorMode))
+      setMode(sharedMode as CalculatorMode);
+    const settings = safeSettings({
+      sleepLatencyMinutes: params.has("latency")
+        ? Number(params.get("latency"))
+        : 15,
+      cycleLengthMinutes: params.has("cycle")
+        ? Number(params.get("cycle"))
+        : 90,
+      timeFormat: params.get("format") === "12h" ? "12h" : "24h",
     });
-    setMounted(true);
+    setLatency(String(settings.sleepLatencyMinutes));
+    setCycle(String(settings.cycleLengthMinutes));
+    setFormat(settings.timeFormat);
+    setZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
   }, []);
-
-  // Read URL params on mount
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const queryMode = parseMode(params.get('mode'));
-    const wake = params.get('wake');
-    const bed = params.get('bed');
-    const nap = params.get('nap');
-    const queryLatency = params.has('latency') ? Number(params.get('latency')) : Number.NaN;
-    const queryCycle = params.has('cycle') ? Number(params.get('cycle')) : Number.NaN;
-    const queryFormat = params.get('format');
-
-    if (queryMode) setMode(queryMode);
-    if (validTime(wake)) setWakeTime(wake);
-    if (validTime(bed)) setBedTime(bed);
-    if (validTime(nap)) setNapTime(nap);
-    if (Number.isFinite(queryLatency)) setLatency(queryLatency);
-    if (Number.isFinite(queryCycle)) setCycleLength(queryCycle);
-    if (queryFormat === '12h' || queryFormat === '24h') setTimeFormat(queryFormat);
-  }, []);
-
-  // Reset to "now" when switching to sleepNow mode
-  useEffect(() => {
-    if (mode === 'sleepNow') {
-      setWakeTime(nowTime());
+    const visibility = () => {
+      if (
+        document.visibilityState === "visible" &&
+        mode === "sleepNow" &&
+        outcome
+      )
+        setStale(true);
+    };
+    document.addEventListener("visibilitychange", visibility);
+    return () => document.removeEventListener("visibilitychange", visibility);
+  }, [mode, outcome]);
+  const clear = () => {
+    setOutcome(null);
+    setStatus("");
+    setManualLink("");
+    setStale(false);
+  };
+  const event = (name: string) => {
+    if (privacy.analyticsAllowed) track(name, { mode, language: lang });
+  };
+  function run(e?: FormEvent) {
+    e?.preventDefault();
+    const result = calculate({
+      mode,
+      now: new Date(),
+      ...fields,
+      settings: {
+        sleepLatencyMinutes: latency.trim() ? Number(latency) : NaN,
+        cycleLengthMinutes: cycle.trim() ? Number(cycle) : NaN,
+        timeFormat: format,
+      },
+    });
+    setOutcome(result);
+    setStale(false);
+    setStatus(
+      result.results.length ? `${result.results.length}${c.ready}` : "",
+    );
+    if (result.results.length) event("calculation_completed");
+  }
+  function change(
+    field: Field,
+    key: "date" | "time" | "occurrence",
+    value: string,
+  ) {
+    clear();
+    setFields((previous) => ({
+      ...previous,
+      [field]: {
+        ...previous[field],
+        ...(key === "occurrence" ? {} : { occurrence: undefined }),
+        [key]: value,
+      },
+    }));
+  }
+  const time = (iso: string) =>
+    new Intl.DateTimeFormat(lang, {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: format === "12h",
+    }).format(new Date(iso));
+  const date = (iso: string) =>
+    new Intl.DateTimeFormat(lang, {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).format(new Date(iso));
+  const duration = (minutes: number) =>
+    `${Math.floor(minutes / 60) ? `${Math.floor(minutes / 60)} h ` : ""}${minutes % 60 || minutes === 0 ? `${minutes % 60} min` : ""}`.trim();
+  function link() {
+    const params = new URLSearchParams({ mode, latency, cycle, format });
+    for (const [field, key] of [
+      ["wakeAt", "wake"],
+      ["bedAt", "bed"],
+      ["napAt", "nap"],
+    ] as const) {
+      if (
+        (mode === "wake" && field === "wakeAt") ||
+        (mode === "window" && field !== "napAt") ||
+        (mode === "nap" && field === "napAt")
+      ) {
+        params.set(key, fields[field].time);
+        params.set(`${key}Date`, fields[field].date);
+        if (fields[field].occurrence)
+          params.set(`${key}Occurrence`, fields[field].occurrence!);
+      }
     }
-  }, [mode]);
-
-  // Keep URL in sync with state
-  useEffect(() => {
-    const url = new URL(window.location.href);
-    url.searchParams.set('mode', mode);
-    if (mode !== 'sleepNow') url.searchParams.set('wake', wakeTime);
-    if (mode === 'window') url.searchParams.set('bed', bedTime);
-    if (mode === 'nap') url.searchParams.set('nap', napTime);
-    url.searchParams.set('latency', String(latency));
-    url.searchParams.set('cycle', String(cycleLength));
-    url.searchParams.set('format', timeFormat);
-    window.history.replaceState(null, '', url);
-  }, [mode, wakeTime, bedTime, napTime, latency, cycleLength, timeFormat]);
-
-  const settings = useMemo(() => safeSettings({ sleepLatencyMinutes: latency, cycleLengthMinutes: cycleLength, timeFormat }), [latency, cycleLength, timeFormat]);
-  const results = useMemo(() => {
+    return `${location.origin}${location.pathname}#sleep=${params}`;
+  }
+  async function copyLink(url: string) {
     try {
-      if (mode === 'wake') return calculateBedtimes({ wakeTime, settings });
-      if (mode === 'sleepNow') return calculateWakeTimes({ settings });
-      if (mode === 'nap') return calculateNaps({ startTime: napTime, settings });
-      return calculateWindow({ bedTime, wakeTime, settings });
+      if (!navigator.clipboard) throw new Error("unavailable");
+      await navigator.clipboard.writeText(url);
+      setStatus(c.copied);
+      event("share");
     } catch {
-      return [];
+      setManualLink(url);
+      setStatus(c.failed);
     }
-  }, [bedTime, mode, napTime, settings, wakeTime]);
-
-  const displayTime = mode === 'sleepNow' ? nowTime() : (mode === 'nap' ? napTime : wakeTime);
-
-  function handleTimeChange(value: string) {
-    if (mode === 'nap') setNapTime(value);
-    else setWakeTime(value);
   }
-
-  async function copyResult(result: SleepResult) {
-    const shareUrl = window.location.href;
-    const text = `${result.time} — ${result.title}. ${result.description} ${shareUrl}`;
-    await navigator.clipboard?.writeText(text).catch(() => undefined);
-    setCopied(result.id);
-    window.setTimeout(() => setCopied(null), 1400);
+  async function share() {
+    const url = link();
+    if (navigator.share) {
+      try {
+        await navigator.share({ title: "SleepLike", url });
+        event("share");
+        return;
+      } catch (error) {
+        if (error instanceof Error && error.name === "AbortError") return;
+      }
+    }
+    await copyLink(url);
   }
-  const [copied, setCopied] = useState<string | null>(null);
-
+  function calendar(option: SleepOption) {
+    if (!outcome) return;
+    const url = URL.createObjectURL(
+      new Blob([createCalendar(option, lang, outcome.calculatedAt)], {
+        type: "text/calendar;charset=utf-8",
+      }),
+    );
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `sleeplike-${option.id}.ics`;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+    event("reminder_download");
+  }
+  function input(field: Field) {
+    const issue = outcome?.issues.find((item) => item.field === field);
+    return (
+      <fieldset className="date-time-field" key={field}>
+        <legend>{c[field]}</legend>
+        <div className="date-time-inputs">
+          <label htmlFor={`${field}-date`}>
+            {c.date}
+            <input
+              id={`${field}-date`}
+              type="date"
+              required
+              value={fields[field].date}
+              onChange={(e) => change(field, "date", e.target.value)}
+              aria-invalid={!!issue}
+              aria-describedby={issue ? `${field}-error` : undefined}
+            />
+          </label>
+          <label htmlFor={`${field}-time`}>
+            {c.time}
+            <input
+              id={`${field}-time`}
+              type="time"
+              required
+              value={fields[field].time}
+              onChange={(e) => change(field, "time", e.target.value)}
+              aria-invalid={!!issue}
+              aria-describedby={issue ? `${field}-error` : undefined}
+            />
+          </label>
+        </div>
+        {(issue?.code === "ambiguous" || fields[field].occurrence) && (
+          <label htmlFor={`${field}-occurrence`}>
+            {c.occurrence}
+            <select
+              id={`${field}-occurrence`}
+              value={fields[field].occurrence ?? ""}
+              onChange={(e) => change(field, "occurrence", e.target.value)}
+            >
+              <option value="">{c.choose}</option>
+              <option value="earlier">{c.earlier}</option>
+              <option value="later">{c.later}</option>
+            </select>
+          </label>
+        )}
+        {issue && (
+          <p className="field-error" id={`${field}-error`}>
+            {c[issue.code]}
+          </p>
+        )}
+      </fieldset>
+    );
+  }
   return (
-    <section id="calculator" aria-label="Sleep calculator">
-      {/* App title */}
-      <div className="app-title">sleeplike</div>
-
-      {/* Mode selector — iOS segmented control */}
-      <div className="mode-grid" role="group" aria-label="Calculator mode">
-        {(Object.keys(modeIcons) as Mode[]).map((item) => (
-          <button key={item} type="button" className="mode-button" aria-pressed={mode === item} onClick={() => setMode(item)}>
-            <span aria-hidden="true">{modeIcons[item]}</span>
-            <span>{(lang === 'es' ? modeLabelsEs : modeLabels)[item]}</span>
+    <section
+      id="calculator"
+      className="calculator"
+      aria-label={lang === "es" ? "Calculadora de sueño" : "Sleep calculator"}
+    >
+      <div
+        className="mode-grid"
+        role="group"
+        aria-label={lang === "es" ? "Modo de cálculo" : "Calculation mode"}
+      >
+        {modes.map((item, index) => (
+          <button
+            key={item}
+            type="button"
+            aria-pressed={mode === item}
+            onClick={() => {
+              clear();
+              setMode(item);
+            }}
+          >
+            {c.modes[index]}
           </button>
         ))}
       </div>
-
-      {/* Mode description — live-updating */}
-      <div className="mode-desc">{c.modeDesc[mode]}</div>
-
-      {/* iOS grouped form — always visible */}
-      <div className="form-group">
-        <div className="form-row">
-          <label>{mode === 'nap' ? c.napLabel : c.wakeLabel}</label>
-          <input
-            autoComplete="off"
-            className="time-input"
-            type="time"
-            value={displayTime}
-            suppressHydrationWarning
-            onChange={(e) => handleTimeChange(e.target.value)}
-          />
-          {mode === 'sleepNow' && <span className="time-now">{c.now}</span>}
-        </div>
-
-        {mode === 'window' ? (
-          <div className="form-row">
-            <label>{c.bedLabel}</label>
-            <input autoComplete="off" className="time-input" type="time" value={bedTime} suppressHydrationWarning onChange={(e) => setBedTime(e.target.value)} />
+      <form onSubmit={run} noValidate>
+        <h2 className="calculator-question">
+          {c.questions[modes.indexOf(mode)]}
+        </h2>
+        {mode === "window" && input("bedAt")}
+        {(mode === "wake" || mode === "window") && input("wakeAt")}
+        {mode === "nap" && input("napAt")}
+        {mode === "sleepNow" && <p className="now-note">{c.now}</p>}
+        <details className="settings">
+          <summary>
+            {c.settings}
+            <span aria-hidden="true">+</span>
+          </summary>
+          <div className="settings-grid">
+            <label htmlFor="latency">
+              {c.latency}
+              <input
+                id="latency"
+                type="number"
+                min="0"
+                max="60"
+                step="1"
+                value={latency}
+                onChange={(e) => {
+                  clear();
+                  setLatency(e.target.value);
+                }}
+              />
+            </label>
+            <label htmlFor="cycle">
+              {c.cycle}
+              <input
+                id="cycle"
+                type="number"
+                min="70"
+                max="120"
+                step="1"
+                value={cycle}
+                onChange={(e) => {
+                  clear();
+                  setCycle(e.target.value);
+                }}
+              />
+            </label>
+            <label htmlFor="time-format">
+              {c.format}
+              <select
+                id="time-format"
+                value={format}
+                onChange={(e) => {
+                  clear();
+                  setFormat(e.target.value as "24h" | "12h");
+                }}
+              >
+                <option value="24h">24 h</option>
+                <option value="12h">12 h</option>
+              </select>
+            </label>
           </div>
-        ) : null}
-
-        <div className="form-row">
-          <label>{c.latency}</label>
-          <select className="select" value={latency} onChange={(e) => setLatency(Number(e.target.value))}>
-            {[0, 5, 10, 15, 20, 30, 45, 60].map((v) => <option key={v} value={v}>{v} min</option>)}
-          </select>
-        </div>
-
-        <div className="form-row">
-          <label>{c.cycle}</label>
-          <select className="select" value={cycleLength} onChange={(e) => setCycleLength(Number(e.target.value))}>
-            {[70, 80, 90, 100, 110, 120].map((v) => <option key={v} value={v}>{v} min</option>)}
-          </select>
-        </div>
-
-        <div className="form-row format-row" onClick={() => setTimeFormat(timeFormat === '24h' ? '12h' : '24h')}>
-          <label>Format</label>
-          <span className="format-value">{timeFormat === '24h' ? '24-Hour' : '12-Hour'}</span>
-        </div>
-      </div>
-
-      {/* Results + monetization — only after mount (avoids hydration mismatch) */}
-      {mounted && (
-        <>
-          <div className="result-zone" aria-live="polite">
-            <div className="results-section">
-              {results.map((result, index) => (
-                <div key={result.id} className={`result-item ${result.quality === 'best' ? 'best' : ''}`}>
-                  <div className={`result-rank ${result.quality === 'best' ? 'result-rank-star' : ''}`}>
-                    {index === 0 && result.quality === 'best' ? '★' : `${index + 1}`}
-                  </div>
-                  <div className="result-info">
-                    <div className="result-time">{result.time}</div>
-                    <div className="result-meta">
-                      {result.quality === 'best' ? <><span className="result-label">{c.best}</span> · </> : null}
-                      {formatDuration(result.timeInBedMinutes)} · {result.cycles ?? '?'} {c.cycles}
-                    </div>
-                  </div>
-                  <div className="result-actions">
-                    <button type="button" className="icon-btn" onClick={() => void copyResult(result)} aria-label={`${c.copy} ${result.time}`}>{copied === result.id ? c.copied : '⧉'}</button>
-                    <a className="icon-btn" href={`#share-${result.id}`} onClick={(e) => { e.preventDefault(); window.open(window.location.href, '_blank'); }} aria-label={`${c.share} ${result.time}`}>↗</a>
-                    <a className="icon-btn" href={createCalendarHref(result, lang)} download={`sleeplike-${result.id}.ics`} aria-label="Calendar">+</a>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <div className="ad-slot" data-ad-slot="true">
-              <span className="ad-label">{c.sponsored}</span>
-              {monetization.adNetwork === 'carbon' ? (
-                <div id="_carbonads_js">
-                  <script async type="text/javascript" src={carbonAdsUrl()!} />
-                </div>
-              ) : (
-                <div className="ad-placeholder"><span>📢</span></div>
-              )}
-            </div>
-
-            {monetization.showAffiliateLinks && (
-              <div className="affiliate-products">
-                <span className="ad-label">{c.support}</span>
-                <div className="product-links">
-                  {productsForMode(mode, lang as 'en' | 'es').map((p) => (
-                    <a key={p.asin} className="product-link" href={amazonUrl(p.asin)} target="_blank" rel="nofollow sponsored">
-                      <span>{p.emoji}</span>
-                      <span>{p.label}</span>
-                    </a>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {monetization.showEmailCapture && (
-              <div className="email-capture">
-                <span className="ad-label">{lang === 'es' ? 'Tips de sueño' : 'Sleep tips'}</span>
-                <form className="email-form" action={`https://convertkit.com/forms/${monetization.convertKitFormId}/subscriptions`} method="post" target="_blank">
-                  <input className="email-input" type="email" name="email" placeholder={lang === 'es' ? 'tu@email.com' : 'your@email.com'} required />
-                  <button type="submit" className="email-submit">{lang === 'es' ? 'Suscribirme' : 'Subscribe'}</button>
-                </form>
-              </div>
-            )}
+        </details>
+        {outcome?.issues.some((i) => i.field === "settings") && (
+          <p className="field-error" role="alert">
+            {c.settingError}
+          </p>
+        )}
+        <button type="submit" className="calculate-button">
+          {c.calculate}
+          <span aria-hidden="true">↗</span>
+        </button>
+      </form>
+      <p className="calculation-note">{c.note}</p>
+      <p className="timezone">
+        {c.zone} {zone || "—"}
+      </p>
+      <p role="status" className="status-message">
+        {status}
+      </p>
+      {outcome && outcome.results.length > 0 && (
+        <section className="results" aria-labelledby="results-heading">
+          <div className="results-heading">
+            <h2 id="results-heading">{c.results}</h2>
+            <p>
+              {c.calculated}{" "}
+              <time dateTime={outcome.calculatedAt}>
+                {time(outcome.calculatedAt)} · {date(outcome.calculatedAt)}
+              </time>
+            </p>
           </div>
-
-          <p className="disclaimer">{c.disclaimer}</p>
-          <p className="affiliate">{c.affiliate}</p>
-        </>
+          {stale && (
+            <div className="stale-note">
+              <p>{c.refreshed}</p>
+              <button onClick={() => run()}>{c.update}</button>
+            </div>
+          )}
+          <ol className="results-list">
+            {outcome.results.map((option, index) => (
+              <li className="result" key={option.id}>
+                <span className="result-number" aria-hidden="true">
+                  {String(index + 1).padStart(2, "0")}
+                </span>
+                <div className="result-body">
+                  <p className="eyebrow">
+                    {option.kind === "bedtime" ? c.bed : c.wake}
+                  </p>
+                  <time className="result-time" dateTime={option.target}>
+                    {time(option.target)}
+                  </time>
+                  <p className="result-date">{date(option.target)}</p>
+                  <p className="result-duration">
+                    {!(mode === "nap" && option.inBedMinutes === 20) && (
+                      <>
+                        {duration(option.sleepMinutes)} {c.sleep}
+                        <span> · </span>
+                      </>
+                    )}
+                    {duration(option.inBedMinutes)} {c.inBed}
+                  </p>
+                  <p className="result-interval">
+                    {time(option.bedtime)} → {time(option.wakeTime)}
+                  </p>
+                  {mode === "nap" ? (
+                    <p className="result-tag">
+                      {option.inBedMinutes === 20 ? c.napShort : c.napLong}
+                    </p>
+                  ) : option.sleepMinutes < 420 ? (
+                    <p className="short-sleep">{c.short}</p>
+                  ) : null}
+                  <button
+                    className="text-button"
+                    type="button"
+                    onClick={() => calendar(option)}
+                  >
+                    {c.calendar}
+                    <span aria-hidden="true"> ↓</span>
+                  </button>
+                </div>
+              </li>
+            ))}
+          </ol>
+          <p className="reminder-note">{c.reminder}</p>
+          <div className="share-actions">
+            <button type="button" onClick={() => void share()}>
+              {c.share}
+            </button>
+            <button type="button" onClick={() => void copyLink(link())}>
+              {c.copy}
+            </button>
+          </div>
+          {manualLink && (
+            <label htmlFor="manual-link">
+              {c.manual}
+              <input
+                id="manual-link"
+                value={manualLink}
+                readOnly
+                onFocus={(e) => e.target.select()}
+              />
+            </label>
+          )}
+          <AdSlot placement="result" eligible locale={lang} />
+        </section>
       )}
     </section>
   );

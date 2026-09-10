@@ -1,39 +1,47 @@
 export type CalculatorMode = 'wake' | 'sleepNow' | 'nap' | 'window';
 
+export type Locale = 'en' | 'es';
+
+export interface LocalTime {
+  date: string;
+  time: string;
+  occurrence?: 'earlier' | 'later';
+}
+
 export interface SleepSettings {
   sleepLatencyMinutes: number;
   cycleLengthMinutes: number;
   timeFormat: '24h' | '12h';
 }
 
-export interface SleepResult {
+export interface CalculationInput {
+  mode: CalculatorMode;
+  now: Date;
+  wakeAt?: LocalTime;
+  bedAt?: LocalTime;
+  napAt?: LocalTime;
+  settings: SleepSettings;
+}
+
+export interface SleepOption {
   id: string;
-  time: string;
-  minutesFromMidnight: number;
+  target: string;
+  bedtime: string;
+  wakeTime: string;
+  sleepMinutes: number;
+  inBedMinutes: number;
   cycles: number;
-  timeInBedMinutes: number;
-  quality: 'best' | 'good' | 'minimum' | 'nap';
-  title: string;
-  description: string;
+  kind: 'bedtime' | 'wake' | 'nap';
 }
 
-export interface WakeCalculationInput {
-  wakeTime: string;
-  settings: SleepSettings;
+export interface InputIssue {
+  field: 'wakeAt' | 'bedAt' | 'napAt' | 'settings';
+  code: 'invalid' | 'nonexistent' | 'ambiguous' | 'window-too-short' | 'window-too-long';
+  choices?: string[];
 }
 
-export interface SleepNowInput {
-  now?: Date;
-  settings: SleepSettings;
-}
-
-export interface NapInput {
-  startTime: string;
-  settings: SleepSettings;
-}
-
-export interface WindowInput {
-  bedTime: string;
-  wakeTime: string;
-  settings: SleepSettings;
+export interface CalculationOutcome {
+  results: SleepOption[];
+  issues: InputIssue[];
+  calculatedAt: string;
 }

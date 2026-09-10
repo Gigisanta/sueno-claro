@@ -1,14 +1,5 @@
 import type { MetadataRoute } from 'next';
-
-export const dynamic = 'force-static';
-
-const routes = ['', '/sleep-calculator', '/bedtime-calculator', '/nap-calculator', '/calculadora-de-sueno', '/siesta', '/ciclos-de-sueno'];
-
-export default function sitemap(): MetadataRoute.Sitemap {
-  return routes.map((route) => ({
-    url: `https://sleeplike.maat.work${route}`,
-    lastModified: new Date('2026-06-30'),
-    changeFrequency: 'weekly',
-    priority: route === '' ? 1 : 0.8,
-  }));
-}
+import { pages } from '../lib/content/pages';
+import { SITE_URL } from '../lib/site';
+export const dynamic='force-static';
+export default function sitemap():MetadataRoute.Sitemap {return pages.map(page=>({url:SITE_URL+page.path,lastModified:page.updated,alternates:{languages:{[page.locale]:SITE_URL+page.path,[page.locale==='es'?'en':'es']:SITE_URL+page.pairPath}}}));}

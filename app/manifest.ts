@@ -4,13 +4,13 @@ export const dynamic = 'force-static';
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: 'sleeplike',
-    short_name: 'sleeplike',
+    name: 'SleepLike',
+    short_name: 'SleepLike',
     description: 'Private sleep cycle calculator for bedtime, wake-up times and naps.',
     start_url: '/',
     display: 'standalone',
-    background_color: '#07111f',
-    theme_color: '#07111f',
+    background_color: '#161918',
+    theme_color: '#161918',
     icons: [
       { src: '/icon.svg', sizes: 'any', type: 'image/svg+xml', purpose: 'maskable' },
     ],
