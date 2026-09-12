@@ -4,6 +4,10 @@
 
 Sleep planning calculator for adults. Bilingual static web app/PWA.
 
+Open source under the [MIT License](LICENSE). The calculator, interface and
+content pipeline can be inspected, run and adapted without sending sleep data
+to an application backend.
+
 **Production:** https://sleeplike.maat.work  
 **GitHub:** https://github.com/Gigisanta/sueno-claro
 
