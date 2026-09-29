@@ -1,6 +1,6 @@
-> **September 2026 rework:** the current implementation and release gates are documented in [docs/13-launch-2026-09.md](docs/13-launch-2026-09.md). Earlier roadmap sections below are historical.
-
 # sleeplike
+
+> **September 2026 rework:** the current implementation and release gates are documented in [docs/13-launch-2026-09.md](docs/13-launch-2026-09.md). Earlier roadmap sections below are historical.
 
 Sleep planning calculator for adults. Bilingual static web app/PWA.
 
