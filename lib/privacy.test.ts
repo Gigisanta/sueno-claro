@@ -10,6 +10,7 @@ const allowed: TcfData = {
   eventStatus: "useractioncomplete",
   purpose: { consents: { 1: true, 2: true, 7: true, 9: true, 10: true } },
   vendor: { consents: { 755: true } },
+  publisher: { restrictions: { 2: { 755: 1 }, 7: { 755: 1 }, 9: { 755: 1 }, 10: { 755: 1 } } },
 };
 describe("consent gates", () => {
   it("requires consent, loaded CMP and allowed purpose/vendor", () => {
@@ -37,6 +38,47 @@ describe("consent gates", () => {
         true,
       ),
     ).toBe(false);
+  });
+  const legitimateInterest: TcfData = {
+    cmpStatus: "loaded",
+    eventStatus: "useractioncomplete",
+    purpose: {
+      consents: { 1: true },
+      legitimateInterests: { 2: true, 7: true, 9: true, 10: true },
+    },
+    vendor: { consents: { 755: true }, legitimateInterests: { 755: true } },
+  };
+  it("requires Google's own legitimate interest in addition to purpose permissions", () => {
+    expect(permitsNonPersonalizedAds(legitimateInterest, true)).toBe(true);
+    for (const googlePermission of [false, undefined]) {
+      expect(permitsNonPersonalizedAds({
+        ...legitimateInterest,
+        vendor: { consents: { 755: true }, legitimateInterests: { 755: googlePermission } },
+      }, true)).toBe(false);
+    }
+  });
+  it("uses Google's default legal basis unless the publisher requires consent", () => {
+    expect(permitsNonPersonalizedAds({ ...allowed, publisher: undefined }, true)).toBe(false);
+    expect(permitsNonPersonalizedAds({
+      ...legitimateInterest,
+      publisher: { restrictions: { 7: { 755: 1 } } },
+    }, true)).toBe(false);
+    expect(permitsNonPersonalizedAds({
+      ...allowed,
+      publisher: { restrictions: { ...allowed.publisher?.restrictions, 7: { 755: 2 } } },
+    }, true)).toBe(false);
+  });
+  it.each([1, 2, 7, 9, 10])("honors a publisher prohibition for purpose %i", (purpose) => {
+    expect(permitsNonPersonalizedAds({
+      ...allowed,
+      publisher: { restrictions: { ...allowed.publisher?.restrictions, [purpose]: { 755: 0 } } },
+    }, true)).toBe(false);
+  });
+  it("does not treat an unsupported restriction as permission", () => {
+    expect(permitsNonPersonalizedAds({
+      ...legitimateInterest,
+      publisher: { restrictions: { 7: { 755: 3 } } },
+    }, true)).toBe(false);
   });
 });
 describe("link privacy", () => {
