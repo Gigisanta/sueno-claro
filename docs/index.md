@@ -16,6 +16,10 @@
 | `11-autonomous-hermes-runbook.md` | Agent execution protocol |
 | `12-backlog.md` | Ordered backlog and acceptance criteria |
 | `13-copy-and-content-system.md` | Product copy and SEO content templates |
+| `13-launch-2026-09.md` | Current web release, privacy and advertising gates |
+| `14-responsive-taste.md` | Current responsive visual design and acceptance |
+| `15-source-and-shared-time-corrections-2026-09-30.md` | Verified source links and future shared-clock release |
+| `16-worked-guide-examples-2026-09-30.md` | Local bilingual worked-example candidate and release evidence |
 | `adrs/` | Architecture Decision Records |
 | `17-design-inspiration-brief.md` | UI inspiration brief and visual QA constraints |
 | `18-delegated-research-addendum.md` | Integrated findings from six delegated research agents |

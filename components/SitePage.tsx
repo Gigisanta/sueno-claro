@@ -1,13 +1,18 @@
+import { Fragment } from "react";
+import { getGuideExamples } from "../lib/content/examples";
 import { getPage } from "../lib/content/pages";
 import { structuredData } from "../lib/metadata";
 import { homePath } from "../lib/site";
 import { CalculatorShell } from "./CalculatorShell";
 import { PageChrome } from "./PageChrome";
 import { AdSlot } from "./AdSlot";
+import { GuideExamples } from "./GuideExamples";
 import { SharePage } from "./SharePage";
 export function SitePage({ path }: { path: string }) {
   const page = getPage(path)!;
   const es = page.locale === "es";
+  const examples =
+    page.kind === "guide" ? getGuideExamples(page.path) : undefined;
   return (
     <PageChrome lang={page.locale} pairPath={page.pairPath}>
       <script
@@ -71,9 +76,12 @@ export function SitePage({ path }: { path: string }) {
             >
               <strong>{es ? "En esta guía" : "In this guide"}</strong>
               {page.sections.map((section) => (
-                <a key={section.id} href={`#${section.id}`}>
-                  {section.heading}
-                </a>
+                <Fragment key={section.id}>
+                  <a href={`#${section.id}`}>{section.heading}</a>
+                  {examples?.afterSectionId === section.id && (
+                    <a href="#guide-examples">{examples.heading}</a>
+                  )}
+                </Fragment>
               ))}
             </nav>
           )}
@@ -121,6 +129,9 @@ export function SitePage({ path }: { path: string }) {
                   </div>
                 )}
               </section>
+              {examples?.afterSectionId === section.id && (
+                <GuideExamples content={examples} />
+              )}
               {page.kind === "guide" && (index === 1 || index === 3) && (
                 <AdSlot placement="article" eligible locale={page.locale} />
               )}

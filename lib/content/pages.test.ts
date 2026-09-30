@@ -147,7 +147,11 @@ describe('content catalog', () => {
     expect(spanishMethodologyText).toContain('no pronostica etapas futuras del sueño');
   });
 
-  it('uses one update date and does not import app or core code', () => {
-    expect(new Set(pages.map((page) => page.updated))).toEqual(new Set(['2026-09-10']));
+  it('keeps valid calendar revision dates consistent across language pairs', () => {
+    for (const page of pages) {
+      expect(page.updated, page.path).toMatch(/^\d{4}-\d{2}-\d{2}$/);
+      expect(new Date(page.updated).toISOString().slice(0, 10), page.path).toBe(page.updated);
+      expect(getPage(page.pairPath)?.updated, page.path).toBe(page.updated);
+    }
   });
 });

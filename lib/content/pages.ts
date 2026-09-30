@@ -261,7 +261,7 @@ export const pages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/', '/bedtime-calculator', '/how-much-sleep', '/sleep-latency'],
-    updated: '2026-09-10',
+    updated: '2026-09-30',
   },
   {
     path: '/calculadora-de-sueno',
@@ -468,7 +468,7 @@ export const pages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/calculadora-de-sueno', '/hora-de-dormir', '/cuantas-horas-dormir', '/cuanto-tardo-en-dormirme'],
-    updated: '2026-09-10',
+    updated: '2026-09-30',
   },
   {
     path: '/about',
@@ -980,7 +980,7 @@ export const pages: ContentPage[] = [
     ],
     sources: [...sleepSources, durationSource],
     related: ['/calculadora-de-sueno', '/ciclos-de-sueno', '/horario-de-sueno', '/cuanto-tardo-en-dormirme'],
-    updated: '2026-09-10',
+    updated: '2026-09-30',
   },
   {
     path: '/cuanto-tardo-en-dormirme',
@@ -1040,7 +1040,7 @@ export const pages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/hora-de-dormir', '/calculadora-de-sueno', '/horario-de-sueno', '/cuantas-horas-dormir'],
-    updated: '2026-09-10',
+    updated: '2026-09-30',
   },
   {
     path: '/horario-de-sueno',
@@ -1101,7 +1101,7 @@ export const pages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/calculadora-de-sueno', '/hora-de-dormir', '/cuantas-horas-dormir', '/cuanto-tardo-en-dormirme'],
-    updated: '2026-09-10',
+    updated: '2026-09-30',
   },
   {
     path: '/how-much-sleep',
@@ -1169,7 +1169,7 @@ export const pages: ContentPage[] = [
     ],
     sources: [...sleepSources, durationSource],
     related: ['/', '/sleep-cycles', '/sleep-schedule', '/sleep-latency'],
-    updated: '2026-09-10',
+    updated: '2026-09-30',
   },
   {
     path: '/sleep-latency',
@@ -1229,7 +1229,7 @@ export const pages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/bedtime-calculator', '/', '/sleep-schedule', '/how-much-sleep'],
-    updated: '2026-09-10',
+    updated: '2026-09-30',
   },
   {
     path: '/sleep-schedule',
@@ -1290,7 +1290,7 @@ export const pages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/', '/bedtime-calculator', '/how-much-sleep', '/sleep-latency'],
-    updated: '2026-09-10',
+    updated: '2026-09-30',
   },
 ];
 
