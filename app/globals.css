@@ -741,3 +741,29 @@ th {
 @media (max-width: 639px) {
   .result-time small { display: block; margin-top: .1rem; font-size: .75rem; line-height: 1.4; }
 }
+
+/* Worked guide examples: one or two server-rendered cards, stacked on phones. */
+.guide-examples { margin: 0 0 3rem; }
+.guide-examples h2 { margin-bottom: 1.3rem; }
+.guide-examples-intro { color: #c9d0c9; line-height: 1.9; }
+.guide-examples-list { display: grid; gap: .85rem; list-style: none; padding: 0; margin: 1.5rem 0 0; }
+.guide-example { display: flex; flex-direction: column; min-width: 0; padding: 1.25rem; border: 1px solid var(--line); border-radius: 16px; background: var(--panel); overflow-wrap: break-word; }
+.guide-example h3 { font-size: 1.15rem; font-weight: 600; letter-spacing: -.02em; margin-bottom: .5rem; }
+.guide-example > p { color: #c9d0c9; font-size: .9rem; line-height: 1.7; margin-bottom: 1rem; }
+.guide-example dl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .9rem .75rem; margin: auto 0 0; padding: 1rem 0 .75rem; border-top: 1px solid var(--line); }
+.guide-example dl div { min-width: 0; }
+.guide-example dt { font-size: .75rem; line-height: 1.45; color: var(--muted); margin-bottom: .2rem; }
+.guide-example dd { margin: 0; font-size: 1.1rem; font-weight: 600; line-height: 1.35; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.guide-example a { display: inline-flex; align-items: center; gap: .45rem; align-self: flex-start; max-width: 100%; min-height: 44px; color: var(--gold); font-size: .9rem; font-weight: 600; text-decoration: underline; text-underline-offset: 4px; }
+.guide-examples-note { color: var(--muted); font-size: .82rem; line-height: 1.75; margin: 1.25rem 0 0; }
+@media (hover: hover) { .guide-example a:hover { color: var(--ink); } }
+@media (min-width: 640px) {
+  .guide-examples-list { grid-auto-flow: column; grid-auto-columns: minmax(0, 1fr); }
+  .guide-example:only-child dl { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+}
+@media (max-width: 639px) {
+  .guide-examples { margin-bottom: 2rem; }
+  .guide-examples h2 { font-size: 1.5rem; }
+  .guide-examples-intro { font-size: .95rem; line-height: 1.8; }
+  .guide-example { padding: 1rem; }
+}
