@@ -51,6 +51,17 @@
       "permanent": true
     },
     {
+      "source": "/",
+      "has": [
+        {
+          "type": "host",
+          "value": "sueno-claro.vercel.app"
+        }
+      ],
+      "destination": "https://sleeplike.maat.work/",
+      "permanent": true
+    },
+    {
       "source": "/:path*",
       "has": [
         {
