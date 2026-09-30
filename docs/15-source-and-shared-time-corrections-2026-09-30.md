@@ -1,0 +1,29 @@
+# SleepLike: sources and shared clock corrections · 2026-09-30
+
+## Scope and evidence
+
+The public `/sleep-cycles`, `/sleep-latency` and sitemap returned HTTP 200 on September 30. This does not establish Google indexing. The most recent confirmed dated index report remains September 20: one indexed page and 23 discovered, currently not indexed. The later overview repeats that total without a new confirmed cutoff.
+
+The old primary citation `https://www.nhlbi.nih.gov/health/sleep/healthy-sleep` returned HTTP 404. All 14 calculator/guide pages now cite the official [Healthy Sleep Habits](https://www.nhlbi.nih.gov/health/sleep-deprivation/healthy-sleep-habits) page, verified HTTP 200. The two adult-duration guides also cite [How Much Sleep Is Enough?](https://www.nhlbi.nih.gov/health/sleep/how-much-sleep), verified HTTP 200 and supporting the existing 7–9-hour adult reference. NHLBI Sleep Phases and Stages returned HTTP 200. The existing CDC About Sleep page was readable through the web research source, while a direct urllib request returned HTTP 403; that observation is not recorded as a broken citation or as HTTP 200. Editorial body dates remain unchanged.
+
+A clock-only link requesting 07:00, visited at 07:15 in America/New_York, retained the current date because restoration used the default 07:30 date. The new browser regression fails on the preceding artifact with September 11 where September 12 is expected. Restoration now calls the deterministic core to find a valid future local occurrence of the linked clock. A repeated clock chooses a still-future earlier/later occurrence and respects an explicit occurrence preference; a nonexistent clock skips to the next valid calendar day. Explicit shared dates stay strict, and the existing overnight-window logic remains in place. Calculation and daylight-saving validation remain in the existing deterministic core.
+
+## Test ownership
+
+The added browser regression protects actual shared-link restoration and local-date selection. Existing coverage uses explicit shared dates and could not catch the stale default date. It uses Playwright's existing clock facility and requires no test-only production seam. Baseline failures: `/tmp/sleeplike-example-date-baseline-20260930.log` (ordinary day), then `/tmp/sleeplike-example-dst-baseline-20260930.log` (two failures for fall fold and spring gap, one passing control for an explicit later preference). The independent checker identified the DST bug in the initial `Date.setHours` repair; the parser-backed revision corrects it before publication. The browser boundary owns clock-only-link inference; core unit tests continue to own explicit-date arithmetic and validation.
+
+The citation unit test no longer freezes three exact URLs, including the dead URL. It checks the independently meaningful boundary of HTTPS primary CDC/NHLBI citations, without credentials. Actual citation HTTP availability is a dated release observation rather than a brittle network unit test. Existing calculator tests own explicit dates, daylight-saving ambiguity/gaps, overnight windows, exports and privacy.
+
+## Frontend coordination
+
+The requested Claude Code invocation used `claude-opus-5-5`, the existing claude.ai firstParty Max account, and only local Read/Edit/Write/Glob/Grep tools. It returned a session quota limit before making changes or recording model usage: reset at 06:50 America/Argentina/Salta. No paid API fallback was used.
+
+Worked-example content and the frontend prompt remain prepared outside this release in `/Users/gigi/HerMaatOS/output/miniapps-guides-20260930/examples.ts` and `/Users/gigi/HerMaatOS/output/miniapps-guides-20260930/opus-prompt.txt`. They are not rendered or counted as completed. After quota renewal, restore the content module, rerun Opus, then verify the eight guide journeys and genuine editorial-date updates before a separate release.
+
+## Release gates
+
+Initial root `bin/gate.sh`: PASS, four checks, 28 unit tests and static build, 24 localized routes with reciprocal languages, schemas and discovery links. Log: `/tmp/sleeplike-sources-date-gate-20260930.log`. Final parser-backed gate: PASS, four checks, 28 unit tests and static build. Log: `/tmp/sleeplike-sources-date-gate-final-20260930.log`.
+
+Initial `make verify`: PASS, documentation validation, lint, 28 unit tests, static build and 88 browser cases across desktop/mobile Chromium and WebKit. Log: `/tmp/sleeplike-sources-date-verify-20260930.log`. The initial ordinary clock-only regression passes; existing explicit-date, DST, window, offline, export, layout and privacy cases also pass. Final `make verify`: PASS, documentation validation, lint, 28 unit tests, static build and 100 browser cases; all four added clock-only scenarios passed in each browser project. Log: `/tmp/sleeplike-sources-date-verify-final-20260930.log`. The new documentation file was then separately validated. Independent checker, staged deployment and production smoke are required before promotion. The preceding live artifact, confirmed at 07:12:30 UTC, is `dpl_GR6eLt3QPQKDc83SoJ99pte3zr7U` (`de50d0b1bfc93d26bdfb83dcf32eba1da6c1eb45`), the rollback target. Project `sueno-claro` has `autoAssignCustomDomains=false`; production `NEXT_PUBLIC_ADS_APPROVED` is explicitly false. At about 07:12 UTC, the refreshed Vercel team panel showed USD 7.20 of USD 20 included credit used, USD 0 on-demand, approximately USD 12.80 remaining. Shared rounded consumption is not attributable miniapp cost or reconciled monthly net income.
+
+No ads, additional public capture, indexing requests, sitemap resubmissions, tax changes, account permission changes or new routes are part of this release. Corrections improve citation access and the calculator journey; they do not establish that Google has crawled, indexed or approved the site.

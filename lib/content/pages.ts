@@ -36,14 +36,19 @@ const sleepSources: ContentSource[] = [
     url: 'https://www.nhlbi.nih.gov/health/sleep/stages-of-sleep',
   },
   {
-    title: 'NHLBI · Healthy Sleep',
-    url: 'https://www.nhlbi.nih.gov/health/sleep/healthy-sleep',
+    title: 'NHLBI · Healthy Sleep Habits',
+    url: 'https://www.nhlbi.nih.gov/health/sleep-deprivation/healthy-sleep-habits',
   },
   {
     title: 'CDC · About Sleep',
     url: 'https://www.cdc.gov/sleep/about/',
   },
 ];
+
+const durationSource: ContentSource = {
+  title: 'NHLBI · How Much Sleep Is Enough?',
+  url: 'https://www.nhlbi.nih.gov/health/sleep/how-much-sleep',
+};
 
 const contactSource: ContentSource = {
   title: 'MaatWork · sitio público',
@@ -973,7 +978,7 @@ export const pages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/calculadora-de-sueno', '/ciclos-de-sueno', '/horario-de-sueno', '/cuanto-tardo-en-dormirme'],
     updated: '2026-09-10',
   },
@@ -1162,7 +1167,7 @@ export const pages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/', '/sleep-cycles', '/sleep-schedule', '/sleep-latency'],
     updated: '2026-09-10',
   },

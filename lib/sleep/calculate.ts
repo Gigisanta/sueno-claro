@@ -67,6 +67,48 @@ export function safeSettings(partial: Partial<SleepSettings> = {}): SleepSetting
   };
 }
 
+/** Resolve a clock-only link to a future local occurrence, including DST folds/gaps. */
+export function nextLocalTime(
+  time: string,
+  now: Date,
+  occurrence?: LocalTime['occurrence'],
+): LocalTime | undefined {
+  if (
+    !(now instanceof Date) || !Number.isFinite(now.getTime()) ||
+    (occurrence !== undefined && occurrence !== 'earlier' && occurrence !== 'later')
+  ) return;
+
+  // Walk calendar days at noon so crossing a midnight gap cannot normalize the
+  // requested clock. Missing clocks are resolved by the same parser as calculate.
+  const day = new Date(now);
+  day.setHours(12, 0, 0, 0);
+  for (let attempt = 0; attempt < 8; attempt += 1) {
+    const date = `${String(day.getFullYear()).padStart(4, '0')}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`;
+    const parsed = parseLocalTime({ date, time }, 'wakeAt');
+    if (parsed.issue?.code === 'invalid') return;
+    const candidates = parsed.date
+      ? [parsed.date]
+      : parsed.issue?.code === 'ambiguous'
+        ? parsed.issue.choices!.map((iso) => new Date(iso))
+        : [];
+    const indices = occurrence === 'earlier'
+      ? [0]
+      : occurrence === 'later'
+        ? [candidates.length - 1]
+        : candidates.length > 1 ? [0, candidates.length - 1] : [0];
+    for (const index of indices) {
+      if (candidates[index]?.getTime() > now.getTime()) {
+        return {
+          date,
+          time,
+          ...(candidates.length > 1 ? { occurrence: index === 0 ? 'earlier' as const : 'later' as const } : {}),
+        };
+      }
+    }
+    day.setDate(day.getDate() + 1);
+  }
+}
+
 export function calculate(input: CalculationInput): CalculationOutcome {
   const calculatedAt = toIsoOrEpoch(input.now);
   if (!(input.now instanceof Date) || !Number.isFinite(input.now.getTime())) {

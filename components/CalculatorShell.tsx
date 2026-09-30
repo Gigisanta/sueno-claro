@@ -3,7 +3,7 @@
 import { useEffect, useLayoutEffect, useState, type FormEvent } from "react";
 import { ArrowRightIcon, CalendarIcon, ClockIcon, MoonIcon, SunIcon, TimerIcon } from "@radix-ui/react-icons";
 import { track } from "@vercel/analytics";
-import { calculate, safeSettings } from "../lib/sleep/calculate";
+import { calculate, nextLocalTime, safeSettings } from "../lib/sleep/calculate";
 import { createCalendar } from "../lib/sleep/calendar";
 import type {
   CalculatorMode,
@@ -186,6 +186,14 @@ export function CalculatorShell({
       if (occurrence === "earlier" || occurrence === "later")
         defaults[field].occurrence = occurrence;
     }
+    const sharedMode = params.get("mode");
+    const restoredMode = modes.includes(sharedMode as CalculatorMode) ? sharedMode : initialMode;
+    // Clock-only wake links choose a valid future occurrence using the core's
+    // local-time parser. Explicit dates and other planning modes stay strict.
+    if (restoredMode === "wake" && !params.has("wakeDate") && !params.has("date") && params.has("wake")) {
+      const nextWake = nextLocalTime(defaults.wakeAt.time, now, defaults.wakeAt.occurrence);
+      if (nextWake) defaults.wakeAt = nextWake;
+    }
     // Old links contained wall times only. Interpret an overnight window as the next day,
     // while keeping explicit dates strict (including an intentionally insufficient window).
     if (
@@ -203,7 +211,6 @@ export function CalculatorShell({
       }
     }
     setFields(defaults);
-    const sharedMode = params.get("mode");
     if (modes.includes(sharedMode as CalculatorMode))
       setMode(sharedMode as CalculatorMode);
     const settings = safeSettings({

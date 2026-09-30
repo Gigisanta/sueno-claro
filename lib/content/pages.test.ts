@@ -24,12 +24,6 @@ const spanishProductPaths = [
 const englishLegalPaths = ['/about', '/contact', '/privacy', '/terms', '/methodology'];
 const spanishLegalPaths = ['/acerca-de', '/contacto', '/privacidad', '/terminos', '/metodologia'];
 
-const sourceUrls = [
-  'https://www.nhlbi.nih.gov/health/sleep/stages-of-sleep',
-  'https://www.nhlbi.nih.gov/health/sleep/healthy-sleep',
-  'https://www.cdc.gov/sleep/about/',
-];
-
 function contentWords(page: ContentPage): number {
   const values = [
     page.intro,
@@ -117,8 +111,11 @@ describe('content catalog', () => {
 
   it('keeps primary science sources on product and guide pages', () => {
     for (const page of pages.filter((candidate) => candidate.kind !== 'legal')) {
-      for (const url of sourceUrls) {
-        expect(page.sources.map((source) => source.url), page.path).toContain(url);
+      const sources = page.sources.map((source) => new URL(source.url));
+      expect(new Set(sources.map((source) => source.hostname)), page.path).toEqual(new Set(['www.nhlbi.nih.gov', 'www.cdc.gov']));
+      for (const source of sources) {
+        expect(source.protocol, page.path).toBe('https:');
+        expect(source.username + source.password, page.path).toBe('');
       }
     }
   });

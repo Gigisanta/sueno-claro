@@ -2,6 +2,29 @@ import { test, expect } from "@playwright/test";
 import ICAL from "ical.js";
 import { readFile } from "node:fs/promises";
 
+test("clock-only wake links choose the next occurrence of the linked time", async ({ page }) => {
+  await page.clock.install({ time: new Date("2026-09-11T11:15:00Z") });
+  await page.goto("/calculadora-de-sueno#sleep=mode=wake&wake=07%3A00&latency=15");
+  await expect(page.locator("#wakeAt-time")).toHaveValue("07:00");
+  await expect(page.locator("#wakeAt-date")).toHaveValue("2026-09-12");
+});
+
+for (const scenario of [
+  { name: "fold chooses the still-future second occurrence", now: "2026-11-01T06:15:00Z", params: "wake=01%3A30", date: "2026-11-01", occurrence: "later" },
+  { name: "fold preserves an explicit later preference", now: "2026-11-01T05:15:00Z", params: "wake=01%3A30&wakeOccurrence=later", date: "2026-11-01", occurrence: "later" },
+  { name: "gap skips the nonexistent local clock", now: "2026-03-08T06:15:00Z", params: "wake=02%3A30", date: "2026-03-09", occurrence: undefined },
+]) {
+  test(`clock-only DST link: ${scenario.name}`, async ({ page }) => {
+    await page.clock.install({ time: new Date(scenario.now) });
+    await page.goto(`/#sleep=mode=wake&${scenario.params}`);
+    await expect(page.locator("#wakeAt-date")).toHaveValue(scenario.date);
+    if (scenario.occurrence) await expect(page.locator("#wakeAt-occurrence")).toHaveValue(scenario.occurrence);
+    await page.getByRole("button", { name: "Calculate", exact: true }).click();
+    await expect(page.locator(".result")).toHaveCount(4);
+    await expect(page.locator("#wakeAt-error")).toHaveCount(0);
+  });
+}
+
 test("wake calculation, explicit date, accessible settings and complete ICS", async ({
   page,
 }) => {
