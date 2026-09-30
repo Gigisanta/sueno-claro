@@ -20,6 +20,7 @@
 | `14-responsive-taste.md` | Current responsive visual design and acceptance |
 | `15-source-and-shared-time-corrections-2026-09-30.md` | Verified source links and future shared-clock release |
 | `16-worked-guide-examples-2026-09-30.md` | Local bilingual worked-example candidate and release evidence |
+| `17-ad-consent-correction-2026-09-30.md` | Vendor legal basis and publisher restrictions for future manual ads |
 | `adrs/` | Architecture Decision Records |
 | `17-design-inspiration-brief.md` | UI inspiration brief and visual QA constraints |
 | `18-delegated-research-addendum.md` | Integrated findings from six delegated research agents |

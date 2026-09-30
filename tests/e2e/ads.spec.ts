@@ -35,8 +35,8 @@ const consentScript = `
       listenerId: 1,
       cmpStatus: 'loaded',
       eventStatus: 'useractioncomplete',
-      purpose: { consents: { 1: yes, 2: yes, 7: yes, 9: yes, 10: yes } },
-      vendor: { consents: { 755: yes } }
+      purpose: { consents: { 1: yes }, legitimateInterests: { 2: yes, 7: yes, 9: yes, 10: yes } },
+      vendor: { consents: { 755: yes }, legitimateInterests: { 755: yes } }
     };
     window.__consentListeners.slice().forEach((callback) => callback(data, true));
   };
