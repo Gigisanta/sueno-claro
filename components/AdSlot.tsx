@@ -2,7 +2,6 @@
 import { useEffect, useRef, useState } from "react";
 import { monetization } from "../lib/monetization/config";
 import { usePrivacy } from "./PrivacyProvider";
-import type { Locale } from "../lib/site";
 declare global {
   interface Window {
     adsbygoogle?: Array<Record<string, unknown>> & {
@@ -18,11 +17,11 @@ const requests: Record<"result" | "article", number> = {
 export function AdSlot({
   placement,
   eligible,
-  locale,
+  label,
 }: {
   placement: "result" | "article";
   eligible: boolean;
-  locale: Locale;
+  label: string;
 }) {
   const { adsAllowed } = usePrivacy();
   const [near, setNear] = useState(false);
@@ -82,13 +81,13 @@ export function AdSlot({
       ref={container}
       className="ad-slot"
       data-testid={"ad-" + placement}
-      aria-label={locale === "es" ? "Publicidad" : "Advertisement"}
+      aria-label={label}
     >
       {near && !failed && (
         <>
           {filled && (
             <span className="ad-label">
-              {locale === "es" ? "Publicidad" : "Advertisement"}
+              {label}
             </span>
           )}
           <ins

@@ -1,7 +1,5 @@
 export type CalculatorMode = 'wake' | 'sleepNow' | 'nap' | 'window';
 
-export type Locale = 'en' | 'es';
-
 export interface LocalTime {
   date: string;
   time: string;

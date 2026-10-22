@@ -23,7 +23,7 @@ for (const example of [
     await expect(page.locator('html')).toHaveAttribute('lang', example.locale);
     await expect(page.locator('#wakeAt-time')).toHaveValue('07:00');
     await expect(page.locator('#wakeAt-date')).toHaveValue('2026-09-12');
-    await page.locator('summary').click();
+    await page.locator('.settings summary').click();
     await expect(page.locator('#latency')).toHaveValue('30');
     await page.getByRole('button', { name: example.calculate, exact: true }).click();
     await expect(page.locator('.result-time')).toHaveText(['21:30', '23:00', '00:30', '02:00']);

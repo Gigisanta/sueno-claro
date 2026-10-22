@@ -4,7 +4,7 @@
 scripts/validate_docs.py exige que este archivo exista, empiece con "#" y no tenga
 tabs ni la marca de pendiente en mayúsculas. El estado fechado vive en docs/. -->
 
-Calculadora de ciclos de sueño privacy-first, bilingüe EN/ES, web/PWA en
+Calculadora de ciclos de sueño privacy-first, en EN/ES/PT-BR/FR/DE/IT, web/PWA en
 `https://sleeplike.maat.work` (el repo conserva el nombre viejo, `sueno-claro`).
 El estado vigente y los gates de release están en `docs/13-launch-2026-09.md`, que
 reemplaza el roadmap anterior de afiliados, app nativa y cero analítica; el diseño

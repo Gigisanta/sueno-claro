@@ -16,7 +16,7 @@ import {
   publicPageUrl,
   type TcfData,
 } from "../lib/privacy";
-import type { Locale } from "../lib/site";
+import type { LocaleCopy } from "../lib/locales/en";
 declare global {
   interface Window {
     __tcfapi?: (
@@ -58,10 +58,10 @@ const PrivacyContext = createContext({
 export const usePrivacy = () => useContext(PrivacyContext);
 export function PrivacyProvider({
   children,
-  locale,
+  copy: c,
 }: {
   children: ReactNode;
-  locale: Locale;
+  copy: LocaleCopy["privacy"];
 }) {
   const [ready, setReady] = useState(false);
   const [production, setProduction] = useState(false);
@@ -70,7 +70,6 @@ export function PrivacyProvider({
   const [adsenseReady, setAdsenseReady] = useState(false);
   const [analyticsAllowed, setAnalyticsAllowed] = useState(false);
   const [open, setOpen] = useState(false);
-  const es = locale === "es";
   const analyticsPermission = useRef(false);
   const adsenseReadyRef = useRef(false);
   const adConsentRef = useRef(false);
@@ -298,22 +297,20 @@ export function PrivacyProvider({
           aria-expanded={open}
           aria-controls="privacy-preferences"
         >
-          {es ? "Preferencias de privacidad" : "Privacy preferences"}
+          {c.preferences}
         </button>
       </div>
       {open && (
         <section
           id="privacy-preferences"
           className="privacy-panel"
-          aria-label={es ? "Preferencias de privacidad" : "Privacy preferences"}
+          aria-label={c.preferences}
         >
           <h2>
-            {es ? "Tu descanso. Tus decisiones." : "Your rest. Your choices."}
+            {c.heading}
           </h2>
           <p>
-            {es
-              ? "El cálculo se realiza en tu dispositivo. Podés permitir estadísticas agregadas; no enviamos tus horarios ni resultados."
-              : "Calculations run on your device. You can allow aggregate usage statistics; we do not send your sleep times or results."}
+            {c.description}
           </p>
           <label className="check-label">
             <input
@@ -321,18 +318,10 @@ export function PrivacyProvider({
               checked={analyticsAllowed}
               onChange={(e) => setAnalytics(e.target.checked)}
             />
-            {es
-              ? "Permitir estadísticas agregadas"
-              : "Allow aggregate usage statistics"}
+            {c.analytics}
           </label>
           <p>
-            {monetization.enabled
-              ? es
-                ? "Los anuncios no personalizados requieren consentimiento independiente."
-                : "Non-personalized ads require a separate consent choice."
-              : es
-                ? "La publicidad todavía no está habilitada."
-                : "Advertising is not currently enabled."}
+            {monetization.enabled ? c.separateConsent : c.disabled}
           </p>
           {monetization.enabled && (
             <button
@@ -340,9 +329,7 @@ export function PrivacyProvider({
               className="secondary-button"
               onClick={queueRevocationMessage}
             >
-              {es
-                ? "Revisar consentimiento de anuncios"
-                : "Review advertising consent"}
+              {c.review}
             </button>
           )}
           <button
@@ -350,7 +337,7 @@ export function PrivacyProvider({
             className="secondary-button"
             onClick={() => setOpen(false)}
           >
-            {es ? "Cerrar" : "Close"}
+            {c.close}
           </button>
         </section>
       )}

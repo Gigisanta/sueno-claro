@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { getPage, pages, type ContentPage } from './pages';
+import { locales, localizedPaths } from '../i18n';
 
 const englishProductPaths = [
   '/',
@@ -55,7 +56,7 @@ function pageText(page: ContentPage): string {
 }
 
 describe('content catalog', () => {
-  it('contains exactly the agreed bilingual product and legal routes', () => {
+  it('contains all twelve page topics in each of the six languages', () => {
     const expectedPaths = [
       ...englishProductPaths,
       ...spanishProductPaths,
@@ -63,49 +64,65 @@ describe('content catalog', () => {
       ...spanishLegalPaths,
     ];
 
-    expect(pages).toHaveLength(24);
-    expect(new Set(pages.map((page) => page.path))).toEqual(new Set(expectedPaths));
-    expect(new Set(pages.map((page) => page.path)).size).toBe(expectedPaths.length);
-    expect(pages.filter((page) => page.locale === 'en')).toHaveLength(12);
-    expect(pages.filter((page) => page.locale === 'es')).toHaveLength(12);
-    expect(pages.filter((page) => page.kind === 'tool')).toHaveLength(6);
-    expect(pages.filter((page) => page.kind === 'guide')).toHaveLength(8);
-    expect(pages.filter((page) => page.kind === 'legal')).toHaveLength(10);
+    expect(pages).toHaveLength(72);
+    expect(pages.filter((page) => page.locale === 'en' || page.locale === 'es').map((page) => page.path).sort()).toEqual(expectedPaths.sort());
+    expect(new Set(pages.map((page) => page.path)).size).toBe(72);
+    for (const locale of locales) {
+      const localized = pages.filter((page) => page.locale === locale);
+      expect(localized, locale).toHaveLength(12);
+      expect(new Set(localized.map((page) => page.key)).size, locale).toBe(12);
+      expect(localized.filter((page) => page.kind === 'tool'), locale).toHaveLength(3);
+      expect(localized.filter((page) => page.kind === 'guide'), locale).toHaveLength(4);
+      expect(localized.filter((page) => page.kind === 'legal'), locale).toHaveLength(5);
+    }
   });
 
-  it('keeps every language pair symmetric and every related link in the catalog', () => {
+  it('keeps every translation group complete and related links in the same language', () => {
     for (const page of pages) {
       expect(getPage(page.path)).toBe(page);
-      expect(getPage(page.pairPath)?.pairPath).toBe(page.path);
+      expect(page.path, page.path).toBe(localizedPaths[page.locale][page.key]);
+      const translations = pages.filter((candidate) => candidate.key === page.key);
+      expect(new Set(translations.map((translation) => translation.locale)), page.path).toEqual(new Set(locales));
       for (const relatedPath of page.related) {
         expect(getPage(relatedPath), `${page.path} links to ${relatedPath}`).toBeDefined();
+        expect(getPage(relatedPath)?.locale, `${page.path} links to ${relatedPath}`).toBe(page.locale);
       }
     }
   });
 
   it('uses the requested modes and content length bands', () => {
-    const expectedModes: Record<string, 'wake' | 'nap'> = {
-      '/': 'wake',
-      '/bedtime-calculator': 'wake',
-      '/nap-calculator': 'nap',
-      '/calculadora-de-sueno': 'wake',
-      '/hora-de-dormir': 'wake',
-      '/siesta': 'nap',
-    };
 
     for (const page of pages) {
       if (page.kind === 'tool') {
-        expect(page.mode).toBe(expectedModes[page.path]);
-        expect(contentWords(page), page.path).toBeGreaterThanOrEqual(250);
-        expect(contentWords(page), page.path).toBeLessThanOrEqual(400);
+        expect(page.mode).toBe(page.key === 'nap' ? 'nap' : 'wake');
+        if (page.locale === 'en' || page.locale === 'es') {
+          expect(contentWords(page), page.path).toBeGreaterThanOrEqual(250);
+          expect(contentWords(page), page.path).toBeLessThanOrEqual(400);
+        }
       } else {
         expect(page.mode, page.path).toBeUndefined();
       }
 
-      if (page.kind === 'guide') {
+      if (page.kind === 'guide' && (page.locale === 'en' || page.locale === 'es')) {
         expect(contentWords(page), page.path).toBeGreaterThanOrEqual(500);
         expect(contentWords(page), page.path).toBeLessThanOrEqual(750);
       }
+    }
+  });
+
+  it('preserves the complete English editorial structure in every new translation', () => {
+    for (const page of pages.filter((candidate) => candidate.locale !== 'en' && candidate.locale !== 'es')) {
+      const original = pages.find((candidate) => candidate.locale === 'en' && candidate.key === page.key)!;
+      expect(page.sections.map((section) => section.id), page.path).toEqual(original.sections.map((section) => section.id));
+      for (const [index, section] of page.sections.entries()) {
+        const source = original.sections[index];
+        expect(section.paragraphs.length, `${page.path}#${section.id}`).toBe(source.paragraphs.length);
+        expect(section.bullets?.length, `${page.path}#${section.id}`).toBe(source.bullets?.length);
+        expect(section.table?.rows.map((row) => row.length), `${page.path}#${section.id}`).toEqual(source.table?.rows.map((row) => row.length));
+        expect(section.table?.headers.length, `${page.path}#${section.id}`).toBe(source.table?.headers.length);
+        expect([section.heading, ...section.paragraphs, ...(section.bullets ?? [])].every((text) => text.trim().length > 0), page.path).toBe(true);
+      }
+      expect(page.sources.map((source) => source.url), page.path).toEqual(original.sources.map((source) => source.url));
     }
   });
 
@@ -147,11 +164,12 @@ describe('content catalog', () => {
     expect(spanishMethodologyText).toContain('no pronostica etapas futuras del sueño');
   });
 
-  it('keeps valid calendar revision dates consistent across language pairs', () => {
+  it('uses valid revision dates without backdating new translations', () => {
     for (const page of pages) {
       expect(page.updated, page.path).toMatch(/^\d{4}-\d{2}-\d{2}$/);
       expect(new Date(page.updated).toISOString().slice(0, 10), page.path).toBe(page.updated);
-      expect(getPage(page.pairPath)?.updated, page.path).toBe(page.updated);
+      const original = pages.find((candidate) => candidate.locale === 'en' && candidate.key === page.key)!;
+      expect(page.updated >= original.updated, page.path).toBe(true);
     }
   });
 });

@@ -15,123 +15,10 @@ import { readSharedSettings } from "../lib/privacy";
 import { usePrivacy } from "./PrivacyProvider";
 import { AdSlot } from "./AdSlot";
 
-type Locale = "en" | "es";
+import type { Locale } from "../lib/i18n";
+import type { LocaleCopy } from "../lib/locales/en";
 type Field = "wakeAt" | "bedAt" | "napAt";
 const modes: CalculatorMode[] = ["wake", "sleepNow", "nap", "window"];
-const copy = {
-  en: {
-    modes: ["Wake up", "Sleep now", "Nap", "Time window"],
-    questions: [
-      "When do you need to wake up?",
-      "Heading to bed now?",
-      "When will your nap start?",
-      "How much time do you have?",
-    ],
-    wakeAt: "Wake up",
-    bedAt: "Go to bed",
-    napAt: "Start nap",
-    date: "Date",
-    time: "Time",
-    settings: "Adjust your estimates",
-    latency: "Time to fall asleep (minutes)",
-    cycle: "Estimated cycle (minutes)",
-    format: "Time format",
-    calculate: "Calculate",
-    results: "Your estimated times",
-    bed: "Go to bed at",
-    wake: "Wake up at",
-    sleep: "estimated sleep",
-    inBed: "in bed",
-    short: "Under 7 hours of sleep",
-    share: "Share plan",
-    copy: "Copy link",
-    calendar: "Calendar reminder",
-    calculated: "Calculated at",
-    refreshed: "Time has moved on. Update your calculation when you are ready.",
-    update: "Update to now",
-    earlier: "First occurrence",
-    later: "Second occurrence",
-    choose: "Choose an occurrence",
-    occurrence: "This time occurs twice",
-    now: "The current time is captured when you calculate.",
-    note: "Estimates for adults, not a guarantee of rest. Sleep cycles vary. Prioritize enough sleep and a regular schedule.",
-    copied: "Link copied.",
-    failed: "Automatic copying is unavailable. Copy the link below.",
-    manual: "Plan link",
-    ready: " options calculated.",
-    invalid: "Enter a valid date and time.",
-    nonexistent:
-      "This local time does not exist because the clocks change. Choose another time.",
-    ambiguous:
-      "Clocks go back at this time. Choose the first or second occurrence.",
-    "window-too-short":
-      "This window cannot fit a complete estimated cycle after time to fall asleep. Choose a longer window.",
-    "window-too-long": "Choose a window of 24 hours or less.",
-    settingError:
-      "Use 0–60 minutes to fall asleep and a cycle of 70–120 minutes.",
-    zone: "Times use your device’s time zone:",
-    reminder:
-      "Downloads a calendar event. Your calendar controls notifications; this website is not an alarm.",
-    napShort: "Short nap · 20 minutes in bed",
-    napLong: "Long nap · estimated cycle",
-  },
-  es: {
-    modes: ["Despertar", "Dormir ahora", "Siesta", "Ventana"],
-    questions: [
-      "¿A qué hora necesitas despertarte?",
-      "¿Te vas a acostar ahora?",
-      "¿Cuándo empieza tu siesta?",
-      "¿De cuánto tiempo dispones?",
-    ],
-    wakeAt: "Despertarse",
-    bedAt: "Acostarse",
-    napAt: "Empezar la siesta",
-    date: "Fecha",
-    time: "Hora",
-    settings: "Ajustar las estimaciones",
-    latency: "Tiempo para dormirte (minutos)",
-    cycle: "Ciclo estimado (minutos)",
-    format: "Formato de hora",
-    calculate: "Calcular",
-    results: "Tus horarios estimados",
-    bed: "Acostarse a las",
-    wake: "Despertarse a las",
-    sleep: "de sueño estimado",
-    inBed: "en cama",
-    short: "Menos de 7 horas de sueño",
-    share: "Compartir plan",
-    copy: "Copiar enlace",
-    calendar: "Recordatorio de calendario",
-    calculated: "Calculado a las",
-    refreshed: "Ha pasado tiempo. Actualiza el cálculo cuando estés listo.",
-    update: "Actualizar a ahora",
-    earlier: "Primera ocurrencia",
-    later: "Segunda ocurrencia",
-    choose: "Elige una ocurrencia",
-    occurrence: "Esta hora ocurre dos veces",
-    now: "La hora actual se toma al pulsar Calcular.",
-    note: "Estimaciones para adultos, sin garantía de descanso. Los ciclos varían. Prioriza dormir suficiente y mantener horarios regulares.",
-    copied: "Enlace copiado.",
-    failed: "No se pudo copiar automáticamente. Copia el enlace de abajo.",
-    manual: "Enlace del plan",
-    ready: " opciones calculadas.",
-    invalid: "Introduce una fecha y una hora válidas.",
-    nonexistent:
-      "Esta hora local no existe por el cambio horario. Elige otra hora.",
-    ambiguous:
-      "El reloj retrocede a esta hora. Elige la primera o segunda ocurrencia.",
-    "window-too-short":
-      "La ventana no permite un ciclo estimado completo después de la latencia. Elige una ventana más larga.",
-    "window-too-long": "Elige una ventana de 24 horas o menos.",
-    settingError:
-      "Usa entre 0 y 60 minutos para dormirte y ciclos de 70 a 120 minutos.",
-    zone: "Los horarios usan la zona horaria de tu dispositivo:",
-    reminder:
-      "Descarga un evento. Tu calendario controla las notificaciones; esta web no es una alarma.",
-    napShort: "Siesta corta · 20 minutos en cama",
-    napLong: "Siesta larga · ciclo estimado",
-  },
-};
 const localDate = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 const localTime = (d: Date) =>
@@ -139,13 +26,18 @@ const localTime = (d: Date) =>
 const empty: LocalTime = { date: "", time: "" };
 
 export function CalculatorShell({
-  lang = "en",
+  lang,
+  copy: c,
+  reminders,
+  advertisement,
   initialMode = "wake",
 }: {
-  lang?: Locale;
+  lang: Locale;
+  copy: LocaleCopy["calculator"];
+  reminders: LocaleCopy["reminders"];
+  advertisement: string;
   initialMode?: CalculatorMode;
 }) {
-  const c = copy[lang];
   const privacy = usePrivacy();
   const [mode, setMode] = useState<CalculatorMode>(initialMode);
   const [fields, setFields] = useState<Record<Field, LocalTime>>({
@@ -344,7 +236,7 @@ export function CalculatorShell({
   function calendar(option: SleepOption) {
     if (!outcome) return;
     const url = URL.createObjectURL(
-      new Blob([createCalendar(option, lang, outcome.calculatedAt)], {
+      new Blob([createCalendar(option, reminders, outcome.calculatedAt)], {
         type: "text/calendar;charset=utf-8",
       }),
     );
@@ -419,13 +311,13 @@ export function CalculatorShell({
     <section
       id="calculator"
       className={`calculator ${outcome?.results.length ? "has-results" : "awaiting-results"}`}
-      aria-label={lang === "es" ? "Calculadora de sueño" : "Sleep calculator"}
+      aria-label={c.label}
     >
       <div className="calculator-controls">
       <div
         className="mode-grid"
         role="group"
-        aria-label={lang === "es" ? "Modo de cálculo" : "Calculation mode"}
+        aria-label={c.mode}
       >
         {modes.map((item, index) => (
           <button
@@ -521,21 +413,21 @@ export function CalculatorShell({
       </p>
       </div>
       {(!outcome || outcome.results.length === 0) && (
-        <aside className="results-preview" aria-label={lang === "es" ? "Cómo se calcula" : "How it works"}>
+        <aside className="results-preview" aria-label={c.how}>
           <MoonIcon className="preview-moon" aria-hidden="true" />
-          <h2>{lang === "es" ? "Dale tiempo a tu descanso." : "Make room for rest."}</h2>
-          <p>{lang === "es" ? "Elige tu horario y compara las opciones para tu próxima noche o siesta." : "Set your schedule and compare options for your next night or nap."}</p>
+          <h2>{c.previewHeading}</h2>
+          <p>{c.previewIntro}</p>
           <dl className="estimate-summary">
-            <div><dt>{lang === "es" ? "Para conciliar el sueño" : "To fall asleep"}</dt><dd>{latency || "0"}<span> min</span></dd></div>
-            <div><dt>{lang === "es" ? "Por ciclo estimado" : "Per estimated cycle"}</dt><dd>{cycle || "0"}<span> min</span></dd></div>
+            <div><dt>{c.previewLatency}</dt><dd>{latency || "0"}<span> min</span></dd></div>
+            <div><dt>{c.previewCycle}</dt><dd>{cycle || "0"}<span> min</span></dd></div>
           </dl>
-          <p className="preview-footnote">{lang === "es" ? "Son estimaciones ajustables. Cada noche es diferente." : "Adjustable estimates. Every night is different."}</p>
+          <p className="preview-footnote">{c.previewNote}</p>
         </aside>
       )}
       {outcome && outcome.results.length > 0 && (
         <section className="results" aria-labelledby="results-heading">
           <div className="results-heading">
-            <div className="results-title-row"><h2 id="results-heading">{c.results}</h2><a className="edit-calculation" href="#calculator">{lang === "es" ? "Editar horario" : "Edit schedule"}</a></div>
+            <div className="results-title-row"><h2 id="results-heading">{c.results}</h2><a className="edit-calculation" href="#calculator">{c.edit}</a></div>
             <p>
               {c.calculated}{" "}
               <time dateTime={outcome.calculatedAt}>
@@ -616,7 +508,7 @@ export function CalculatorShell({
               />
             </label>
           )}
-          <AdSlot placement="result" eligible locale={lang} />
+          <AdSlot placement="result" eligible label={advertisement} />
         </section>
       )}
     </section>

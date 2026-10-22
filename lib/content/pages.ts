@@ -1,4 +1,8 @@
-export type Locale = 'en' | 'es';
+import type { Locale, PageKey } from '../i18n';
+import { ptBRPages } from './pt-BR';
+import { frPages } from './fr';
+import { dePages } from './de';
+import { itPages } from './it';
 export type PageKind = 'tool' | 'guide' | 'legal';
 
 export interface ContentSection {
@@ -18,7 +22,7 @@ export interface ContentPage {
   path: string;
   locale: Locale;
   kind: PageKind;
-  pairPath: string;
+  key: PageKey;
   title: string;
   description: string;
   heading: string;
@@ -55,15 +59,15 @@ const contactSource: ContentSource = {
   url: 'https://maat.work',
 };
 
-export const pages: ContentPage[] = [
+const originalPages: ContentPage[] = [
   {
     path: '/',
     locale: 'en',
     kind: 'tool',
-    pairPath: '/calculadora-de-sueno',
-    title: 'Sleep Cycle Calculator',
-    description: 'Plan a practical bedtime around your wake-up time with a private, educational sleep cycle calculator.',
-    heading: 'Sleep calculator',
+    key: 'home',
+    title: 'Sleep Cycle Calculator: Plan Your Bedtime',
+    description: 'Choose a wake-up time and compare estimated bedtimes. Adjust time to fall asleep and cycle length. Private, educational planning; not medical advice.',
+    heading: 'Sleep Cycle Calculator',
     intro: 'Enter when you need to wake up and use the estimates to choose a practical bedtime.',
     mode: 'wake',
     sections: [
@@ -99,13 +103,13 @@ export const pages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/bedtime-calculator', '/nap-calculator', '/sleep-cycles', '/how-much-sleep'],
-    updated: '2026-09-10',
+    updated: '2026-10-22',
   },
   {
     path: '/bedtime-calculator',
     locale: 'en',
     kind: 'tool',
-    pairPath: '/hora-de-dormir',
+    key: 'bedtime',
     title: 'Bedtime Calculator',
     description: 'Find estimated bedtimes from a wake-up target, with an explicit allowance for falling asleep.',
     heading: 'Find your bedtime',
@@ -150,7 +154,7 @@ export const pages: ContentPage[] = [
     path: '/nap-calculator',
     locale: 'en',
     kind: 'tool',
-    pairPath: '/siesta',
+    key: 'nap',
     title: 'Nap Calculator',
     description: 'Plan a short or full-cycle nap with simple local estimates and clear sleep-cycle caveats.',
     heading: 'Find time for a nap',
@@ -195,7 +199,7 @@ export const pages: ContentPage[] = [
     path: '/sleep-cycles',
     locale: 'en',
     kind: 'guide',
-    pairPath: '/ciclos-de-sueno',
+    key: 'cycles',
     title: 'Sleep Cycles: What the 90-Minute Estimate Means',
     description: 'Learn how sleep cycles work, why 90 minutes is only an estimate, and how to plan without treating it as a promise.',
     heading: 'Sleep cycles are patterns, not timers',
@@ -267,10 +271,10 @@ export const pages: ContentPage[] = [
     path: '/calculadora-de-sueno',
     locale: 'es',
     kind: 'tool',
-    pairPath: '/',
-    title: 'Calculadora de ciclos de sueño',
-    description: 'Planifica una hora práctica para dormir según tu hora de despertar con una calculadora privada y educativa.',
-    heading: 'Calculadora de sueño',
+    key: 'home',
+    title: 'Calculadora de sueño: planifica tu descanso',
+    description: 'Elige cuándo despertar y compara horas para acostarte. Ajusta el tiempo para dormirte y los ciclos. Cálculo privado y educativo, no consejo médico.',
+    heading: 'Calculadora de ciclos de sueño',
     intro: 'Indica a qué hora necesitas levantarte y compara horarios estimados para acostarte.',
     mode: 'wake',
     sections: [
@@ -306,13 +310,13 @@ export const pages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/hora-de-dormir', '/siesta', '/ciclos-de-sueno', '/cuantas-horas-dormir'],
-    updated: '2026-09-10',
+    updated: '2026-10-22',
   },
   {
     path: '/hora-de-dormir',
     locale: 'es',
     kind: 'tool',
-    pairPath: '/bedtime-calculator',
+    key: 'bedtime',
     title: 'Calculadora de hora de dormir',
     description: 'Calcula horarios estimados para acostarte a partir de una hora de despertar y un margen para dormirte.',
     heading: 'Encuentra tu hora de dormir',
@@ -357,7 +361,7 @@ export const pages: ContentPage[] = [
     path: '/siesta',
     locale: 'es',
     kind: 'tool',
-    pairPath: '/nap-calculator',
+    key: 'nap',
     title: 'Calculadora de siesta',
     description: 'Planifica una siesta corta o de ciclo completo con estimaciones simples y advertencias claras sobre la variación del sueño.',
     heading: 'Haz tiempo para una siesta',
@@ -402,8 +406,8 @@ export const pages: ContentPage[] = [
     path: '/ciclos-de-sueno',
     locale: 'es',
     kind: 'guide',
-    pairPath: '/sleep-cycles',
-    title: 'Ciclos de sueño: qué significa el promedio de 90 minutos',
+    key: 'cycles',
+    title: 'Ciclos de sueño: el promedio de 90 minutos',
     description: 'Aprende cómo funcionan los ciclos de sueño, por qué 90 minutos es solo una aproximación y cómo planificar sin tomarla como promesa.',
     heading: 'Los ciclos de sueño son patrones, no cronómetros',
     intro: 'Una estimación sencilla puede ordenar una hora de dormir o despertar si dejas espacio para la variación normal.',
@@ -474,7 +478,7 @@ export const pages: ContentPage[] = [
     path: '/about',
     locale: 'en',
     kind: 'legal',
-    pairPath: '/acerca-de',
+    key: 'about',
     title: 'About SleepLike',
     description: 'Learn who publishes SleepLike, what the calculator is for, and how the educational content is maintained.',
     heading: 'About SleepLike / Maat Work',
@@ -517,7 +521,7 @@ export const pages: ContentPage[] = [
     path: '/contact',
     locale: 'en',
     kind: 'legal',
-    pairPath: '/contacto',
+    key: 'contact',
     title: 'Contact SleepLike',
     description: 'Find the public MaatWork contact route for questions about SleepLike, privacy, accessibility, or content.',
     heading: 'Contact SleepLike',
@@ -555,7 +559,7 @@ export const pages: ContentPage[] = [
     path: '/privacy',
     locale: 'en',
     kind: 'legal',
-    pairPath: '/privacidad',
+    key: 'privacy',
     title: 'SleepLike Privacy',
     description: 'Read how SleepLike handles local calculator use, browser preferences, optional analytics, consent choices, and prepared advertising integrations.',
     heading: 'Privacy at SleepLike',
@@ -602,7 +606,7 @@ export const pages: ContentPage[] = [
     path: '/terms',
     locale: 'en',
     kind: 'legal',
-    pairPath: '/terminos',
+    key: 'terms',
     title: 'SleepLike Terms',
     description: 'General terms for using SleepLike as an educational sleep-planning tool.',
     heading: 'Terms for using SleepLike',
@@ -641,7 +645,7 @@ export const pages: ContentPage[] = [
     path: '/methodology',
     locale: 'en',
     kind: 'legal',
-    pairPath: '/metodologia',
+    key: 'methodology',
     title: 'SleepLike Methodology',
     description: 'See the four calculator modes, arithmetic assumptions, local-time behavior, date handling, and limits of SleepLike estimates.',
     heading: 'How the SleepLike estimates work',
@@ -696,7 +700,7 @@ export const pages: ContentPage[] = [
     path: '/acerca-de',
     locale: 'es',
     kind: 'legal',
-    pairPath: '/about',
+    key: 'about',
     title: 'Acerca de SleepLike',
     description: 'Conoce quién publica SleepLike, para qué sirve la calculadora y cómo se mantiene el contenido educativo.',
     heading: 'Acerca de SleepLike / Maat Work',
@@ -739,7 +743,7 @@ export const pages: ContentPage[] = [
     path: '/contacto',
     locale: 'es',
     kind: 'legal',
-    pairPath: '/contact',
+    key: 'contact',
     title: 'Contacto de SleepLike',
     description: 'Encuentra el canal público de MaatWork para preguntas sobre SleepLike, privacidad, accesibilidad o contenido.',
     heading: 'Contacta a SleepLike',
@@ -777,7 +781,7 @@ export const pages: ContentPage[] = [
     path: '/privacidad',
     locale: 'es',
     kind: 'legal',
-    pairPath: '/privacy',
+    key: 'privacy',
     title: 'Privacidad de SleepLike',
     description: 'Conoce cómo SleepLike gestiona el uso local de la calculadora, las preferencias del navegador, la analítica opcional y el consentimiento.',
     heading: 'Privacidad en SleepLike',
@@ -824,7 +828,7 @@ export const pages: ContentPage[] = [
     path: '/terminos',
     locale: 'es',
     kind: 'legal',
-    pairPath: '/terms',
+    key: 'terms',
     title: 'Términos de SleepLike',
     description: 'Términos generales para usar SleepLike como herramienta educativa de planificación del sueño.',
     heading: 'Términos para usar SleepLike',
@@ -863,7 +867,7 @@ export const pages: ContentPage[] = [
     path: '/metodologia',
     locale: 'es',
     kind: 'legal',
-    pairPath: '/methodology',
+    key: 'methodology',
     title: 'Metodología de SleepLike',
     description: 'Consulta los cuatro modos, las suposiciones aritméticas, el uso de la hora local, el manejo de fechas y los límites de las estimaciones.',
     heading: 'Cómo funcionan las estimaciones de SleepLike',
@@ -918,7 +922,7 @@ export const pages: ContentPage[] = [
     path: '/cuantas-horas-dormir',
     locale: 'es',
     kind: 'guide',
-    pairPath: '/how-much-sleep',
+    key: 'duration',
     title: '¿Cuántas horas de sueño necesita un adulto?',
     description: 'Una guía práctica sobre duración del sueño adulto, calidad del descanso y cómo elegir un horario con suficiente oportunidad para dormir.',
     heading: '¿Cuánto sueño conviene planificar?',
@@ -986,7 +990,7 @@ export const pages: ContentPage[] = [
     path: '/cuanto-tardo-en-dormirme',
     locale: 'es',
     kind: 'guide',
-    pairPath: '/sleep-latency',
+    key: 'latency',
     title: '¿Cuánto tardo en dormirme?',
     description: 'Entiende la latencia del sueño, usa un margen sencillo para planificar y reconoce cuándo la dificultad repetida requiere ayuda profesional.',
     heading: 'Planifica el tiempo entre acostarte y dormirte',
@@ -1046,7 +1050,7 @@ export const pages: ContentPage[] = [
     path: '/horario-de-sueno',
     locale: 'es',
     kind: 'guide',
-    pairPath: '/sleep-schedule',
+    key: 'schedule',
     title: 'Cómo construir un horario de sueño',
     description: 'Crea un horario de sueño adulto posible con una hora estable para despertar, suficiente oportunidad de descanso y espacio para la vida real.',
     heading: 'Construye un horario que puedas repetir',
@@ -1107,7 +1111,7 @@ export const pages: ContentPage[] = [
     path: '/how-much-sleep',
     locale: 'en',
     kind: 'guide',
-    pairPath: '/cuantas-horas-dormir',
+    key: 'duration',
     title: 'How Much Sleep Do Adults Need?',
     description: 'A practical guide to adult sleep duration, sleep quality, and choosing a schedule that gives you enough opportunity to rest.',
     heading: 'How much sleep should an adult plan for?',
@@ -1175,7 +1179,7 @@ export const pages: ContentPage[] = [
     path: '/sleep-latency',
     locale: 'en',
     kind: 'guide',
-    pairPath: '/cuanto-tardo-en-dormirme',
+    key: 'latency',
     title: 'How Long Does It Take to Fall Asleep?',
     description: 'Understand sleep latency, use a simple planning allowance, and recognize when repeated difficulty deserves professional help.',
     heading: 'Plan for the time between bed and sleep',
@@ -1235,7 +1239,7 @@ export const pages: ContentPage[] = [
     path: '/sleep-schedule',
     locale: 'en',
     kind: 'guide',
-    pairPath: '/horario-de-sueno',
+    key: 'schedule',
     title: 'How to Build a Sleep Schedule',
     description: 'Create a workable adult sleep schedule with a stable wake time, enough sleep opportunity, and room for real life.',
     heading: 'Build a sleep schedule you can repeat',
@@ -1293,6 +1297,8 @@ export const pages: ContentPage[] = [
     updated: '2026-09-30',
   },
 ];
+
+export const pages: ContentPage[] = [...originalPages, ...ptBRPages, ...frPages, ...dePages, ...itPages];
 
 export function getPage(path: string): ContentPage | undefined {
   return pages.find((page) => page.path === path);

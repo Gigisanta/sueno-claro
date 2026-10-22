@@ -2,7 +2,7 @@
 
 > **September 2026 rework:** the current implementation and release gates are documented in [docs/13-launch-2026-09.md](docs/13-launch-2026-09.md). Earlier roadmap sections below are historical.
 
-Sleep planning calculator for adults. Bilingual static web app/PWA.
+Sleep planning calculator for adults. Six-language static web app/PWA.
 
 Open source under the [MIT License](LICENSE). The calculator, interface and
 content pipeline can be inspected, run and adapted without sending sleep data
@@ -12,6 +12,22 @@ to an application backend.
 **GitHub:** https://github.com/Gigisanta/sueno-claro
 
 No account, microphone or application backend. Calculations stay in the browser. Aggregate analytics are optional; advertising remains disabled pending approval and consent validation. See [organic discovery and automated SEO checks](docs/15-organic-discovery.md).
+
+## Languages
+
+All 12 page topics are available in English, Spanish, Brazilian Portuguese,
+French, German and Italian (72 canonical pages). Existing English/Spanish URLs
+are unchanged; the new language roots are `/pt-br`, `/fr`, `/de` and `/it`.
+Each page has a native HTML language switcher linking to the same topic in all
+six languages. HTML and sitemap publish reciprocal alternates and English
+`x-default`; the four new locales default to 24-hour time.
+
+Routing lives in `lib/i18n.ts`, complete editorial catalogs in `lib/content/`,
+and interface dictionaries in `lib/locales/`. Only current-language copy is
+passed to interactive components. The build validates actual exported metadata
+and all language alternates; browser tests exercise calculation in each locale.
+Advertising approval stays **false**; adding languages does not authorize ads
+or change consent behavior. No indexing, traffic or medical benefit is promised.
 
 ## What it does
 
@@ -44,10 +60,9 @@ Calculates practical sleep windows locally in the browser:
 ## Development
 
 ```bash
-npm install
-npm run lint
-npm run test
-npm run build
+npm ci
+PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium webkit
+NEXT_PUBLIC_ADS_APPROVED=false make verify
 node scripts/prod_smoke.mjs       # against production
 node scripts/prod_smoke.mjs http://localhost:3000  # against local
 ```

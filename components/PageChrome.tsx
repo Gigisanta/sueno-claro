@@ -1,71 +1,42 @@
 import type { ReactNode } from "react";
-import { homePath, type Locale } from "../lib/site";
+import { homePath, locales, localeInfo, localizedPaths, type Locale, type PageKey } from "../lib/i18n";
+import { localeCopy } from "../lib/locales";
 import { pages } from "../lib/content/pages";
-export function PageChrome({
-  children,
-  lang,
-  pairPath,
-}: {
-  children: ReactNode;
-  lang: Locale;
-  pairPath: string;
-}) {
-  const es = lang === "es";
-  const links = es
-    ? [
-        ["/acerca-de", "Acerca de"],
-        ["/contacto", "Contacto"],
-        ["/metodologia", "Metodología"],
-        ["/privacidad", "Privacidad"],
-        ["/terminos", "Términos"],
-      ]
-    : [
-        ["/about", "About"],
-        ["/contact", "Contact"],
-        ["/methodology", "Methodology"],
-        ["/privacy", "Privacy"],
-        ["/terms", "Terms"],
-      ];
+
+export function PageChrome({ children, lang, pageKey }: { children: ReactNode; lang: Locale; pageKey: PageKey }) {
+  const c = localeCopy[lang].chrome;
+  const links = (["about", "contact", "methodology", "privacy", "terms"] as const).map((key) => [localizedPaths[lang][key], c[key]]);
   return (
     <>
-      <a className="skip-link" href="#main-content">
-        {es ? "Saltar al contenido" : "Skip to content"}
-      </a>
+      <a className="skip-link" href="#main-content">{c.skip}</a>
       <header className="topbar">
-        <a
-          className="brand"
-          href={homePath(lang)}
-          aria-label={es ? "SleepLike, inicio" : "SleepLike home"}
-        >
-          <span className="brand-mark" aria-hidden="true">
-            ◒
-          </span>
+        <a className="brand" href={homePath(lang)} aria-label={c.home}>
+          <span className="brand-mark" aria-hidden="true">◒</span>
           SleepLike<span className="brand-dot">.</span>
         </a>
-        <nav aria-label={es ? "Navegación principal" : "Main navigation"}>
-          <a href={es ? "/siesta" : "/nap-calculator"}>
-            {es ? "Siestas" : "Naps"}
-          </a>
-          <a href="#sleep-resources">
-            {es ? "Guías" : "Guides"}
-          </a>
-          <a
-            className="language-link"
-            href={pairPath}
-            hrefLang={es ? "en" : "es"}
-            lang={es ? "en" : "es"}
-          >
-            {es ? "English" : "Español"}
-            <span aria-hidden="true"> ↗</span>
-          </a>
+        <nav aria-label={c.navigation}>
+          <a href={localizedPaths[lang].nap}>{c.naps}</a>
+          <a href="#sleep-resources">{c.guides}</a>
+          <details className="language-switcher">
+            <summary aria-label={c.languages}>{lang.toUpperCase()}</summary>
+            <ul aria-label={c.languages}>
+              {locales.map((locale) => (
+                <li key={locale}>
+                  <a href={localizedPaths[locale][pageKey]} hrefLang={locale} lang={locale} aria-current={locale === lang ? "page" : undefined}>
+                    {localeInfo[locale].name}
+                  </a>
+                </li>
+              ))}
+            </ul>
+          </details>
         </nav>
       </header>
       <main id="main-content">{children}</main>
       <footer className="footer">
-        <nav id="sleep-resources" className="resource-directory" aria-label={es ? "Calculadoras y guías de sueño" : "Sleep calculators and guides"}>
+        <nav id="sleep-resources" className="resource-directory" aria-label={c.resources}>
           {(["tool", "guide"] as const).map((kind) => (
             <div key={kind}>
-              <h2>{kind === "tool" ? (es ? "Planifica tu descanso" : "Plan your rest") : (es ? "Entiende tu sueño" : "Understand your sleep")}</h2>
+              <h2>{kind === "tool" ? c.tools : c.learn}</h2>
               {pages.filter((page) => page.locale === lang && page.kind === kind).map((page) => (
                 <a key={page.path} href={page.path}>{page.title}</a>
               ))}
@@ -73,30 +44,14 @@ export function PageChrome({
           ))}
         </nav>
         <div>
-          <a className="brand" href={homePath(lang)}>
-            SleepLike<span className="brand-dot">.</span>
-          </a>
-          <p>
-            {es
-              ? "Un poco de claridad antes de dormir."
-              : "A little clarity before you sleep."}
-          </p>
-          <p className="muted">
-            {es
-              ? "Herramienta educativa para adultos. No ofrece diagnóstico médico."
-              : "Educational tool for adults. Not a medical diagnosis."}
-          </p>
+          <a className="brand" href={homePath(lang)}>SleepLike<span className="brand-dot">.</span></a>
+          <p>{c.tagline}</p>
+          <p className="muted">{c.caution}</p>
         </div>
-        <nav aria-label={es ? "Información del sitio" : "Site information"}>
-          {links.map(([href, label]) => (
-            <a href={href} key={href}>
-              {label}
-            </a>
-          ))}
+        <nav aria-label={c.information}>
+          {links.map(([href, label]) => <a href={href} key={href}>{label}</a>)}
         </nav>
-        <p className="footer-credit">
-          © 2026 SleepLike · <a href="https://maat.work">MaatWork</a>
-        </p>
+        <p className="footer-credit">© 2026 SleepLike · <a href="https://maat.work">MaatWork</a></p>
       </footer>
     </>
   );

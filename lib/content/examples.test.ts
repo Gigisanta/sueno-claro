@@ -43,5 +43,5 @@ it('worked examples lead to the localized calculator and reproduce their display
       checked += 1;
     }
   }
-  expect(checked).toBe(12);
+  expect(checked).toBe(36);
 });

@@ -1,12 +1,12 @@
 "use client";
 
 import { useState } from "react";
-import { SITE_URL, type Locale } from "../lib/site";
+import { SITE_URL } from "../lib/site";
+import type { LocaleCopy } from "../lib/locales/en";
 
-export function SharePage({ path, title, locale }: { path: string; title: string; locale: Locale }) {
+export function SharePage({ path, title, copy: c }: { path: string; title: string; copy: LocaleCopy["share"] }) {
   const [status, setStatus] = useState("");
   const [manual, setManual] = useState(false);
-  const es = locale === "es";
   // Share the public article, never location.href (which may contain private inputs).
   const url = SITE_URL + path;
   async function share() {
@@ -21,16 +21,16 @@ export function SharePage({ path, title, locale }: { path: string; title: string
     }
     try {
       await navigator.clipboard.writeText(url);
-      setStatus(es ? "Enlace copiado." : "Link copied.");
+      setStatus(c.copied);
     } catch {
       setManual(true);
-      setStatus(es ? "Selecciona y copia el enlace." : "Select and copy the link.");
+      setStatus(c.manual);
     }
   }
-  return <section className="public-share" aria-label={es ? "Compartir guía" : "Share guide"}>
-    <p>{es ? "¿A alguien le serviría esta guía?" : "Know someone who could use this guide?"}</p>
-    <button type="button" className="text-button" onClick={share}>{es ? "Compartir esta guía ↗" : "Share this guide ↗"}</button>
+  return <section className="public-share" aria-label={c.label}>
+    <p>{c.prompt}</p>
+    <button type="button" className="text-button" onClick={share}>{c.action}</button>
     <p role="status">{status}</p>
-    {manual && <label>{es ? "Enlace público" : "Public link"}<input readOnly value={url} onFocus={(event) => event.currentTarget.select()} /></label>}
+    {manual && <label>{c.link}<input readOnly value={url} onFocus={(event) => event.currentTarget.select()} /></label>}
   </section>;
 }

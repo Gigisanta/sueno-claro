@@ -7,7 +7,7 @@ let bundle = "";
 test.beforeAll(async () => {
   const result = await build({
     stdin: {
-      contents: `import React,{useState} from 'react';import{createRoot}from'react-dom/client';import{PrivacyProvider}from'./components/PrivacyProvider';import{AdSlot}from'./components/AdSlot';function Fixture(){const[valid,setValid]=useState(false);const[key,setKey]=useState(0);return <PrivacyProvider locale="en"><button onClick={()=>{setValid(true);setKey(key+1)}}>Calculate fixture</button><AdSlot key={key} placement="result" eligible={valid} locale="en"/></PrivacyProvider>}createRoot(document.getElementById('root')).render(<Fixture/>);`,
+      contents: `import React,{useState} from 'react';import{createRoot}from'react-dom/client';import{PrivacyProvider}from'./components/PrivacyProvider';import{AdSlot}from'./components/AdSlot';import{en}from'./lib/locales/en';function Fixture(){const[valid,setValid]=useState(false);const[key,setKey]=useState(0);return <PrivacyProvider copy={en.privacy}><button onClick={()=>{setValid(true);setKey(key+1)}}>Calculate fixture</button><AdSlot key={key} placement="result" eligible={valid} label={en.advertisement}/></PrivacyProvider>}createRoot(document.getElementById('root')).render(<Fixture/>);`,
       resolveDir: resolve("."),
       loader: "tsx",
     },
