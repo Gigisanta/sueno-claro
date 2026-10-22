@@ -129,11 +129,50 @@ describe('content catalog', () => {
   it('keeps primary science sources on product and guide pages', () => {
     for (const page of pages.filter((candidate) => candidate.kind !== 'legal')) {
       const sources = page.sources.map((source) => new URL(source.url));
-      expect(new Set(sources.map((source) => source.hostname)), page.path).toEqual(new Set(['www.nhlbi.nih.gov', 'www.cdc.gov']));
+      const expectedHosts = ['www.nhlbi.nih.gov', 'www.cdc.gov'];
+      if (page.key === 'schedule') expectedHosts.push('archive.cdc.gov');
+      expect(new Set(sources.map((source) => source.hostname)), page.path).toEqual(new Set(expectedHosts));
       for (const source of sources) {
         expect(source.protocol, page.path).toBe('https:');
         expect(source.username + source.password, page.path).toBe('');
       }
+    }
+  });
+
+  it('distinguishes the worked time-in-bed interval from estimated sleep in every locale', () => {
+    const examples = [
+      ['en', '2:45 a.m.', '7:33 a.m.', '4 hours 48 minutes', '4 hours 33 minutes', 'not a measurement'],
+      ['es', '02:45', '07:33', '4 horas 48 minutos', '4 horas 33 minutos', 'no una medición'],
+      ['pt-BR', '02:45', '07:33', '4 horas e 48 minutos', '4 horas e 33 minutos', 'não uma medição'],
+      ['fr', '02:45', '07:33', '4 heures 48 minutes', '4 heures 33 minutes', 'pas une mesure'],
+      ['de', '02:45', '07:33', '4 Stunden und 48 Minuten', '4 Stunden und 33 Minuten', 'keine Messung'],
+      ['it', '02:45', '07:33', '4 ore e 48 minuti', '4 ore e 33 minuti', 'non una misurazione'],
+    ];
+    for (const [locale, ...terms] of examples) {
+      const page = pages.find((candidate) => candidate.locale === locale && candidate.key === 'home')!;
+      const example = page.sections.flatMap((section) => section.paragraphs).find((text) => text.includes(terms[0]));
+      expect(example, page.path).toBeDefined();
+      for (const term of terms) expect(example, page.path).toContain(term);
+    }
+  });
+
+  it('cites official night-shift guidance and preserves safety cautions in all six schedules', () => {
+    const cautions = {
+      en: ['cannot adapt your circadian rhythms', 'Do not drive when sleepy', 'occupational health'],
+      es: ['no adapta tus ritmos circadianos', 'No conduzcas con sueño', 'salud laboral'],
+      'pt-BR': ['não adapta seus ritmos circadianos', 'Não dirija com sono', 'saúde ocupacional'],
+      fr: ['ni adapter tes rythmes circadiens', 'Ne conduis pas si tu somnoles', 'santé au travail'],
+      de: ['weder deinen zirkadianen Rhythmus anpassen', 'Fahre nicht, wenn du schläfrig bist', 'betriebsärztlich'],
+      it: ['non adatta i ritmi circadiani', 'Non guidare se hai sonno', 'medicina del lavoro'],
+    };
+    for (const locale of locales) {
+      const page = getPage(localizedPaths[locale].schedule)!;
+      const section = page.sections.find((candidate) => candidate.id === 'night-shift');
+      expect(section, page.path).toBeDefined();
+      for (const caution of cautions[locale]) expect(section?.paragraphs.join(' '), page.path).toContain(caution);
+      expect(page.sources.map((source) => source.url), page.path).toContain(
+        'https://archive.cdc.gov/www_cdc_gov/niosh/work-hour-training-for-nurses/longhours/mod9/05.html',
+      );
     }
   });
 

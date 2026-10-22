@@ -42,7 +42,7 @@ export const dePages: ContentPage[] = [
         heading: 'Beginne mit der Zeit, die feststeht',
         paragraphs: [
           'Eine feste Aufstehzeit gibt der Berechnung einen sinnvollen Ausgangspunkt. Das Tool rechnet von dieser Uhrzeit in ungefähren Schlafzyklen zurück und lässt einen kleinen Puffer zum Einschlafen. Du kannst das Ergebnis nutzen, um einen Arbeitstag, eine Reise oder einen Termin am Morgen zu planen.',
-          'Der voreingestellte Puffer beträgt 15 Minuten. Das ist eine praktische Annahme für die Planung und keine Messung deiner Einschlafdauer. Wenn du normalerweise mehr oder weniger Zeit brauchst, nimm die angezeigten Möglichkeiten als Ausgangspunkt und passe deine Abendroutine entsprechend an.',
+          'Wie lange hast du von 02:45 bis 07:33 Uhr geschlafen? Dazwischen liegen 4 Stunden und 48 Minuten. Wenn das deine Bettzeiten sind, ziehe die Wachzeit ab: Mit dem voreingestellten Einschlafpuffer von 15 Minuten und ohne nächtliches Erwachen bleiben geschätzte 4 Stunden und 33 Minuten Schlaf. Der Puffer ist eine Planungsannahme, keine Messung; der Rechner weiß nicht, wie lange du tatsächlich geschlafen hast.',
         ],
       },
       {
@@ -417,8 +417,19 @@ export const dePages: ContentPage[] = [
           'Wenn du regelmäßig keinen Rhythmus einhalten kannst, weil du nicht einschläfst, oder wenn du übermäßige Tagesschläfrigkeit, lautes Schnarchen, Luftschnappen oder Atempausen hast, sprich mit einer qualifizierten medizinischen Fachperson. Dieser Ratgeber enthält allgemeine Informationen zu Schlaf und Wohlbefinden und ist keine medizinische Beratung.',
         ],
       },
+      {
+        id: 'night-shift',
+        heading: 'Nachtschichten und wechselnde Schichten',
+        paragraphs: [
+          'Wenn du nachts oder in wechselnden Schichten arbeitest, ist der oben gezeigte Tagesablauf keine persönliche Vorgabe. Die NIOSH-Schulung für Pflegekräfte empfiehlt, nach der Heimkehr Zeit zum Schlafen freizuhalten, statt Hausarbeit zu erledigen, und das Schlafzimmer dunkel, ruhig und frei von Störungen zu halten. Bitte die Menschen, mit denen du zusammenlebst, diese Ruhezeit zu respektieren.',
+          'Der Rechner vergleicht nur Uhrzeiten: Er kann weder deinen zirkadianen Rhythmus anpassen noch Wachheit garantieren. Fahre nicht, wenn du schläfrig bist. Wenn Schläfrigkeit deine Sicherheit bei der Arbeit oder am Steuer beeinträchtigt, lass dich ärztlich und betriebsärztlich zu deiner Situation beraten. Diese Informationen dienen der Aufklärung und sind keine individuelle medizinische Beratung.',
+        ],
+      },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, {
+      title: 'CDC/NIOSH · Schlaf nach Nachtschichten (Archiv; abgerufen am 22.10.2026)',
+      url: 'https://archive.cdc.gov/www_cdc_gov/niosh/work-hour-training-for-nurses/longhours/mod9/05.html',
+    }],
     related: ['/de', '/de/schlafenszeit', '/de/wie-viel-schlaf', '/de/einschlafdauer'],
     updated: '2026-10-22',
   },

@@ -23,6 +23,11 @@ for (const journey of journeys) {
       await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'Choose a wake-up time and compare estimated bedtimes. Adjust time to fall asleep and cycle length. Private, educational planning; not medical advice.');
       await expect(page.locator('h1')).toHaveText('Sleep Cycle Calculator');
     }
+    if (journey.locale === 'es') {
+      await expect(page).toHaveTitle('Calculadora de sueño: estima tus ciclos | SleepLike');
+      await expect(page.locator('h1')).toHaveText('Calculadora de sueño y ciclos');
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /No detecta fases reales/);
+    }
     const resources = page.locator('.home-resources');
     await expect(resources).toBeVisible();
     await expect(resources.locator('a')).toHaveCount(5);

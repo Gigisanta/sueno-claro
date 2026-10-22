@@ -42,7 +42,7 @@ export const frPages: ContentPage[] = [
         heading: 'Commence par l’heure que tu ne peux pas déplacer',
         paragraphs: [
           'Une heure de réveil fixe donne un point de repère utile au calcul. L’outil remonte le temps à partir de cette heure par cycles de sommeil approximatifs, en laissant une petite marge pour t’endormir. Tu peux utiliser le résultat pour préparer une journée de travail, un voyage ou un rendez-vous matinal.',
-          'La marge par défaut est de 15 minutes. C’est une convention pratique pour organiser tes horaires, pas une mesure de ton temps d’endormissement. Si tu as habituellement besoin de plus ou de moins de temps, prends les options affichées comme point de départ et adapte ta routine de détente en conséquence.',
+          'Combien as-tu dormi entre 02:45 et 07:33 ? L’intervalle est de 4 heures 48 minutes. S’il s’agit de ton temps au lit, retire le temps passé éveillé : avec la marge par défaut de 15 minutes pour t’endormir et sans réveil nocturne, cela donne environ 4 heures 33 minutes de sommeil. Cette marge est une convention de calcul, pas une mesure ; le calculateur ne sait pas combien tu as réellement dormi.',
         ],
       },
       {
@@ -417,8 +417,19 @@ export const frPages: ContentPage[] = [
           'Si tu n’arrives régulièrement pas à garder tes horaires parce que le sommeil ne vient pas, ou si tu présentes une somnolence excessive en journée, de forts ronflements, des reprises de souffle ou des pauses respiratoires, consulte un professionnel de santé qualifié. Ce guide propose des informations éducatives de bien-être, pas un avis médical.',
         ],
       },
+      {
+        id: 'night-shift',
+        heading: 'Travail de nuit et horaires alternants',
+        paragraphs: [
+          'Si tu travailles de nuit ou en horaires alternants, l’exemple de rythme diurne ci-dessus n’est pas une prescription personnelle. La formation du NIOSH destinée au personnel infirmier recommande de préserver le sommeil au retour à la maison plutôt que de consacrer ce temps aux tâches quotidiennes, et de garder la chambre sombre, calme et sans interruptions. Demande aux personnes qui vivent avec toi de respecter ce temps de repos.',
+          'Le calculateur compare seulement des horaires : il ne peut ni adapter tes rythmes circadiens ni garantir ta vigilance. Ne conduis pas si tu somnoles. Si la somnolence compromet ta sécurité au travail ou au volant, consulte un professionnel de santé qualifié et le service de santé au travail pour évaluer ta situation. Ces informations sont éducatives, pas un avis médical individuel.',
+        ],
+      },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, {
+      title: 'CDC/NIOSH · Dormir après le travail de nuit (archives ; consulté le 22/10/2026)',
+      url: 'https://archive.cdc.gov/www_cdc_gov/niosh/work-hour-training-for-nurses/longhours/mod9/05.html',
+    }],
     related: ['/fr', '/fr/heure-du-coucher', '/fr/combien-d-heures-dormir', '/fr/temps-d-endormissement'],
     updated: '2026-10-22',
   },

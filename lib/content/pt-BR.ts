@@ -42,7 +42,7 @@ export const ptBRPages: ContentPage[] = [
         heading: 'Comece pelo horário que não pode mudar',
         paragraphs: [
           'Um horário fixo para acordar dá ao cálculo um ponto de referência útil. A ferramenta conta para trás a partir desse horário, usando ciclos de sono aproximados e reservando uma pequena margem para adormecer. Você pode usar o resultado para planejar um dia de trabalho, uma viagem ou um compromisso pela manhã.',
-          'A margem padrão é de 15 minutos. Ela é uma convenção prática de planejamento, não uma medição da sua latência do sono. Se você costuma precisar de mais ou menos tempo, considere as opções exibidas um ponto de partida e ajuste sua rotina de desaceleração conforme necessário.',
+          'Quanto você dormiu das 02:45 às 07:33? O intervalo é de 4 horas e 48 minutos. Se esses são os horários em que ficou na cama, desconte o tempo acordado: com a margem padrão de 15 minutos para adormecer e sem despertares, seriam cerca de 4 horas e 33 minutos de sono. Essa margem é uma convenção de planejamento, não uma medição; a calculadora não sabe quanto você realmente dormiu.',
         ],
       },
       {
@@ -417,8 +417,19 @@ export const ptBRPages: ContentPage[] = [
           'Se você frequentemente não consegue manter uma rotina porque o sono não vem, ou se tem sonolência excessiva durante o dia, ronco alto, engasgos ou pausas na respiração, converse com um profissional de saúde habilitado. Este guia é um conteúdo educativo de bem-estar, não uma orientação médica.',
         ],
       },
+      {
+        id: 'night-shift',
+        heading: 'Trabalho noturno e turnos alternados',
+        paragraphs: [
+          'Se você trabalha à noite ou em turnos alternados, o exemplo de rotina diurna acima não é uma prescrição pessoal. A formação do NIOSH para profissionais de enfermagem recomenda preservar o sono ao chegar em casa, em vez de usar esse tempo para tarefas, e manter o quarto escuro, silencioso e sem interrupções. Combine com quem mora com você para respeitar esse período de descanso.',
+          'A calculadora só compara horários: não adapta seus ritmos circadianos nem garante que você esteja alerta. Não dirija com sono. Se a sonolência comprometer sua segurança ao trabalhar ou dirigir, procure um profissional de saúde habilitado e o serviço de saúde ocupacional para avaliar sua situação. Este conteúdo é educativo, não uma orientação médica individual.',
+        ],
+      },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, {
+      title: 'CDC/NIOSH · Sono após o turno noturno (arquivo; acesso em 22/10/2026)',
+      url: 'https://archive.cdc.gov/www_cdc_gov/niosh/work-hour-training-for-nurses/longhours/mod9/05.html',
+    }],
     related: ['/pt-br', '/pt-br/hora-de-dormir', '/pt-br/quantas-horas-dormir', '/pt-br/tempo-para-adormecer'],
     updated: '2026-10-22',
   },
