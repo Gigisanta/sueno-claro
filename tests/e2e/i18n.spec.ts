@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test';
+import { localizedPaths } from '../../lib/i18n';
 
 const journeys = [
   { locale: 'en', path: '/', calculate: 'Calculate', nextLocale: 'es', nextPath: '/calculadora-de-sueno', language: 'Español' },
@@ -7,7 +8,7 @@ const journeys = [
   { locale: 'fr', path: '/fr', calculate: 'Calculer', nextLocale: 'de', nextPath: '/de', language: 'Deutsch' },
   { locale: 'de', path: '/de', calculate: 'Berechnen', nextLocale: 'it', nextPath: '/it', language: 'Italiano' },
   { locale: 'it', path: '/it', calculate: 'Calcola', nextLocale: 'en', nextPath: '/', language: 'English' },
-];
+] as const;
 
 for (const journey of journeys) {
   test(`calculator and crawlable language switch work in ${journey.locale}`, async ({ page }) => {
@@ -17,6 +18,18 @@ for (const journey of journeys) {
     await page.goto(journey.path);
     await expect(page.locator('html')).toHaveAttribute('lang', journey.locale);
     await expect(page.locator('h1')).toBeVisible();
+    if (journey.locale === 'en') {
+      await expect(page).toHaveTitle('Sleep Cycle Calculator: Plan Your Bedtime | SleepLike');
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'Choose a wake-up time and compare estimated bedtimes. Adjust time to fall asleep and cycle length. Private, educational planning; not medical advice.');
+      await expect(page.locator('h1')).toHaveText('Sleep Cycle Calculator');
+    }
+    const resources = page.locator('.home-resources');
+    await expect(resources).toBeVisible();
+    await expect(resources.locator('a')).toHaveCount(5);
+    expect(await resources.locator('a').evaluateAll((links) => links.map((link) => link.getAttribute('href')))).toEqual(
+      (['schedule', 'nap', 'bedtime', 'cycles', 'duration'] as const).map((key) => localizedPaths[journey.locale][key]),
+    );
+    for (const link of await resources.locator('a').all()) await expect(link).toBeVisible();
     await expect(page.locator('[data-testid^="ad-"]')).toHaveCount(0);
     await page.locator('#wakeAt-date').fill('2026-10-23');
     await page.locator('#wakeAt-time').fill('07:00');

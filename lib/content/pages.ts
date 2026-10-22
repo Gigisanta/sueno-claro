@@ -65,9 +65,9 @@ const originalPages: ContentPage[] = [
     locale: 'en',
     kind: 'tool',
     key: 'home',
-    title: 'Sleep Cycle Calculator',
-    description: 'Plan a practical bedtime around your wake-up time with a private, educational sleep cycle calculator.',
-    heading: 'Sleep calculator',
+    title: 'Sleep Cycle Calculator: Plan Your Bedtime',
+    description: 'Choose a wake-up time and compare estimated bedtimes. Adjust time to fall asleep and cycle length. Private, educational planning; not medical advice.',
+    heading: 'Sleep Cycle Calculator',
     intro: 'Enter when you need to wake up and use the estimates to choose a practical bedtime.',
     mode: 'wake',
     sections: [
@@ -103,7 +103,7 @@ const originalPages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/bedtime-calculator', '/nap-calculator', '/sleep-cycles', '/how-much-sleep'],
-    updated: '2026-09-10',
+    updated: '2026-10-22',
   },
   {
     path: '/bedtime-calculator',
@@ -272,9 +272,9 @@ const originalPages: ContentPage[] = [
     locale: 'es',
     kind: 'tool',
     key: 'home',
-    title: 'Calculadora de ciclos de sueño',
-    description: 'Planifica una hora práctica para dormir según tu hora de despertar con una calculadora privada y educativa.',
-    heading: 'Calculadora de sueño',
+    title: 'Calculadora de sueño: planifica tu descanso',
+    description: 'Elige cuándo despertar y compara horas para acostarte. Ajusta el tiempo para dormirte y los ciclos. Cálculo privado y educativo, no consejo médico.',
+    heading: 'Calculadora de ciclos de sueño',
     intro: 'Indica a qué hora necesitas levantarte y compara horarios estimados para acostarte.',
     mode: 'wake',
     sections: [
@@ -310,7 +310,7 @@ const originalPages: ContentPage[] = [
     ],
     sources: sleepSources,
     related: ['/hora-de-dormir', '/siesta', '/ciclos-de-sueno', '/cuantas-horas-dormir'],
-    updated: '2026-09-10',
+    updated: '2026-10-22',
   },
   {
     path: '/hora-de-dormir',

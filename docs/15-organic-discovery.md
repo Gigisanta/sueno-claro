@@ -34,6 +34,17 @@ Independent model-assisted translation review uses ten real sample strings per
 new language in the PR; it is not accredited medical or professional translation
 certification. No deployment, indexing, traffic or ranking is implied.
 
+The 2026-10-22 Search Console handoff reported 200 English-home impressions for
+“sleep calculator cycle”, average position 7.09 and zero clicks. The home snippet
+now names the calculator and practical bedtime-planning task; English H1 is
+“Sleep Cycle Calculator”. All six homepages use localized task-focused titles
+and descriptions and a visible five-link directory immediately after the
+calculator (schedule, nap, bedtime, cycles and adult sleep duration). These are
+ordinary server-rendered links, not footer-only discovery. Home titles use the
+`| SleepLike` suffix; other pages retain their existing suffix. Medical body
+copy, calculation assumptions and source URLs are unchanged. This is a snippet
+and internal-link improvement, not evidence of later clicks or indexing.
+
 Retained primary references, accessed 2026-10-22 (no unverified national sources):
 
 - NHLBI, phases/stages and variable cycles: https://www.nhlbi.nih.gov/health/sleep/stages-of-sleep

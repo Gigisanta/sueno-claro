@@ -8,7 +8,7 @@ export function pageMetadata(path: string): Metadata {
   const page = getPage(path)!;
   return {
     metadataBase: new URL(SITE_URL),
-    title: `${page.title} · SleepLike`,
+    title: `${page.title} ${page.key === "home" ? "|" : "·"} SleepLike`,
     description: page.description,
     applicationName: "SleepLike",
     alternates: {

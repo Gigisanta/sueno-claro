@@ -2,7 +2,7 @@ import { Fragment } from "react";
 import { getGuideExamples } from "../lib/content/examples";
 import { getPage } from "../lib/content/pages";
 import { structuredData } from "../lib/metadata";
-import { homePath } from "../lib/i18n";
+import { homePath, localizedPaths } from "../lib/i18n";
 import { localeCopy } from "../lib/locales";
 import { CalculatorShell } from "./CalculatorShell";
 import { PageChrome } from "./PageChrome";
@@ -55,6 +55,17 @@ export function SitePage({ path }: { path: string }) {
         </header>
         {page.kind === "tool" && (
           <CalculatorShell lang={page.locale} initialMode={page.mode} copy={c.calculator} reminders={c.reminders} advertisement={c.advertisement} />
+        )}
+        {page.key === "home" && (
+          <nav className="home-resources" aria-labelledby="home-resources-heading">
+            <h2 id="home-resources-heading">{c.editorial.related}</h2>
+            <div>
+              {(["schedule", "nap", "bedtime", "cycles", "duration"] as const).map((key) => {
+                const resource = getPage(localizedPaths[page.locale][key])!;
+                return <a key={key} href={resource.path}>{resource.title}</a>;
+              })}
+            </div>
+          </nav>
         )}
         <article
           className="editorial"

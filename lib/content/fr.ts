@@ -31,9 +31,9 @@ export const frPages: ContentPage[] = [
     locale: 'fr',
     kind: 'tool',
     key: 'home',
-    title: 'Calculateur de cycles de sommeil',
-    description: 'Prévois une heure du coucher adaptée à ton réveil avec un calculateur de cycles de sommeil éducatif, respectueux de ta vie privée.',
-    heading: 'Calculateur de sommeil',
+    title: 'Calculateur de sommeil : planifie ton coucher',
+    description: 'Choisis ton réveil et compare les heures de coucher. Ajuste le temps d’endormissement et les cycles. Outil privé et éducatif, sans conseil médical.',
+    heading: 'Calculateur de cycles de sommeil',
     intro: 'Indique l’heure à laquelle tu dois te réveiller et utilise les estimations pour choisir une heure de coucher réaliste.',
     mode: 'wake',
     sections: [
