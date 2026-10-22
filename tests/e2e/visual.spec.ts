@@ -4,29 +4,39 @@ import { pages } from "../../lib/content/pages";
 test("all routes have unique static SEO, reciprocal languages and structured data", async ({
   request,
 }) => {
+  const documents = new Map<string, Record<string, string>>();
   for (const entry of pages) {
     const response = await request.get(entry.path);
     expect(response.status()).toBe(200);
     const html = await response.text();
     expect(html).toContain(`<html lang="${entry.locale}"`);
-    expect(
-      new URL(html.match(/<link rel="canonical" href="([^"]+)"/)![1]).href,
-    ).toBe(new URL(entry.path, "https://sleeplike.maat.work").href);
-    expect(
-      new URL(
-        html.match(
-          new RegExp(
-            `hrefLang="${entry.locale === "en" ? "es" : "en"}" href="([^"]+)"`,
-          ),
-        )![1],
-      ).href,
-    ).toBe(new URL(entry.pairPath, "https://sleeplike.maat.work").href);
+    expect(new URL(html.match(/<link rel="canonical" href="([^"]+)"/)![1]).href).toBe(new URL(entry.path, "https://sleeplike.maat.work").href);
+    const alternates = Object.fromEntries([...html.matchAll(/<link rel="alternate" hrefLang="([^"]+)" href="([^"]+)"/g)].map((match) => [match[1], new URL(match[2]).href]));
+    expect(Object.keys(alternates).sort()).toEqual(["en", "es", "pt-BR", "fr", "de", "it", "x-default"].sort());
+    expect(alternates[entry.locale]).toBe(`https://sleeplike.maat.work${entry.path}`);
+    expect(alternates["x-default"]).toBe(`https://sleeplike.maat.work${pages.find((page) => page.key === entry.key && page.locale === "en")!.path}`);
+    documents.set(entry.path, alternates);
     expect(html.match(/<h1[ >]/g)?.length).toBe(1);
     expect(html).toContain("application/ld+json");
     expect(html).not.toContain("B0EXAMPLE");
   }
+  for (const entry of pages) {
+    for (const [locale, href] of Object.entries(documents.get(entry.path)!)) {
+      const targetPath = new URL(href).pathname;
+      const translation = pages.find((candidate) => candidate.path === targetPath)!;
+      expect(translation.key).toBe(entry.key);
+      expect(translation.locale).toBe(locale === "x-default" ? "en" : locale);
+      expect(documents.get(targetPath)![entry.locale]).toBe(`https://sleeplike.maat.work${entry.path}`);
+    }
+  }
   const sitemap = await (await request.get("/sitemap.xml")).text();
-  expect(sitemap.match(/<url>/g) || []).toHaveLength(24);
+  const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
+  expect(sitemapEntries).toHaveLength(72);
+  for (const entry of sitemapEntries) {
+    const path = new URL(entry.match(/<loc>([^<]+)<\/loc>/)![1]).pathname;
+    const alternates = Object.fromEntries([...entry.matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((match) => [match[1], new URL(match[2]).href]));
+    expect(alternates).toEqual(documents.get(path));
+  }
   expect(sitemap).not.toContain("/sleep-calculator");
   const redirect = await request.get("/sleep-calculator", { maxRedirects: 0 });
   expect(redirect.status()).toBe(308);
@@ -39,10 +49,8 @@ test("mobile and desktop remain accessible without overflow", async ({
   browserName,
 }) => {
   for (const path of [
-    "/calculadora-de-sueno",
-    "/siesta",
-    "/sleep-cycles",
-    "/privacidad",
+    "/calculadora-de-sueno", "/siesta", "/sleep-cycles", "/privacidad",
+    "/pt-br", "/fr", "/de", "/it",
   ]) {
     await page.goto(path);
     const issues = await new AxeBuilder({ page })

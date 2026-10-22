@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
 import { getPage, type ContentPage } from "./content/pages";
-import { SITE_URL, isPreview, homePath } from "./site";
+import { SITE_URL, isPreview } from "./site";
+import { alternatePaths, homePath, localeInfo, locales, localizedPaths } from "./i18n";
+import { localeCopy } from "./locales";
 import { socialImagePath } from "./social";
 export function pageMetadata(path: string): Metadata {
   const page = getPage(path)!;
-  const en = page.locale === "en" ? page.path : page.pairPath;
-  const es = page.locale === "es" ? page.path : page.pairPath;
   return {
     metadataBase: new URL(SITE_URL),
     title: `${page.title} · SleepLike`,
@@ -13,7 +13,7 @@ export function pageMetadata(path: string): Metadata {
     applicationName: "SleepLike",
     alternates: {
       canonical: page.path,
-      languages: { en, es, "x-default": en },
+      languages: alternatePaths(page.key),
     },
     robots: isPreview
       ? { index: false, follow: false }
@@ -23,8 +23,8 @@ export function pageMetadata(path: string): Metadata {
       description: page.description,
       url: page.path,
       siteName: "SleepLike",
-      locale: page.locale === "es" ? "es_ES" : "en_US",
-      alternateLocale: page.locale === "es" ? "en_US" : "es_ES",
+      locale: localeInfo[page.locale].openGraph,
+      alternateLocale: locales.filter((locale) => locale !== page.locale).map((locale) => localeInfo[locale].openGraph),
       type: page.kind === "guide" ? "article" : "website",
       images: [
         {
@@ -50,7 +50,7 @@ export function structuredData(page: ContentPage) {
     "@type": "Organization",
     "@id": SITE_URL + "/#organization",
     name: "SleepLike",
-    url: SITE_URL + (page.locale === "es" ? "/acerca-de" : "/about"),
+    url: SITE_URL + localizedPaths[page.locale].about,
   };
   const primary =
     page.kind === "tool"
@@ -86,7 +86,7 @@ export function structuredData(page: ContentPage) {
           };
   const items = [
     {
-      name: page.locale === "es" ? "Calculadora de sueño" : "Sleep calculator",
+      name: localeCopy[page.locale].editorial.calculator,
       item: SITE_URL + homePath(page.locale),
     },
     ...(page.path === homePath(page.locale)
@@ -107,7 +107,7 @@ export function structuredData(page: ContentPage) {
         "@id": SITE_URL + "/#website",
         name: "SleepLike",
         url: SITE_URL + "/",
-        inLanguage: ["en", "es"],
+        inLanguage: locales,
         publisher: author,
       }] : []),
     ],

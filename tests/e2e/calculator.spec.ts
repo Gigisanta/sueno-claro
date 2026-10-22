@@ -113,13 +113,14 @@ test("nap entry, equivalent language navigation and legacy links", async ({
   await expect(page.locator(".result-duration").first()).toHaveText(
     "20 min en cama",
   );
-  await page.getByRole("link", { name: "English", exact: false }).click();
+  await page.locator(".language-switcher summary").click();
+  await page.locator(".language-switcher").getByRole("link", { name: "English", exact: true }).click();
   await expect(page).toHaveURL(/\/nap-calculator$/);
   await expect(page.locator("html")).toHaveAttribute("lang", "en");
   await page.goto("/?mode=nap&nap=14%3A20&latency=30&cycle=100&format=12h");
   await expect(page.locator("#napAt-time")).toHaveValue("14:20");
   await expect(page).toHaveURL(/\/$/);
-  await page.locator("summary").click();
+  await page.locator(".settings summary").click();
   await expect(page.locator("#latency")).toHaveValue("30");
 });
 test("shared fragment imported and stripped; copy and Web Share alternatives", async ({

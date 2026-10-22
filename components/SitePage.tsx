@@ -2,7 +2,8 @@ import { Fragment } from "react";
 import { getGuideExamples } from "../lib/content/examples";
 import { getPage } from "../lib/content/pages";
 import { structuredData } from "../lib/metadata";
-import { homePath } from "../lib/site";
+import { homePath } from "../lib/i18n";
+import { localeCopy } from "../lib/locales";
 import { CalculatorShell } from "./CalculatorShell";
 import { PageChrome } from "./PageChrome";
 import { AdSlot } from "./AdSlot";
@@ -10,11 +11,11 @@ import { GuideExamples } from "./GuideExamples";
 import { SharePage } from "./SharePage";
 export function SitePage({ path }: { path: string }) {
   const page = getPage(path)!;
-  const es = page.locale === "es";
+  const c = localeCopy[page.locale];
   const examples =
     page.kind === "guide" ? getGuideExamples(page.path) : undefined;
   return (
-    <PageChrome lang={page.locale} pairPath={page.pairPath}>
+    <PageChrome lang={page.locale} pageKey={page.key}>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
@@ -26,33 +27,23 @@ export function SitePage({ path }: { path: string }) {
           {page.path !== homePath(page.locale) && (
             <nav
               className="breadcrumb"
-              aria-label={es ? "Ruta de navegación" : "Breadcrumb"}
+              aria-label={c.editorial.breadcrumb}
             >
-              <a href={homePath(page.locale)}>{es ? "Inicio" : "Home"}</a>
+              <a href={homePath(page.locale)}>{c.editorial.home}</a>
               <span aria-hidden="true">/</span>
               <span>{page.title}</span>
             </nav>
           )}
           <p className="eyebrow">
-            {page.kind === "tool"
-              ? es
-                ? "TU NOCHE, CON MÁS CLARIDAD"
-                : "MAKE ROOM FOR REST"
-              : page.kind === "guide"
-                ? es
-                  ? "LA GUÍA DE SLEEPLIKE"
-                  : "THE SLEEPLIKE GUIDE"
-                : "SLEEPLIKE"}
+            {page.kind === "tool" ? c.editorial.toolEyebrow : page.kind === "guide" ? c.editorial.guideEyebrow : "SLEEPLIKE"}
           </p>
           <h1>{page.heading}</h1>
           <p className="intro-text">{page.intro}</p>
           {page.kind !== "tool" && (
             <p className="byline">
-              {es
-                ? "Por el equipo de SleepLike · Revisado el"
-                : "By the SleepLike team · Reviewed"}{" "}
+              {c.editorial.reviewed}{" "}
               <time dateTime={page.updated}>
-                {new Intl.DateTimeFormat(es ? "es" : "en", {
+                {new Intl.DateTimeFormat(page.locale, {
                   day: "numeric",
                   month: "long",
                   year: "numeric",
@@ -63,18 +54,18 @@ export function SitePage({ path }: { path: string }) {
           )}
         </header>
         {page.kind === "tool" && (
-          <CalculatorShell lang={page.locale} initialMode={page.mode} />
+          <CalculatorShell lang={page.locale} initialMode={page.mode} copy={c.calculator} reminders={c.reminders} advertisement={c.advertisement} />
         )}
         <article
           className="editorial"
-          aria-label={es ? "Guía y método" : "Guide and method"}
+          aria-label={c.editorial.article}
         >
           {page.kind === "guide" && (
             <nav
               className="contents"
-              aria-label={es ? "En esta guía" : "In this guide"}
+              aria-label={c.editorial.contents}
             >
-              <strong>{es ? "En esta guía" : "In this guide"}</strong>
+              <strong>{c.editorial.contents}</strong>
               {page.sections.map((section) => (
                 <Fragment key={section.id}>
                   <a href={`#${section.id}`}>{section.heading}</a>
@@ -133,13 +124,13 @@ export function SitePage({ path }: { path: string }) {
                 <GuideExamples content={examples} />
               )}
               {page.kind === "guide" && (index === 1 || index === 3) && (
-                <AdSlot placement="article" eligible locale={page.locale} />
+                <AdSlot placement="article" eligible label={c.advertisement} />
               )}
             </div>
           ))}
           {page.sources.length > 0 && (
             <section className="sources">
-              <h2>{es ? "Fuentes y revisión" : "Sources and review"}</h2>
+              <h2>{c.editorial.sources}</h2>
               <ul>
                 {page.sources.map((source) => (
                   <li key={source.url}>
@@ -151,17 +142,15 @@ export function SitePage({ path }: { path: string }) {
                 ))}
               </ul>
               <p>
-                {es
-                  ? "Edición: equipo de SleepLike. Contenido educativo, sin revisión médica acreditada."
-                  : "Edited by the SleepLike team. Educational content, without accredited medical review."}
+                {c.editorial.sourceNote}
               </p>
             </section>
           )}
         </article>
-        {page.kind === "guide" && <SharePage path={page.path} title={page.title} locale={page.locale} />}
+        {page.kind === "guide" && <SharePage path={page.path} title={page.title} copy={c.share} />}
         {page.related.length > 0 && (
           <aside className="related">
-            <h2>{es ? "Sigue explorando" : "Keep exploring"}</h2>
+            <h2>{c.editorial.related}</h2>
             <div>
               {page.related.map((path) => {
                 const related = getPage(path);

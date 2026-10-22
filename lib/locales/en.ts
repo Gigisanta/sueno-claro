@@ -1,0 +1,36 @@
+export const en = {
+  chrome: {
+    skip: 'Skip to content', home: 'SleepLike home', navigation: 'Main navigation', naps: 'Naps', guides: 'Guides', languages: 'Language', resources: 'Sleep calculators and guides', tools: 'Plan your rest', learn: 'Understand your sleep', tagline: 'A little clarity before you sleep.', caution: 'Educational tool for adults. Not a medical diagnosis.', information: 'Site information', about: 'About', contact: 'Contact', methodology: 'Methodology', privacy: 'Privacy', terms: 'Terms', noSignup: 'No sign-up · For adults',
+  },
+  editorial: {
+    breadcrumb: 'Breadcrumb', home: 'Home', toolEyebrow: 'MAKE ROOM FOR REST', guideEyebrow: 'THE SLEEPLIKE GUIDE', reviewed: 'By the SleepLike team · Reviewed', article: 'Guide and method', contents: 'In this guide', sources: 'Sources and review', sourceNote: 'Edited by the SleepLike team. Educational content, without accredited medical review.', related: 'Keep exploring', calculator: 'Sleep calculator',
+  },
+  share: { label: 'Share guide', prompt: 'Know someone who could use this guide?', action: 'Share this guide ↗', copied: 'Link copied.', manual: 'Select and copy the link.', link: 'Public link' },
+  privacy: { preferences: 'Privacy preferences', heading: 'Your rest. Your choices.', description: 'Calculations run on your device. You can allow aggregate usage statistics; we do not send your sleep times or results.', analytics: 'Allow aggregate usage statistics', separateConsent: 'Non-personalized ads require a separate consent choice.', disabled: 'Advertising is not currently enabled.', review: 'Review advertising consent', close: 'Close' },
+  advertisement: 'Advertisement',
+  calculator: {
+    modes: ['Wake up', 'Sleep now', 'Nap', 'Time window'],
+    questions: ['When do you need to wake up?', 'Heading to bed now?', 'When will your nap start?', 'How much time do you have?'],
+    wakeAt: 'Wake up', bedAt: 'Go to bed', napAt: 'Start nap', date: 'Date', time: 'Time', settings: 'Adjust your estimates', latency: 'Time to fall asleep (minutes)', cycle: 'Estimated cycle (minutes)', format: 'Time format', calculate: 'Calculate', results: 'Your estimated times', bed: 'Go to bed at', wake: 'Wake up at', sleep: 'estimated sleep', inBed: 'in bed', short: 'Under 7 hours of sleep', share: 'Share plan', copy: 'Copy link', calendar: 'Calendar reminder', calculated: 'Calculated at', refreshed: 'Time has moved on. Update your calculation when you are ready.', update: 'Update to now', earlier: 'First occurrence', later: 'Second occurrence', choose: 'Choose an occurrence', occurrence: 'This time occurs twice', now: 'The current time is captured when you calculate.', note: 'Estimates for adults, not a guarantee of rest. Sleep cycles vary. Prioritize enough sleep and a regular schedule.', copied: 'Link copied.', failed: 'Automatic copying is unavailable. Copy the link below.', manual: 'Plan link', ready: ' options calculated.', invalid: 'Enter a valid date and time.', nonexistent: 'This local time does not exist because the clocks change. Choose another time.', ambiguous: 'Clocks go back at this time. Choose the first or second occurrence.', 'window-too-short': 'This window cannot fit a complete estimated cycle after time to fall asleep. Choose a longer window.', 'window-too-long': 'Choose a window of 24 hours or less.', settingError: 'Use 0–60 minutes to fall asleep and a cycle of 70–120 minutes.', zone: 'Times use your device’s time zone:', reminder: 'Downloads a calendar event. Your calendar controls notifications; this website is not an alarm.', napShort: 'Short nap · 20 minutes in bed', napLong: 'Long nap · estimated cycle', label: 'Sleep calculator', mode: 'Calculation mode', how: 'How it works', previewHeading: 'Make room for rest.', previewIntro: 'Set your schedule and compare options for your next night or nap.', previewLatency: 'To fall asleep', previewCycle: 'Per estimated cycle', previewNote: 'Adjustable estimates. Every night is different.', edit: 'Edit schedule',
+  },
+  reminders: {
+    bedtime: { summary: 'Bedtime reminder', description: 'Time to go to bed.' },
+    wake: { summary: 'Wake-up reminder', description: 'Time to wake up.' },
+    nap: { summary: 'Nap reminder', description: 'Time to wake up from your nap.' },
+    shortNap: { summary: 'Short nap reminder', description: 'Short nap: 20 minutes in bed; no sleep-latency estimate.' },
+  },
+  examples: {
+    heading: 'Try the example with your schedule', action: 'Try in the calculator', note: 'These examples use five 90-minute cycles and no clock change; they do not predict your sleep stages. The calculator opens these values so you can change the time, date, and allowance; it does not save them. Prioritize enough time for sleep and check the selected day.', wake: 'Wake up', inBed: 'Get into bed', sleep: 'Estimated sleep', allowance: 'Settling allowance', duration: '7 hours 30 minutes',
+    cyclesIntro: 'Five estimated cycles are 7 hours 30 minutes of sleep. The 15-minute allowance adds to time in bed; the calculator also shows other durations to compare.',
+    durationIntro: 'Reproduce the example-week calculation: time in bed includes settling and can be longer than estimated sleep.',
+    latencyIntro: 'Keep the wake time and estimated sleep the same. A longer allowance moves the in-bed time earlier; the allowance does not become sleep.',
+    scheduleIntro: 'Compare two mornings 45 minutes apart. This comparison estimates 7 hours 30 minutes of sleep; the eight-hour plan above reserves more time.',
+    cycles: { title: 'Wake at 07:00', summary: '23:15 to 07:00 is 7 hours 45 minutes in bed, including the 15-minute transition.' },
+    durationCard: { title: 'The 06:45 alarm', summary: 'Getting into bed at 23:00 leaves 7 hours 45 minutes until the alarm. Subtracting the allowance leaves 7 hours 30 minutes of estimated sleep.' },
+    latency15: { title: '15-minute allowance', summary: '7 hours 45 minutes in bed for this example.' },
+    latency30: { title: '30-minute allowance', summary: '8 hours in bed with the same estimated sleep.' },
+    weekday: { title: 'Weekday morning', summary: 'A 06:30 alarm places the estimated in-bed time at 22:45.' },
+    weekend: { title: 'Weekend morning', summary: 'With a 07:15 alarm, the in-bed time becomes 23:30. The opportunity remains 7 hours 45 minutes.' },
+  },
+};
+export type LocaleCopy = typeof en;

@@ -2,6 +2,8 @@ import { describe, expect, it } from 'vitest';
 import ICAL from 'ical.js';
 import { createCalendar } from './calendar';
 import type { SleepOption } from './types';
+import { en } from '../locales/en';
+import { es } from '../locales/es';
 
 const option: SleepOption = {
   id: 'wake-6',
@@ -29,7 +31,7 @@ function property(event: ICAL.Component, name: string): string {
 
 describe('createCalendar', () => {
   it('creates parseable CRLF ICS with UTC timing and a stable target UID', () => {
-    const ics = createCalendar(option, 'en', '2026-06-30T12:00:00.000Z');
+    const ics = createCalendar(option, en.reminders, '2026-06-30T12:00:00.000Z');
     const event = parsedEvent(ics);
 
     expect(ics).toContain('\r\nBEGIN:VEVENT\r\n');
@@ -43,15 +45,15 @@ describe('createCalendar', () => {
   });
 
   it('localizes the target action for Spanish wake and nap reminders', () => {
-    const wake = createCalendar({ ...option, kind: 'wake', target: option.wakeTime }, 'es', '2026-06-30T12:00:00Z');
-    const nap = createCalendar({ ...option, kind: 'nap', target: option.wakeTime }, 'es', '2026-06-30T12:00:00Z');
+    const wake = createCalendar({ ...option, kind: 'wake', target: option.wakeTime }, es.reminders, '2026-06-30T12:00:00Z');
+    const nap = createCalendar({ ...option, kind: 'nap', target: option.wakeTime }, es.reminders, '2026-06-30T12:00:00Z');
     const shortNap = createCalendar({
       ...option,
       kind: 'nap',
       target: option.wakeTime,
       inBedMinutes: 20,
       sleepMinutes: 20,
-    }, 'en', '2026-06-30T12:00:00Z');
+    }, en.reminders, '2026-06-30T12:00:00Z');
 
     expect(property(parsedEvent(wake), 'summary')).toBe('Recordatorio de despertar');
     expect(property(parsedEvent(nap), 'summary')).toBe('Recordatorio de siesta');
