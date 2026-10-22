@@ -12,6 +12,7 @@
     "test:watch": "vitest",
     "e2e": "playwright test",
     "verify": "npm run lint && npm run test && npm run build && npm run e2e",
+    "indexnow": "node scripts/indexnow.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

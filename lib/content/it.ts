@@ -42,7 +42,7 @@ export const itPages: ContentPage[] = [
         heading: 'Parti dall’orario che non puoi spostare',
         paragraphs: [
           'Un orario fisso per la sveglia offre al calcolo un utile punto di riferimento. Lo strumento conta a ritroso da quell’ora in cicli del sonno approssimativi, lasciando un piccolo margine per addormentarti. Puoi usare il risultato per organizzare una giornata lavorativa, un viaggio o un appuntamento al mattino.',
-          'Il margine predefinito è di 15 minuti. È una convenzione pratica per organizzarti, non una misurazione della tua latenza del sonno. Se di solito ti serve più o meno tempo, considera le opzioni mostrate come un punto di partenza e adatta di conseguenza la routine con cui ti prepari a dormire.',
+          'Quanto hai dormito dalle 02:45 alle 07:33? L’intervallo è di 4 ore e 48 minuti. Se sono gli orari in cui sei rimasto a letto, sottrai il tempo trascorso sveglio: con il margine predefinito di 15 minuti per addormentarti e senza risvegli, restano circa 4 ore e 33 minuti di sonno stimato. Il margine è una convenzione di calcolo, non una misurazione; il calcolatore non sa quanto hai dormito davvero.',
         ],
       },
       {
@@ -417,8 +417,19 @@ export const itPages: ContentPage[] = [
           'Se spesso non riesci a mantenere degli orari perché il sonno non arriva, o se hai eccessiva sonnolenza diurna, forte russamento, risvegli con affanno o pause nella respirazione, rivolgiti a un professionista sanitario qualificato. Questa guida offre contenuti educativi sul benessere, non consigli medici.',
         ],
       },
+      {
+        id: 'night-shift',
+        heading: 'Lavoro notturno e turni a rotazione',
+        paragraphs: [
+          'Se lavori di notte o su turni a rotazione, l’esempio di orari diurni qui sopra non è una prescrizione personale. La formazione del NIOSH per il personale infermieristico raccomanda di proteggere il sonno al rientro a casa, invece di dedicare quel tempo alle faccende, e di mantenere la camera buia, silenziosa e senza interruzioni. Chiedi a chi vive con te di rispettare quel periodo di riposo.',
+          'Il calcolatore confronta soltanto gli orari: non adatta i ritmi circadiani né garantisce la vigilanza. Non guidare se hai sonno. Se la sonnolenza compromette la sicurezza sul lavoro o al volante, rivolgiti a un professionista sanitario qualificato e al servizio di medicina del lavoro per valutare la tua situazione. Queste informazioni sono educative, non consigli medici individuali.',
+        ],
+      },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, {
+      title: 'CDC/NIOSH · Dormire dopo il turno notturno (archivio; consultato il 22/10/2026)',
+      url: 'https://archive.cdc.gov/www_cdc_gov/niosh/work-hour-training-for-nurses/longhours/mod9/05.html',
+    }],
     related: ['/it', '/it/ora-di-andare-a-letto', '/it/quante-ore-dormire', '/it/tempo-per-addormentarsi'],
     updated: '2026-10-22',
   },

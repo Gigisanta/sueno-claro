@@ -76,7 +76,7 @@ const originalPages: ContentPage[] = [
         heading: 'Start with the time you cannot move',
         paragraphs: [
           'A fixed wake-up time gives the calculation a useful anchor. The tool works backward from that time in approximate sleep cycles, leaving a small allowance for falling asleep. You can use the result when you are planning a workday, a trip, or a morning appointment.',
-          'The default allowance is 15 minutes. It is a practical convention for planning, not a measurement of your sleep latency. If you usually need more or less time, treat the displayed options as a starting point and adjust your wind-down routine accordingly.',
+          'How long did you sleep from 2:45 a.m. to 7:33 a.m.? The interval is 4 hours 48 minutes. If those are your in-bed times, subtract time awake: with the default 15-minute settling allowance and no awakenings, that leaves an estimated 4 hours 33 minutes asleep. The allowance is a planning convention, not a measurement; the calculator cannot tell how much you actually slept.',
         ],
       },
       {
@@ -272,9 +272,9 @@ const originalPages: ContentPage[] = [
     locale: 'es',
     kind: 'tool',
     key: 'home',
-    title: 'Calculadora de sueño: planifica tu descanso',
-    description: 'Elige cuándo despertar y compara horas para acostarte. Ajusta el tiempo para dormirte y los ciclos. Cálculo privado y educativo, no consejo médico.',
-    heading: 'Calculadora de ciclos de sueño',
+    title: 'Calculadora de sueño: estima tus ciclos',
+    description: 'Calculadora de sueño para estimar ciclos y horarios. Ajusta el tiempo para dormirte y la duración del ciclo. No detecta fases reales ni mide cuánto duermes.',
+    heading: 'Calculadora de sueño y ciclos',
     intro: 'Indica a qué hora necesitas levantarte y compara horarios estimados para acostarte.',
     mode: 'wake',
     sections: [
@@ -283,7 +283,7 @@ const originalPages: ContentPage[] = [
         heading: 'Comienza por la hora que sí puedes fijar',
         paragraphs: [
           'Una hora de despertar estable sirve como punto de partida. La herramienta cuenta hacia atrás ciclos de sueño aproximados y deja un margen breve para conciliar el sueño. Puedes usar el resultado para organizar una jornada laboral, un viaje o una cita temprano por la mañana.',
-          'El margen predeterminado es de 15 minutos. Es una convención práctica para hacer la cuenta, no una medición de tu latencia personal. Si normalmente tardas más o menos, toma los horarios como una referencia y ajusta tu rutina de preparación.',
+          '¿Cuánto dormiste de las 02:45 a las 07:33? El intervalo es de 4 horas 48 minutos. Si son horas en cama, resta el tiempo despierto: con el margen predeterminado de 15 minutos para dormirte y sin despertares, quedan unas 4 horas 33 minutos de sueño estimado. Ese margen es una convención, no una medición: la calculadora no sabe cuánto dormiste realmente.',
         ],
       },
       {
@@ -1102,10 +1102,21 @@ const originalPages: ContentPage[] = [
           'Si con frecuencia no puedes seguir un horario porque el sueño no llega, o si tienes somnolencia excesiva durante el día, ronquidos fuertes, jadeos o pausas al respirar, habla con un profesional de la salud calificado. Esta guía es educativa y no es consejo médico.',
         ],
       },
+      {
+        id: 'night-shift',
+        heading: 'Trabajo nocturno y turnos rotativos',
+        paragraphs: [
+          'Si trabajas de noche o con turnos rotativos, el ejemplo de horario diurno no es una pauta personal. La formación de NIOSH para enfermería recomienda proteger el sueño al llegar a casa, en vez de dedicar ese tiempo a tareas, y mantener el dormitorio oscuro, silencioso y sin interrupciones. Habla con quienes viven contigo para que respeten ese descanso.',
+          'La calculadora solo compara horarios: no adapta tus ritmos circadianos ni garantiza que estés alerta. No conduzcas con sueño. Si la somnolencia afecta tu seguridad al trabajar o conducir, consulta a un profesional de la salud y al servicio de salud laboral para evaluar tu situación. Esto es información educativa, no consejo médico individual.',
+        ],
+      },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, {
+      title: 'CDC/NIOSH · Sueño tras el turno nocturno (archivo; consultado el 22/10/2026)',
+      url: 'https://archive.cdc.gov/www_cdc_gov/niosh/work-hour-training-for-nurses/longhours/mod9/05.html',
+    }],
     related: ['/calculadora-de-sueno', '/hora-de-dormir', '/cuantas-horas-dormir', '/cuanto-tardo-en-dormirme'],
-    updated: '2026-09-30',
+    updated: '2026-10-22',
   },
   {
     path: '/how-much-sleep',
@@ -1291,10 +1302,21 @@ const originalPages: ContentPage[] = [
           'If you regularly cannot keep a schedule because sleep will not come, or if you have excessive daytime sleepiness, loud snoring, gasping, or breathing pauses, speak with a qualified health professional. This guide is educational wellness content, not medical advice.',
         ],
       },
+      {
+        id: 'night-shift',
+        heading: 'Night shifts and rotating shift work',
+        paragraphs: [
+          'If you work nights or rotating shifts, the daytime schedule above is not a personal prescription. NIOSH training for nurses recommends protecting sleep after arriving home rather than using that time for chores, and keeping the bedroom dark, quiet, and free from interruptions. Ask the people you live with to protect that sleep period.',
+          'The calculator only compares clock times: it cannot adapt your circadian rhythms or guarantee alertness. Do not drive when sleepy. If sleepiness affects safety at work or behind the wheel, consult a qualified clinician and occupational health service about your situation. This is education, not individual medical advice.',
+        ],
+      },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, {
+      title: 'CDC/NIOSH · Sleep after night shifts (archived training; accessed 2026-10-22)',
+      url: 'https://archive.cdc.gov/www_cdc_gov/niosh/work-hour-training-for-nurses/longhours/mod9/05.html',
+    }],
     related: ['/', '/bedtime-calculator', '/how-much-sleep', '/sleep-latency'],
-    updated: '2026-09-30',
+    updated: '2026-10-22',
   },
 ];
 

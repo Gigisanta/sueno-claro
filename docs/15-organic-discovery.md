@@ -41,8 +41,7 @@ now names the calculator and practical bedtime-planning task; English H1 is
 and descriptions and a visible five-link directory immediately after the
 calculator (schedule, nap, bedtime, cycles and adult sleep duration). These are
 ordinary server-rendered links, not footer-only discovery. Home titles use the
-`| SleepLike` suffix; other pages retain their existing suffix. Medical body
-copy, calculation assumptions and source URLs are unchanged. This is a snippet
+`| SleepLike` suffix; other pages retain their existing suffix. This is a snippet
 and internal-link improvement, not evidence of later clicks or indexing.
 
 Retained primary references, accessed 2026-10-22 (no unverified national sources):
@@ -55,6 +54,55 @@ Retained primary references, accessed 2026-10-22 (no unverified national sources
 The 90-minute cycle and default 15-minute settling allowance remain explicit
 planning conventions, not measurements or individual medical recommendations.
 Short-nap output means 20 minutes **in bed**, not guaranteed time asleep.
+
+## Search Console content follow-through · 2026-10-22
+
+The Spanish calculator title and H1 now lead with “Calculadora de sueño” and
+name estimated cycles. Its description explicitly says it cannot detect actual
+sleep stages or measure sleep. All six calculator homepages include the same
+worked duration example: 02:45–07:33 is 4 hours 48 minutes in bed; subtracting
+the assumed 15-minute settling period, without awakenings, gives an estimated
+4 hours 33 minutes asleep. Clock subtraction cannot establish actual sleep.
+Calculation inputs, formulas, advertising and consent logic are unchanged.
+
+The six existing schedule guides now explain night and rotating shifts without
+adding new keyword pages. They distinguish a daytime example from personal
+guidance, describe protecting sleep after work and a dark, quiet room, deny
+circadian adaptation/alertness guarantees, and include driving and occupational
+health cautions. Official source verified and accessed 2026-10-22:
+CDC/NIOSH, *Training for Nurses on Shift Work and Long Work Hours*, Module 9,
+Sleep (archived; last reviewed 2020-03-31):
+https://archive.cdc.gov/www_cdc_gov/niosh/work-hour-training-for-nurses/longhours/mod9/05.html
+The guidance was written for nurses; it is not represented as a personalized
+plan for every occupation. Source URLs and access dates appear on each guide.
+Routes and translation groups remain unchanged.
+
+### IndexNow (manual, after an authorized production release)
+
+The public ownership key is `public/4f8fddec4720ae1200aad2fa14ff476a.txt`;
+its contents match its basename. It replaces the unused `indexnow-key.txt`.
+This is a public verification file, not a credential.
+
+Preview only, with no network calls:
+
+```bash
+npm run indexnow -- /calculadora-de-sueno /sleep-schedule
+```
+
+After the changed URLs **and** key file are live, an authorized operator can run:
+
+```bash
+npm run indexnow -- --submit /calculadora-de-sueno /sleep-schedule
+```
+
+Pass every changed locale URL explicitly; the command does not silently add
+defaults or submit the sitemap. It accepts paths or HTTPS URLs only on
+`sleeplike.maat.work`, removes fragments and deduplicates URLs. With `--submit`
+it first checks that the live key matches, then POSTs JSON to
+https://api.indexnow.org/indexnow. HTTP 200/202 means received/pending key
+validation, not indexed. Without `--submit`, it only prints the payload.
+No submission, deployment or indexing request was made for this change.
+Protocol reference, accessed 2026-10-22: https://www.indexnow.org/documentation .
 
 ## Initial launch · 2026-09-10
 
