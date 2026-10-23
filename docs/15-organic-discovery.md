@@ -95,10 +95,25 @@ After the changed URLs **and** key file are live, an authorized operator can run
 npm run indexnow -- --submit /calculadora-de-sueno /sleep-schedule
 ```
 
-Pass every changed locale URL explicitly; the command does not silently add
-defaults or submit the sitemap. It accepts paths or HTTPS URLs only on
-`sleeplike.maat.work`, removes fragments and deduplicates URLs. With `--submit`
-it first checks that the live key matches, then POSTs JSON to
+Alternatively, preview the live sitemap (this downloads the sitemap but does not
+contact IndexNow), optionally selecting entries updated on or after a date:
+
+```bash
+npm run indexnow -- --sitemap
+npm run indexnow -- --sitemap --since 2026-10-23
+# Only after an authorized release:
+npm run indexnow -- --submit --sitemap --since 2026-10-23
+```
+
+Sitemap mode cannot be mixed with explicit URLs. `--since` requires sitemap mode
+and a valid calendar date; entries with absent or invalid `lastmod` are excluded
+when filtering. With no filter all locations are included. Empty selections do
+not submit. All locations must be absolute HTTPS URLs on `sleeplike.maat.work`,
+including entries excluded by the date filter.
+
+Explicit mode accepts paths or HTTPS URLs only on `sleeplike.maat.work`. Both
+modes remove fragments and deduplicate URLs. With `--submit` the command first
+checks that the live key matches, then POSTs JSON to
 https://api.indexnow.org/indexnow. HTTP 200/202 means received/pending key
 validation, not indexed. Without `--submit`, it only prints the payload.
 No submission, deployment or indexing request was made for this change.
