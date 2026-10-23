@@ -54,10 +54,11 @@ async function main(argv) {
   if (sitemap) {
     const response = await fetch(`${origin}/sitemap.xml`);
     if (!response.ok) throw new Error(`Could not download sitemap (HTTP ${response.status}).`);
-    const xml = await response.text();
+    const xml = (await response.text()).replace(/<!--[\s\S]*?-->/g, '');
     if (!/<urlset(?:\s|>)/.test(xml) || !/<\/urlset>/.test(xml)) {
       throw new Error('Expected a sitemap urlset.');
     }
+    const cutoff = since ? Date.parse(`${since}T00:00:00Z`) : null;
     for (const match of xml.matchAll(/<url(?:\s[^>]*)?>([\s\S]*?)<\/url>/g)) {
       const loc = match[1].match(/<loc>([\s\S]*?)<\/loc>/);
       const lastmod = match[1].match(/<lastmod>([\s\S]*?)<\/lastmod>/);
@@ -66,7 +67,7 @@ async function main(argv) {
       const input = normalizeUrl(new URL(xmlText(loc[1])).href);
       const modified = lastmod && xmlText(lastmod[1]);
       if (since && (!modified || !validDate(modified.slice(0, 10)) || !Number.isFinite(Date.parse(modified)))) continue;
-      if (!since || modified.slice(0, 10) >= since) inputs.push(input);
+      if (!since || Date.parse(modified) >= cutoff) inputs.push(input);
     }
     if (!inputs.length) {
       console.log('No sitemap URLs match; nothing sent.');

@@ -110,6 +110,9 @@ and a valid calendar date; entries with absent or invalid `lastmod` are excluded
 when filtering. With no filter all locations are included. Empty selections do
 not submit. All locations must be absolute HTTPS URLs on `sleeplike.maat.work`,
 including entries excluded by the date filter.
+The cutoff is UTC midnight: timestamp offsets are respected, and date-only
+`lastmod` values represent UTC midnight. XML comments are ignored when reading
+locations and modification times.
 
 Explicit mode accepts paths or HTTPS URLs only on `sleeplike.maat.work`. Both
 modes remove fragments and deduplicate URLs. With `--submit` the command first

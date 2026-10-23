@@ -92,6 +92,40 @@ describe('IndexNow CLI', () => {
     ]);
   });
 
+  it('compares lastmod instants with the UTC-midnight cutoff, including offsets', () => {
+    const xml = `<urlset>
+      <url><loc>https://sleeplike.maat.work/argentina</loc><lastmod>2026-10-22T23:30:00-03:00</lastmod></url>
+      <url><loc>https://sleeplike.maat.work/ahead</loc><lastmod>2026-10-23T00:30:00+14:00</lastmod></url>
+      <url><loc>https://sleeplike.maat.work/utc</loc><lastmod>2026-10-23T02:30:00Z</lastmod></url>
+      <url><loc>https://sleeplike.maat.work/midnight</loc><lastmod>2026-10-23</lastmod></url>
+    </urlset>`;
+    const result = run(['--sitemap', '--since', '2026-10-23'], 200, true, xml);
+    expect(result.status, result.stderr).toBe(0);
+    const start = result.stdout.indexOf('\n{') + 1;
+    const payload = JSON.parse(result.stdout.slice(start, result.stdout.indexOf('\nDry run:')));
+    expect(payload.urlList).toEqual([
+      'https://sleeplike.maat.work/argentina',
+      'https://sleeplike.maat.work/utc',
+      'https://sleeplike.maat.work/midnight',
+    ]);
+    expect(requests(result.stdout)).toHaveLength(1);
+  });
+
+  it('ignores commented URLs and commented loc elements before the real location', () => {
+    const xml = `<urlset>
+      <!-- <url><loc>https://example.com/commented</loc></url> -->
+      <url><!-- <loc>https://example.com/decoy</loc> -->
+        <loc>https://sleeplike.maat.work/real</loc>
+      </url>
+    </urlset>`;
+    const result = run(['--sitemap'], 200, true, xml);
+    expect(result.status, result.stderr).toBe(0);
+    const start = result.stdout.indexOf('\n{') + 1;
+    const payload = JSON.parse(result.stdout.slice(start, result.stdout.indexOf('\nDry run:')));
+    expect(payload.urlList).toEqual(['https://sleeplike.maat.work/real']);
+    expect(requests(result.stdout)).toHaveLength(1);
+  });
+
   it('does not check the key or submit an empty date selection', () => {
     const result = run(['--submit', '--sitemap', '--since', '2026-10-24'], 200, true, sitemap);
     expect(result.status, result.stderr).toBe(0);
