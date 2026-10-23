@@ -7,6 +7,8 @@ for (const example of [
   { locale: 'en', guide: '/sleep-latency', tool: '/bedtime-calculator', contents: 'In this guide', heading: 'Try the example with your schedule', action: 'Try in the calculator: 30-minute allowance', calculate: 'Calculate' },
 ]) {
   test(`worked guide example ${example.locale} opens a future wake target and can be adjusted`, async ({ page }) => {
+    // This journey checks example values, not animated scrolling between edits.
+    await page.emulateMedia({ reducedMotion: "reduce" });
     await page.clock.install({ time: new Date('2026-09-11T11:15:00Z') });
     await page.goto(example.guide);
     const anchor = page.getByRole('navigation', { name: example.contents, exact: true }).getByRole('link', { name: example.heading, exact: true });

@@ -56,7 +56,7 @@ function pageText(page: ContentPage): string {
 }
 
 describe('content catalog', () => {
-  it('contains all twelve page topics in each of the six languages', () => {
+  it('contains all twelve page topics in each of the seven languages', () => {
     const expectedPaths = [
       ...englishProductPaths,
       ...spanishProductPaths,
@@ -64,9 +64,9 @@ describe('content catalog', () => {
       ...spanishLegalPaths,
     ];
 
-    expect(pages).toHaveLength(72);
+    expect(pages).toHaveLength(84);
     expect(pages.filter((page) => page.locale === 'en' || page.locale === 'es').map((page) => page.path).sort()).toEqual(expectedPaths.sort());
-    expect(new Set(pages.map((page) => page.path)).size).toBe(72);
+    expect(new Set(pages.map((page) => page.path)).size).toBe(84);
     for (const locale of locales) {
       const localized = pages.filter((page) => page.locale === locale);
       expect(localized, locale).toHaveLength(12);
@@ -147,6 +147,7 @@ describe('content catalog', () => {
       ['fr', '02:45', '07:33', '4 heures 48 minutes', '4 heures 33 minutes', 'pas une mesure'],
       ['de', '02:45', '07:33', '4 Stunden und 48 Minuten', '4 Stunden und 33 Minuten', 'keine Messung'],
       ['it', '02:45', '07:33', '4 ore e 48 minuti', '4 ore e 33 minuti', 'non una misurazione'],
+      ['id', '02:45', '07:33', '4 jam 48 menit', '4 jam 33 menit', 'bukan pengukuran'],
     ];
     for (const [locale, ...terms] of examples) {
       const page = pages.find((candidate) => candidate.locale === locale && candidate.key === 'home')!;
@@ -156,7 +157,7 @@ describe('content catalog', () => {
     }
   });
 
-  it('cites official night-shift guidance and preserves safety cautions in all six schedules', () => {
+  it('cites official night-shift guidance and preserves safety cautions in all seven schedules', () => {
     const cautions = {
       en: ['cannot adapt your circadian rhythms', 'Do not drive when sleepy', 'occupational health'],
       es: ['no adapta tus ritmos circadianos', 'No conduzcas con sueño', 'salud laboral'],
@@ -164,6 +165,7 @@ describe('content catalog', () => {
       fr: ['ni adapter tes rythmes circadiens', 'Ne conduis pas si tu somnoles', 'santé au travail'],
       de: ['weder deinen zirkadianen Rhythmus anpassen', 'Fahre nicht, wenn du schläfrig bist', 'betriebsärztlich'],
       it: ['non adatta i ritmi circadiani', 'Non guidare se hai sonno', 'medicina del lavoro'],
+      id: ['tidak dapat menyesuaikan ritme sirkadian', 'Jangan mengemudi saat mengantuk', 'kesehatan kerja'],
     };
     for (const locale of locales) {
       const page = getPage(localizedPaths[locale].schedule)!;
@@ -181,6 +183,8 @@ describe('content catalog', () => {
     const spanishPrivacyText = pageText(getPage('/privacidad')!);
     const methodologyText = pageText(getPage('/methodology')!);
     const spanishMethodologyText = pageText(getPage('/metodologia')!);
+    const indonesianPrivacyText = pageText(getPage('/id/privasi')!);
+    const indonesianMethodologyText = pageText(getPage('/id/metodologi')!);
 
     expect(privacyText).toContain('If advertising is enabled');
     expect(privacyText).toContain('Vercel Analytics');
@@ -201,6 +205,16 @@ describe('content catalog', () => {
     expect(spanishMethodologyText).toContain('Los cuatro modos de planificación');
     expect(spanishMethodologyText).toContain('captura de la hora local actual');
     expect(spanishMethodologyText).toContain('no pronostica etapas futuras del sueño');
+    expect(indonesianPrivacyText).toContain('Jika iklan diaktifkan');
+    expect(indonesianPrivacyText).toContain('Vercel Analytics');
+    expect(indonesianPrivacyText).toContain('secara agregat');
+    expect(indonesianPrivacyText).toContain('kontrol Preferensi privasi di bagian bawah halaman');
+    expect(indonesianPrivacyText).toContain('hanya setelah persetujuan Anda');
+    expect(indonesianPrivacyText).toContain('mencabut pilihan sebelumnya');
+    expect(indonesianMethodologyText).toContain('Empat mode perencanaan');
+    expect(indonesianMethodologyText).toContain('Catatan waktu setempat saat ini');
+    expect(indonesianMethodologyText).toContain('tidak memprediksi tahapan tidur mendatang');
+    expect(indonesianMethodologyText).toContain('bukan nasihat medis');
   });
 
   it('uses valid revision dates without backdating new translations', () => {

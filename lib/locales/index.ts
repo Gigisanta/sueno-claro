@@ -4,7 +4,8 @@ import { ptBR } from './pt-BR';
 import { fr } from './fr';
 import { de } from './de';
 import { it } from './it';
+import { id } from './id';
 import type { Locale } from '../i18n';
 
 // Select on the server; interactive components receive only the current copy.
-export const localeCopy: Record<Locale, LocaleCopy> = { en, es, 'pt-BR': ptBR, fr, de, it };
+export const localeCopy: Record<Locale, LocaleCopy> = { en, es, 'pt-BR': ptBR, fr, de, it, id };

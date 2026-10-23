@@ -12,7 +12,7 @@ test("all routes have unique static SEO, reciprocal languages and structured dat
     expect(html).toContain(`<html lang="${entry.locale}"`);
     expect(new URL(html.match(/<link rel="canonical" href="([^"]+)"/)![1]).href).toBe(new URL(entry.path, "https://sleeplike.maat.work").href);
     const alternates = Object.fromEntries([...html.matchAll(/<link rel="alternate" hrefLang="([^"]+)" href="([^"]+)"/g)].map((match) => [match[1], new URL(match[2]).href]));
-    expect(Object.keys(alternates).sort()).toEqual(["en", "es", "pt-BR", "fr", "de", "it", "x-default"].sort());
+    expect(Object.keys(alternates).sort()).toEqual(["en", "es", "pt-BR", "fr", "de", "it", "id", "x-default"].sort());
     expect(alternates[entry.locale]).toBe(`https://sleeplike.maat.work${entry.path}`);
     expect(alternates["x-default"]).toBe(`https://sleeplike.maat.work${pages.find((page) => page.key === entry.key && page.locale === "en")!.path}`);
     documents.set(entry.path, alternates);
@@ -31,7 +31,7 @@ test("all routes have unique static SEO, reciprocal languages and structured dat
   }
   const sitemap = await (await request.get("/sitemap.xml")).text();
   const sitemapEntries = [...sitemap.matchAll(/<url>([\s\S]*?)<\/url>/g)].map((match) => match[1]);
-  expect(sitemapEntries).toHaveLength(72);
+  expect(sitemapEntries).toHaveLength(84);
   for (const entry of sitemapEntries) {
     const path = new URL(entry.match(/<loc>([^<]+)<\/loc>/)![1]).pathname;
     const alternates = Object.fromEntries([...entry.matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((match) => [match[1], new URL(match[2]).href]));
@@ -50,7 +50,7 @@ test("mobile and desktop remain accessible without overflow", async ({
 }) => {
   for (const path of [
     "/calculadora-de-sueno", "/siesta", "/sleep-cycles", "/privacidad",
-    "/pt-br", "/fr", "/de", "/it",
+    "/pt-br", "/fr", "/de", "/it", "/id",
   ]) {
     await page.goto(path);
     const issues = await new AxeBuilder({ page })

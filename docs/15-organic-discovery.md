@@ -1,17 +1,17 @@
 # Organic discovery
 
-## Six-language catalog · 2026-10-22
+## Seven-language catalog · 2026-10-23
 
 All 12 existing page topics are translated into Brazilian Portuguese, French,
-German and Italian without reducing the underlying English sections, tables,
-medical cautions or institutional/privacy content. Together with EN/ES this is
-72 canonical pages, not additional near-duplicate keyword/doorway topics.
-Localized roots are `/pt-br`, `/fr`, `/de` and `/it`; English and Spanish keep
-their published URLs. New-language copy uses 24-hour clocks.
+German, Italian and Indonesian without reducing the underlying English sections,
+tables, medical cautions or institutional/privacy content. Together with EN/ES
+this is 84 canonical pages, not additional near-duplicate keyword/doorway topics.
+Localized roots are `/pt-br`, `/fr`, `/de`, `/it` and `/id`; English and Spanish
+keep their published URLs. Prefixed-language copy uses 24-hour clocks.
 
 `lib/i18n.ts` owns topic IDs and locale routes. A native `details` language
-switcher contains ordinary server-rendered links to the same topic in all six
-languages, without JavaScript. HTML metadata and sitemap include all six
+switcher contains ordinary server-rendered links to the same topic in all seven
+languages, without JavaScript. HTML metadata and sitemap include all seven
 reciprocal hreflang values plus English `x-default`. Canonicals are per-locale,
 and document language uses BCP 47 (`pt-BR` for Brazil). Every localized footer
 retains the MaatWork credit at https://maat.work.
@@ -34,10 +34,17 @@ Independent model-assisted translation review uses ten real sample strings per
 new language in the PR; it is not accredited medical or professional translation
 certification. No deployment, indexing, traffic or ranking is implied.
 
+Indonesian uses `id` / `id_ID` and the language name “Bahasa Indonesia”. Its 12
+pages translate the complete English catalog, retaining the same source URLs,
+non-medical disclaimers, adult scope, night-shift safety cautions and privacy
+conditions. Interface copy includes calendar reminders and worked examples.
+The existing build generates 12 additional localized social cards; switcher,
+hreflang, sitemap and offline export use the same catalog with no new route layer.
+
 The 2026-10-22 Search Console handoff reported 200 English-home impressions for
 “sleep calculator cycle”, average position 7.09 and zero clicks. The home snippet
 now names the calculator and practical bedtime-planning task; English H1 is
-“Sleep Cycle Calculator”. All six homepages use localized task-focused titles
+“Sleep Cycle Calculator”. All seven homepages use localized task-focused titles
 and descriptions and a visible five-link directory immediately after the
 calculator (schedule, nap, bedtime, cycles and adult sleep duration). These are
 ordinary server-rendered links, not footer-only discovery. Home titles use the
@@ -59,7 +66,7 @@ Short-nap output means 20 minutes **in bed**, not guaranteed time asleep.
 
 The Spanish calculator title and H1 now lead with “Calculadora de sueño” and
 name estimated cycles. Its description explicitly says it cannot detect actual
-sleep stages or measure sleep. All six calculator homepages include the same
+sleep stages or measure sleep. All seven calculator homepages include the same
 worked duration example: 02:45–07:33 is 4 hours 48 minutes in bed; subtracting
 the assumed 15-minute settling period, without awakenings, gives an estimated
 4 hours 33 minutes asleep. Clock subtraction cannot establish actual sleep.

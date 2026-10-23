@@ -1,4 +1,4 @@
-export const locales = ['en', 'es', 'pt-BR', 'fr', 'de', 'it'] as const;
+export const locales = ['en', 'es', 'pt-BR', 'fr', 'de', 'it', 'id'] as const;
 export type Locale = (typeof locales)[number];
 export type PageKey = 'home' | 'bedtime' | 'nap' | 'cycles' | 'duration' | 'latency' | 'schedule' | 'about' | 'contact' | 'privacy' | 'terms' | 'methodology';
 
@@ -9,6 +9,7 @@ export const localeInfo: Record<Locale, { name: string; openGraph: string; prefi
   fr: { name: 'Français', openGraph: 'fr_FR', prefix: 'fr' },
   de: { name: 'Deutsch', openGraph: 'de_DE', prefix: 'de' },
   it: { name: 'Italiano', openGraph: 'it_IT', prefix: 'it' },
+  id: { name: 'Bahasa Indonesia', openGraph: 'id_ID', prefix: 'id' },
 };
 
 export const localizedPaths: Record<Locale, Record<PageKey, string>> = {
@@ -18,6 +19,7 @@ export const localizedPaths: Record<Locale, Record<PageKey, string>> = {
   fr: { home: '/fr', bedtime: '/fr/heure-du-coucher', nap: '/fr/calculateur-de-sieste', cycles: '/fr/cycles-du-sommeil', duration: '/fr/combien-d-heures-dormir', latency: '/fr/temps-d-endormissement', schedule: '/fr/horaires-de-sommeil', about: '/fr/a-propos', contact: '/fr/contact', privacy: '/fr/confidentialite', terms: '/fr/conditions', methodology: '/fr/methodologie' },
   de: { home: '/de', bedtime: '/de/schlafenszeit', nap: '/de/mittagsschlaf-rechner', cycles: '/de/schlafzyklen', duration: '/de/wie-viel-schlaf', latency: '/de/einschlafdauer', schedule: '/de/schlafrhythmus', about: '/de/ueber-uns', contact: '/de/kontakt', privacy: '/de/datenschutz', terms: '/de/nutzungsbedingungen', methodology: '/de/methodik' },
   it: { home: '/it', bedtime: '/it/ora-di-andare-a-letto', nap: '/it/calcolatore-pisolino', cycles: '/it/cicli-del-sonno', duration: '/it/quante-ore-dormire', latency: '/it/tempo-per-addormentarsi', schedule: '/it/orari-del-sonno', about: '/it/chi-siamo', contact: '/it/contatti', privacy: '/it/privacy', terms: '/it/condizioni', methodology: '/it/metodologia' },
+  id: { home: '/id', bedtime: '/id/waktu-tidur', nap: '/id/kalkulator-tidur-siang', cycles: '/id/siklus-tidur', duration: '/id/berapa-jam-tidur', latency: '/id/waktu-untuk-tertidur', schedule: '/id/jadwal-tidur', about: '/id/tentang', contact: '/id/kontak', privacy: '/id/privasi', terms: '/id/ketentuan', methodology: '/id/metodologi' },
 };
 
 export const homePath = (locale: Locale) => localizedPaths[locale].home;
@@ -29,6 +31,7 @@ export function alternatePaths(key: PageKey): Record<Locale | 'x-default', strin
     fr: localizedPaths.fr[key],
     de: localizedPaths.de[key],
     it: localizedPaths.it[key],
+    id: localizedPaths.id[key],
     'x-default': localizedPaths.en[key],
   };
 }

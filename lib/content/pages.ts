@@ -3,6 +3,7 @@ import { ptBRPages } from './pt-BR';
 import { frPages } from './fr';
 import { dePages } from './de';
 import { itPages } from './it';
+import { idPages } from './id';
 export type PageKind = 'tool' | 'guide' | 'legal';
 
 export interface ContentSection {
@@ -1320,7 +1321,7 @@ const originalPages: ContentPage[] = [
   },
 ];
 
-export const pages: ContentPage[] = [...originalPages, ...ptBRPages, ...frPages, ...dePages, ...itPages];
+export const pages: ContentPage[] = [...originalPages, ...ptBRPages, ...frPages, ...dePages, ...itPages, ...idPages];
 
 export function getPage(path: string): ContentPage | undefined {
   return pages.find((page) => page.path === path);

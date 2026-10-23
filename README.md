@@ -2,7 +2,7 @@
 
 > **September 2026 rework:** the current implementation and release gates are documented in [docs/13-launch-2026-09.md](docs/13-launch-2026-09.md). Earlier roadmap sections below are historical.
 
-Sleep planning calculator for adults. Six-language static web app/PWA.
+Sleep planning calculator for adults. Seven-language static web app/PWA.
 
 Open source under the [MIT License](LICENSE). The calculator, interface and
 content pipeline can be inspected, run and adapted without sending sleep data
@@ -16,11 +16,11 @@ No account, microphone or application backend. Calculations stay in the browser.
 ## Languages
 
 All 12 page topics are available in English, Spanish, Brazilian Portuguese,
-French, German and Italian (72 canonical pages). Existing English/Spanish URLs
-are unchanged; the new language roots are `/pt-br`, `/fr`, `/de` and `/it`.
-Each page has a native HTML language switcher linking to the same topic in all
-six languages. HTML and sitemap publish reciprocal alternates and English
-`x-default`; the four new locales default to 24-hour time.
+French, German, Italian and Indonesian (84 canonical pages). Existing
+English/Spanish URLs are unchanged; prefixed language roots are `/pt-br`, `/fr`,
+`/de`, `/it` and `/id`. Each page has a native HTML language switcher linking to
+the same topic in all seven languages. HTML and sitemap publish reciprocal
+alternates and English `x-default`; the five prefixed locales default to 24-hour time.
 
 Routing lives in `lib/i18n.ts`, complete editorial catalogs in `lib/content/`,
 and interface dictionaries in `lib/locales/`. Only current-language copy is

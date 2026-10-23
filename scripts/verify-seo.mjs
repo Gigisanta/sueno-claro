@@ -28,7 +28,7 @@ for (const page of pages) {
   assert(sitemapEntry, `Sitemap: ${page.path}`);
   const sitemapAlternates = Object.fromEntries([...sitemapEntry.matchAll(/<xhtml:link rel="alternate" hreflang="([^"]+)" href="([^"]+)"/g)].map((match) => [match[1], new URL(match[2], SITE_URL).href]));
   const translations = pages.filter((candidate) => candidate.key === page.key);
-  assert.equal(translations.length, 6, `Six translations: ${page.path}`);
+  assert.equal(translations.length, 7, `Seven translations: ${page.path}`);
   const expectedAlternates = Object.fromEntries(translations.map((translation) => [translation.locale, SITE_URL + translation.path]));
   expectedAlternates["x-default"] = SITE_URL + translations.find((translation) => translation.locale === "en").path;
   assert.deepEqual(htmlAlternates, expectedAlternates, `HTML hreflang: ${page.path}`);
@@ -48,4 +48,4 @@ for (const page of pages) {
     assert(html.includes(`href="${target.path}"`), `Discovery link: ${page.path} → ${target.path}`);
   }
 }
-console.log(`Static SEO verified: ${pages.length} routes, six-language reciprocal HTML/sitemap alternates + x-default, metadata lengths, schemas, discovery links and images`);
+console.log(`Static SEO verified: ${pages.length} routes, seven-language reciprocal HTML/sitemap alternates + x-default, metadata lengths, schemas, discovery links and images`);
