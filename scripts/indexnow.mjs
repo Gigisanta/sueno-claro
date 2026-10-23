@@ -7,22 +7,75 @@ const host = 'sleeplike.maat.work';
 const origin = `https://${host}`;
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 
-async function main(argv) {
-  const submit = argv.includes('--submit');
-  if (argv.some((arg) => arg.startsWith('--') && arg !== '--submit')) {
-    throw new Error('Unknown option. Usage: npm run indexnow -- [--submit] <urls...>');
-  }
-  const inputs = argv.filter((arg) => arg !== '--submit');
-  if (!inputs.length) throw new Error('Provide changed URLs or paths: npm run indexnow -- [--submit] <urls...>');
+const usage = 'Usage: npm run indexnow -- [--submit] <urls...> | --sitemap [--since YYYY-MM-DD]';
 
-  const urlList = [...new Set(inputs.map((input) => {
-    const url = new URL(input, origin);
-    if (url.origin !== origin || url.username || url.password) {
-      throw new Error(`Only HTTPS URLs on ${host} are allowed: ${input}`);
+function validDate(value) {
+  const date = new Date(`${value}T00:00:00Z`);
+  return /^\d{4}-\d{2}-\d{2}$/.test(value) && Number.isFinite(date.valueOf()) &&
+    date.toISOString().slice(0, 10) === value;
+}
+
+function xmlText(value) {
+  return value.trim().replace(/&(#x[0-9a-f]+|#\d+|amp|lt|gt|quot|apos);/gi, (_, entity) => {
+    const named = { amp: '&', lt: '<', gt: '>', quot: '"', apos: "'" };
+    return entity.startsWith('#')
+      ? String.fromCodePoint(entity[1].toLowerCase() === 'x' ? parseInt(entity.slice(2), 16) : Number(entity.slice(1)))
+      : named[entity];
+  });
+}
+
+function normalizeUrl(input, base = origin) {
+  const url = new URL(input, base);
+  if (url.origin !== origin || url.username || url.password) {
+    throw new Error(`Only HTTPS URLs on ${host} are allowed: ${input}`);
+  }
+  url.hash = '';
+  return url.href;
+}
+
+async function main(argv) {
+  let submit = false;
+  let sitemap = false;
+  let since;
+  const inputs = [];
+  for (let index = 0; index < argv.length; index++) {
+    const arg = argv[index];
+    if (arg === '--submit') submit = true;
+    else if (arg === '--sitemap') sitemap = true;
+    else if (arg === '--since') {
+      since = argv[++index];
+      if (!since || !validDate(since)) throw new Error(`Invalid --since date. ${usage}`);
+    } else if (arg.startsWith('--')) throw new Error(`Unknown option. ${usage}`);
+    else inputs.push(arg);
+  }
+  if ((!sitemap && since) || (sitemap && inputs.length) || (!sitemap && !inputs.length)) {
+    throw new Error(usage);
+  }
+  if (sitemap) {
+    const response = await fetch(`${origin}/sitemap.xml`);
+    if (!response.ok) throw new Error(`Could not download sitemap (HTTP ${response.status}).`);
+    const xml = (await response.text()).replace(/<!--[\s\S]*?-->/g, '');
+    if (!/<urlset(?:\s|>)/.test(xml) || !/<\/urlset>/.test(xml)) {
+      throw new Error('Expected a sitemap urlset.');
     }
-    url.hash = '';
-    return url.href;
-  }))];
+    const cutoff = since ? Date.parse(`${since}T00:00:00Z`) : null;
+    for (const match of xml.matchAll(/<url(?:\s[^>]*)?>([\s\S]*?)<\/url>/g)) {
+      const loc = match[1].match(/<loc>([\s\S]*?)<\/loc>/);
+      const lastmod = match[1].match(/<lastmod>([\s\S]*?)<\/lastmod>/);
+      if (!loc) throw new Error('Sitemap URL is missing loc.');
+      // Validate even entries excluded by --since; sitemap locations must be absolute.
+      const input = normalizeUrl(new URL(xmlText(loc[1])).href);
+      const modified = lastmod && xmlText(lastmod[1]);
+      if (since && (!modified || !validDate(modified.slice(0, 10)) || !Number.isFinite(Date.parse(modified)))) continue;
+      if (!since || Date.parse(modified) >= cutoff) inputs.push(input);
+    }
+    if (!inputs.length) {
+      console.log('No sitemap URLs match; nothing sent.');
+      return;
+    }
+  }
+
+  const urlList = [...new Set(inputs.map((input) => normalizeUrl(input)))];
   if (urlList.length > 10000) throw new Error('IndexNow accepts at most 10,000 URLs per request.');
 
   const publicDir = path.join(root, 'public');

@@ -5,9 +5,10 @@ import { describe, expect, it } from 'vitest';
 const script = fileURLToPath(new URL('../scripts/indexnow.mjs', import.meta.url));
 
 // Intercept fetch in the child process: these tests never reach IndexNow or production.
-function run(args: string[], status = 200, liveKey = true) {
+function run(args: string[], status = 200, liveKey = true, sitemap = '<urlset></urlset>', sitemapStatus = 200) {
   const transport = `globalThis.fetch = async (url, init) => {
     console.log('REQUEST ' + JSON.stringify({ url, method: init?.method ?? 'GET', body: init?.body, headers: init?.headers }));
+    if (String(url).endsWith('/sitemap.xml')) return new Response(${JSON.stringify(sitemap)}, { status: ${sitemapStatus} });
     if (!init) return new Response(${liveKey} ? new URL(url).pathname.slice(1, -4) : 'wrong-key');
     return new Response('', { status: ${status} });
   };`;
@@ -64,6 +65,92 @@ describe('IndexNow CLI', () => {
     expect(result.stderr).toContain('HTTP 403');
   });
 
+  const sitemap = `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+    <url><loc>https://sleeplike.maat.work/old</loc><lastmod>2026-10-21</lastmod></url>
+    <url><loc>https://sleeplike.maat.work/fr?a=1&amp;b=2</loc><lastmod>2026-10-22T12:00:00Z</lastmod></url>
+    <url><loc>https://sleeplike.maat.work/new</loc><lastmod>2026-10-23</lastmod></url>
+    <url><loc>https://sleeplike.maat.work/undated</loc></url>
+    <url><loc>https://sleeplike.maat.work/invalid</loc><lastmod>2026-02-30</lastmod></url>
+  </urlset>`;
+
+  it('previews all sitemap locations, decoding XML entities, without submitting', () => {
+    const result = run(['--sitemap'], 200, true, sitemap);
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.stdout).toContain('https://sleeplike.maat.work/fr?a=1&b=2');
+    expect(result.stdout).toContain('https://sleeplike.maat.work/undated');
+    expect(result.stdout).toContain('https://sleeplike.maat.work/old');
+    expect(requests(result.stdout).map((call) => call.url)).toEqual(['https://sleeplike.maat.work/sitemap.xml']);
+  });
+
+  it('filters inclusively by lastmod before checking the live key and submitting', () => {
+    const result = run(['--submit', '--sitemap', '--since', '2026-10-22'], 202, true, sitemap);
+    expect(result.status, result.stderr).toBe(0);
+    const calls = requests(result.stdout);
+    expect(calls.map((call) => call.method)).toEqual(['GET', 'GET', 'POST']);
+    expect(JSON.parse(calls[2].body).urlList).toEqual([
+      'https://sleeplike.maat.work/fr?a=1&b=2', 'https://sleeplike.maat.work/new',
+    ]);
+  });
+
+  it('compares lastmod instants with the UTC-midnight cutoff, including offsets', () => {
+    const xml = `<urlset>
+      <url><loc>https://sleeplike.maat.work/argentina</loc><lastmod>2026-10-22T23:30:00-03:00</lastmod></url>
+      <url><loc>https://sleeplike.maat.work/ahead</loc><lastmod>2026-10-23T00:30:00+14:00</lastmod></url>
+      <url><loc>https://sleeplike.maat.work/utc</loc><lastmod>2026-10-23T02:30:00Z</lastmod></url>
+      <url><loc>https://sleeplike.maat.work/midnight</loc><lastmod>2026-10-23</lastmod></url>
+    </urlset>`;
+    const result = run(['--sitemap', '--since', '2026-10-23'], 200, true, xml);
+    expect(result.status, result.stderr).toBe(0);
+    const start = result.stdout.indexOf('\n{') + 1;
+    const payload = JSON.parse(result.stdout.slice(start, result.stdout.indexOf('\nDry run:')));
+    expect(payload.urlList).toEqual([
+      'https://sleeplike.maat.work/argentina',
+      'https://sleeplike.maat.work/utc',
+      'https://sleeplike.maat.work/midnight',
+    ]);
+    expect(requests(result.stdout)).toHaveLength(1);
+  });
+
+  it('ignores commented URLs and commented loc elements before the real location', () => {
+    const xml = `<urlset>
+      <!-- <url><loc>https://example.com/commented</loc></url> -->
+      <url><!-- <loc>https://example.com/decoy</loc> -->
+        <loc>https://sleeplike.maat.work/real</loc>
+      </url>
+    </urlset>`;
+    const result = run(['--sitemap'], 200, true, xml);
+    expect(result.status, result.stderr).toBe(0);
+    const start = result.stdout.indexOf('\n{') + 1;
+    const payload = JSON.parse(result.stdout.slice(start, result.stdout.indexOf('\nDry run:')));
+    expect(payload.urlList).toEqual(['https://sleeplike.maat.work/real']);
+    expect(requests(result.stdout)).toHaveLength(1);
+  });
+
+  it('does not check the key or submit an empty date selection', () => {
+    const result = run(['--submit', '--sitemap', '--since', '2026-10-24'], 200, true, sitemap);
+    expect(result.status, result.stderr).toBe(0);
+    expect(result.stdout).toContain('No sitemap URLs match');
+    expect(requests(result.stdout)).toHaveLength(1);
+  });
+
+  it.each([
+    '<urlset><url><loc>https://example.com/</loc><lastmod>2020-01-01</lastmod></url></urlset>',
+    '<urlset><url><loc>http://sleeplike.maat.work/</loc></url></urlset>',
+    '<urlset><url><lastmod>2026-10-23</lastmod></url></urlset>',
+    '<html>not a sitemap</html>',
+  ])('rejects unsafe or malformed sitemaps before submission', (xml) => {
+    const result = run(['--submit', '--sitemap', '--since', '2026-10-22'], 200, true, xml);
+    expect(result.status).toBe(1);
+    expect(requests(result.stdout)).toHaveLength(1);
+  });
+
+  it('reports sitemap download failures without submitting', () => {
+    const result = run(['--submit', '--sitemap'], 200, true, '', 503);
+    expect(result.status).toBe(1);
+    expect(result.stderr).toContain('HTTP 503');
+    expect(requests(result.stdout)).toHaveLength(1);
+  });
+
   it.each([
     { args: [] },
     { args: ['--submit'] },
@@ -71,6 +158,11 @@ describe('IndexNow CLI', () => {
     { args: ['https://maat.work/'] },
     { args: ['http://sleeplike.maat.work/'] },
     { args: ['https://user:password@sleeplike.maat.work/'] },
+    { args: ['--since', '2026-10-22', '/'] },
+    { args: ['--sitemap', '/'] },
+    { args: ['--sitemap', '--since'] },
+    { args: ['--sitemap', '--since', '2026-02-30'] },
+    { args: ['--sitemap', '--since', '2026-13-01'] },
   ])('rejects invalid or missing inputs without network calls: $args', ({ args }) => {
     const result = run(args);
     expect(result.status).toBe(1);
