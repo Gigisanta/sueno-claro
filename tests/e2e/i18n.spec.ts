@@ -7,7 +7,8 @@ const journeys = [
   { locale: 'pt-BR', path: '/pt-br', calculate: 'Calcular', nextLocale: 'fr', nextPath: '/fr', language: 'Français' },
   { locale: 'fr', path: '/fr', calculate: 'Calculer', nextLocale: 'de', nextPath: '/de', language: 'Deutsch' },
   { locale: 'de', path: '/de', calculate: 'Berechnen', nextLocale: 'it', nextPath: '/it', language: 'Italiano' },
-  { locale: 'it', path: '/it', calculate: 'Calcola', nextLocale: 'en', nextPath: '/', language: 'English' },
+  { locale: 'it', path: '/it', calculate: 'Calcola', nextLocale: 'id', nextPath: '/id', language: 'Bahasa Indonesia' },
+  { locale: 'id', path: '/id', calculate: 'Hitung', nextLocale: 'en', nextPath: '/', language: 'English' },
 ] as const;
 
 for (const journey of journeys) {
@@ -28,6 +29,12 @@ for (const journey of journeys) {
       await expect(page.locator('h1')).toHaveText('Calculadora de sueño y ciclos');
       await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /No detecta fases reales/);
     }
+    if (journey.locale === 'id') {
+      await expect(page).toHaveTitle('Kalkulator Siklus Tidur: Tentukan Jam Tidur | SleepLike');
+      await expect(page.locator('h1')).toHaveText('Kalkulator Siklus Tidur');
+      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'Pilih jam bangun dan bandingkan perkiraan jam tidur berdasarkan siklus tidur. Privat dan edukatif; bukan nasihat medis.');
+      await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'id_ID');
+    }
     const resources = page.locator('.home-resources');
     await expect(resources).toBeVisible();
     await expect(resources.locator('a')).toHaveCount(5);
@@ -40,8 +47,9 @@ for (const journey of journeys) {
     await page.locator('#wakeAt-time').fill('07:00');
     await expect(page.locator('#time-format')).toHaveValue('24h');
     await page.getByRole('button', { name: journey.calculate, exact: true }).click();
-    await expect(page.locator('.result-time')).toHaveText(['21:45', '23:15', '00:45', '02:15']);
-    await expect(page.locator('.result-interval').nth(1)).toHaveText('23:15 → 07:00');
+    const expectedTimes = journey.locale === 'id' ? ['21.45', '23.15', '00.45', '02.15'] : ['21:45', '23:15', '00:45', '02:15'];
+    await expect(page.locator('.result-time')).toHaveText(expectedTimes);
+    await expect(page.locator('.result-interval').nth(1)).toHaveText(journey.locale === 'id' ? '23.15 → 07.00' : '23:15 → 07:00');
     await expect(page.locator('#results-heading')).toBeVisible();
     await expect(page.locator('[data-testid^="ad-"]')).toHaveCount(0);
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
