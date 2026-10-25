@@ -1,9 +1,28 @@
 export const en = {
+  taste: {
+    wakeAt: 'Wake at',
+    inBedBy: 'in bed by',
+    sleepNow: 'Sleep now',
+    wakeAround: 'wake around',
+    napAt: 'Nap at',
+    napUntil: 'wake around',
+    windowFrom: 'In bed at',
+    windowTo: 'wake at',
+    estimate: 'Estimated',
+    nightAlt: 'City lights beneath Earth’s glowing horizon and a star-filled sky.',
+    galleryAlts: [
+      'Green and red aurora above city lights in Canada.',
+      'The cratered Moon against the blackness of space.',
+      'The Milky Way above Earth’s glowing horizon.',
+    ],
+    photoCredit: 'Night photographs',
+    publicDomain: 'Public domain',
+  },
   chrome: {
     skip: 'Skip to content', home: 'SleepLike home', navigation: 'Main navigation', naps: 'Naps', guides: 'Guides', languages: 'Language', resources: 'Sleep calculators and guides', tools: 'Plan your rest', learn: 'Understand your sleep', tagline: 'A little clarity before you sleep.', caution: 'Educational tool for adults. Not a medical diagnosis.', information: 'Site information', about: 'About', contact: 'Contact', methodology: 'Methodology', privacy: 'Privacy', terms: 'Terms', noSignup: 'No sign-up · For adults',
   },
   editorial: {
-    breadcrumb: 'Breadcrumb', home: 'Home', toolEyebrow: 'MAKE ROOM FOR REST', guideEyebrow: 'THE SLEEPLIKE GUIDE', reviewed: 'By the SleepLike team · Reviewed', article: 'Guide and method', contents: 'In this guide', sources: 'Sources and review', sourceNote: 'Edited by the SleepLike team. Educational content, without accredited medical review.', related: 'Keep exploring', calculator: 'Sleep calculator',
+    breadcrumb: 'Breadcrumb', home: 'Home', reviewed: 'By the SleepLike team · Reviewed', article: 'Guide and method', contents: 'In this guide', sources: 'Sources and review', sourceNote: 'Edited by the SleepLike team. Educational content, without accredited medical review.', related: 'Keep exploring', calculator: 'Sleep calculator',
   },
   share: { label: 'Share guide', prompt: 'Know someone who could use this guide?', action: 'Share this guide ↗', copied: 'Link copied.', manual: 'Select and copy the link.', link: 'Public link' },
   privacy: { preferences: 'Privacy preferences', heading: 'Your rest. Your choices.', description: 'Calculations run on your device. You can allow aggregate usage statistics; we do not send your sleep times or results.', analytics: 'Allow aggregate usage statistics', separateConsent: 'Non-personalized ads require a separate consent choice.', disabled: 'Advertising is not currently enabled.', review: 'Review advertising consent', close: 'Close' },

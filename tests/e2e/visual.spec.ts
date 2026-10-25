@@ -59,6 +59,13 @@ for (const path of [
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
+    if (path === "/sleep-cycles") {
+      const action = page.getByRole("link", { name: "Sleep calculator", exact: true });
+      await expect(action).toBeInViewport();
+      await expect(action).toHaveAttribute("href", "/#calculator");
+      await action.click();
+      await expect(page.locator("#wakeAt-time")).toBeInViewport();
+    }
   });
 }
 test("keyboard users can skip to the calculator and calculate accessible results", async ({

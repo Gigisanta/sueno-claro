@@ -1,6 +1,25 @@
 import type { LocaleCopy } from './en';
 
 export const fr: LocaleCopy = {
+  taste: {
+    wakeAt: 'Se réveiller à',
+    inBedBy: 'au lit avant',
+    sleepNow: 'Dormir maintenant',
+    wakeAround: 'se réveiller vers',
+    napAt: 'Sieste à',
+    napUntil: 'se réveiller vers',
+    windowFrom: 'Au lit à',
+    windowTo: 'se réveiller à',
+    estimate: 'Estimé',
+    nightAlt: 'Lumières des villes sous l’horizon lumineux de la Terre et un ciel étoilé.',
+    galleryAlts: [
+      'Aurore verte et rouge au-dessus des lumières des villes du Canada.',
+      'La Lune et ses cratères dans le noir de l’espace.',
+      'La Voie lactée au-dessus de l’horizon lumineux de la Terre.',
+    ],
+    photoCredit: 'Photographies nocturnes',
+    publicDomain: 'Domaine public',
+  },
   chrome: {
     skip: 'Aller au contenu',
     home: 'Accueil SleepLike',
@@ -24,8 +43,6 @@ export const fr: LocaleCopy = {
   editorial: {
     breadcrumb: 'Fil d’Ariane',
     home: 'Accueil',
-    toolEyebrow: 'FAIS UNE PLACE AU REPOS',
-    guideEyebrow: 'LE GUIDE SLEEPLIKE',
     reviewed: 'Par l’équipe SleepLike · Revu le',
     article: 'Guide et méthode',
     contents: 'Dans ce guide',

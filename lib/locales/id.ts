@@ -1,6 +1,25 @@
 import type { LocaleCopy } from './en';
 
 export const id: LocaleCopy = {
+  taste: {
+    wakeAt: 'Bangun pukul',
+    inBedBy: 'berbaring pukul',
+    sleepNow: 'Tidur sekarang',
+    wakeAround: 'bangun sekitar',
+    napAt: 'Tidur siang',
+    napUntil: 'bangun sekitar',
+    windowFrom: 'Berbaring pukul',
+    windowTo: 'bangun pukul',
+    estimate: 'Perkiraan',
+    nightAlt: 'Lampu kota di bawah cakrawala Bumi yang bercahaya dan langit berbintang.',
+    galleryAlts: [
+      'Aurora hijau dan merah di atas lampu kota di Kanada.',
+      'Bulan berkawah di tengah gelapnya angkasa.',
+      'Bima Sakti di atas cakrawala Bumi yang bercahaya.',
+    ],
+    photoCredit: 'Foto malam hari',
+    publicDomain: 'Domain publik',
+  },
   chrome: {
     skip: 'Lewati ke konten',
     home: 'Beranda SleepLike',
@@ -24,8 +43,6 @@ export const id: LocaleCopy = {
   editorial: {
     breadcrumb: 'Jejak navigasi',
     home: 'Beranda',
-    toolEyebrow: 'LUANGKAN WAKTU UNTUK ISTIRAHAT',
-    guideEyebrow: 'PANDUAN SLEEPLIKE',
     reviewed: 'Oleh tim SleepLike · Ditinjau',
     article: 'Panduan dan metode',
     contents: 'Dalam panduan ini',

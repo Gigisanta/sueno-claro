@@ -9,11 +9,19 @@ import { PageChrome } from "./PageChrome";
 import { AdSlot } from "./AdSlot";
 import { GuideExamples } from "./GuideExamples";
 import { SharePage } from "./SharePage";
+import { NightPicture } from "./NightPicture";
 export function SitePage({ path }: { path: string }) {
   const page = getPage(path)!;
   const c = localeCopy[page.locale];
   const examples =
     page.kind === "guide" ? getGuideExamples(page.path) : undefined;
+  const splitAt = page.heading.length > 50
+    ? (page.heading.indexOf(":") > 0 && page.heading.indexOf(":") < 42
+      ? page.heading.indexOf(":")
+      : page.heading.lastIndexOf(" ", 34))
+    : -1;
+  const heading = splitAt > 0 ? page.heading.slice(0, splitAt) : page.heading;
+  const headingTail = splitAt > 0 ? page.heading.slice(splitAt).replace(/^:\s*/, "").trim() : "";
   return (
     <PageChrome lang={page.locale} pageKey={page.key}>
       <script
@@ -24,20 +32,8 @@ export function SitePage({ path }: { path: string }) {
       />
       <div className={`page-content page-${page.kind}`}>
         <header className="page-intro">
-          {page.path !== homePath(page.locale) && (
-            <nav
-              className="breadcrumb"
-              aria-label={c.editorial.breadcrumb}
-            >
-              <a href={homePath(page.locale)}>{c.editorial.home}</a>
-              <span aria-hidden="true">/</span>
-              <span>{page.title}</span>
-            </nav>
-          )}
-          <p className="eyebrow">
-            {page.kind === "tool" ? c.editorial.toolEyebrow : page.kind === "guide" ? c.editorial.guideEyebrow : "SLEEPLIKE"}
-          </p>
-          <h1>{page.heading}</h1>
+          <h1 className={heading.length > 38 ? "heading-long" : undefined}>{heading}</h1>
+          {headingTail && <p className="heading-tail">{headingTail}</p>}
           <p className="intro-text">{page.intro}</p>
           {page.kind !== "tool" && (
             <p className="byline">
@@ -52,9 +48,22 @@ export function SitePage({ path }: { path: string }) {
               </time>
             </p>
           )}
+          {page.path !== homePath(page.locale) && (
+            <nav className="breadcrumb" aria-label={c.editorial.breadcrumb}>
+              <a href={homePath(page.locale)}>{c.editorial.home}</a>
+              <span aria-hidden="true">/</span>
+              <span>{page.title}</span>
+            </nav>
+          )}
+          {page.kind === "guide" && (
+            <a className="calculate-button guide-action" href={`${homePath(page.locale)}#calculator`}>
+              {c.editorial.calculator}<span aria-hidden="true">↗</span>
+            </a>
+          )}
+          {page.kind !== "tool" && <NightPicture alt={c.taste.nightAlt} />}
         </header>
         {page.kind === "tool" && (
-          <CalculatorShell lang={page.locale} initialMode={page.mode} copy={c.calculator} reminders={c.reminders} advertisement={c.advertisement} />
+          <CalculatorShell lang={page.locale} initialMode={page.mode} copy={c.calculator} taste={c.taste} reminders={c.reminders} advertisement={c.advertisement} />
         )}
         {page.key === "home" && (
           <nav className="home-resources" aria-labelledby="home-resources-heading">
@@ -90,7 +99,7 @@ export function SitePage({ path }: { path: string }) {
           {page.sections.map((section, index) => (
             <div key={section.id}>
               <section id={section.id} className="content-section">
-                <h2>{section.heading}</h2>
+                <h2 className={section.heading.length > 66 ? "heading-very-long" : section.heading.length > 44 ? "heading-long" : undefined}>{section.heading}</h2>
                 {section.paragraphs.map((paragraph, i) => (
                   <p key={i}>{paragraph}</p>
                 ))}
