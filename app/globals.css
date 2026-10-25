@@ -271,7 +271,6 @@ td, th { padding: .8rem; vertical-align: top; border-bottom: 1px solid var(--lin
   .calculator-question { font-size: 1.125rem; margin-bottom: .65rem; }
   .planning-date-fields { gap: 1rem; }
   .date-time-field { width: 100%; }
-  .date-time-field legend { display: none; }
   .planning-actions { margin-top: .25rem; }
   .settings { margin-bottom: .5rem; }
   .settings-grid { grid-template-columns: 1fr; }

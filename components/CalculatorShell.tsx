@@ -56,6 +56,8 @@ export function CalculatorShell({
   const [zone, setZone] = useState("");
   const [status, setStatus] = useState("");
   const [manualLink, setManualLink] = useState("");
+  // Dates exist only after the client effect below; the sentence waits for it.
+  const [ready, setReady] = useState(false);
   useLayoutEffect(() => {
     const now = new Date();
     const wake = new Date(now);
@@ -121,6 +123,7 @@ export function CalculatorShell({
     setCycle(String(settings.cycleLengthMinutes));
     setFormat(settings.timeFormat);
     setZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    setReady(true);
   }, []);
   useEffect(() => {
     const visibility = () => {
@@ -250,8 +253,10 @@ export function CalculatorShell({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     event("reminder_download");
   }
+  // Every input change clears `outcome`, so a present outcome always matches the
+  // inputs and carries the clock of the latest Calculate / Update to now.
   const estimate = useMemo(() => {
-    if (!fields.wakeAt.date) return null;
+    if (!ready) return null;
     return calculate({
       mode,
       now: new Date(),
@@ -262,10 +267,11 @@ export function CalculatorShell({
         timeFormat: format,
       },
     });
-  }, [mode, fields, latency, cycle, format]);
-  const sentenceOption = estimate?.results.find(
+  }, [ready, mode, fields, latency, cycle, format]);
+  const sentenceSource = outcome?.results.length ? outcome : estimate;
+  const sentenceOption = sentenceSource?.results.find(
     (option) => option.sleepMinutes === Number(cycle) * 5,
-  ) ?? estimate?.results[0];
+  ) ?? sentenceSource?.results[0];
   function timeInput(field: Field) {
     const issue = outcome?.issues.find((item) => item.field === field);
     return (
