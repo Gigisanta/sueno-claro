@@ -46,6 +46,21 @@ export const dePages: ContentPage[] = [
         ],
       },
       {
+        id: 'seven-am-example',
+        heading: 'Beispiel: Aufstehen um 07:00 Uhr',
+        paragraphs: [
+          'Das NHLBI empfiehlt Erwachsenen 7 bis 9 Stunden Schlaf pro Nacht. Plane zuerst genug Zeit zum Schlafen ein, bevor du versuchst, eine geschätzte Zyklusgrenze zu treffen.',
+          'Diese Bettzeiten am Vorabend setzen 90-minütige Planungszyklen, einen Einschlafpuffer von 15 Minuten und eine Nacht ohne Zeitumstellung voraus. Diese Annahmen sind keine Messungen deiner Schlafstadien oder deiner Einschlafdauer.',
+        ],
+        table: {
+          headers: ['Ins Bett gehen', 'Planungszyklen', 'Geschätzter Schlaf'],
+          rows: [
+            ['21:45', '6', '9 Stunden'],
+            ['23:15', '5', '7 Stunden 30 Minuten'],
+          ],
+        },
+      },
+      {
         id: 'estimated-options',
         heading: 'Verstehe die Vorschläge als Spielraum',
         paragraphs: [
@@ -67,9 +82,9 @@ export const dePages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/de/schlafenszeit', '/de/mittagsschlaf-rechner', '/de/schlafzyklen', '/de/wie-viel-schlaf'],
-    updated: '2026-10-22',
+    updated: '2026-10-25',
   },
   {
     path: '/de/schlafenszeit',

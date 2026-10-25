@@ -19,20 +19,9 @@ for (const journey of journeys) {
     await page.goto(journey.path);
     await expect(page.locator('html')).toHaveAttribute('lang', journey.locale);
     await expect(page.locator('h1')).toBeVisible();
-    if (journey.locale === 'en') {
-      await expect(page).toHaveTitle('Sleep Cycle Calculator: Plan Your Bedtime | SleepLike');
-      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'Choose a wake-up time and compare estimated bedtimes. Adjust time to fall asleep and cycle length. Private, educational planning; not medical advice.');
-      await expect(page.locator('h1')).toHaveText('Sleep Cycle Calculator');
-    }
-    if (journey.locale === 'es') {
-      await expect(page).toHaveTitle('Calculadora de sueño: estima tus ciclos | SleepLike');
-      await expect(page.locator('h1')).toHaveText('Calculadora de sueño y ciclos');
-      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', /No detecta fases reales/);
-    }
+    const comparison = page.locator('#seven-am-example').getByRole('region');
+    expect(await comparison.evaluate((region) => region.scrollWidth <= region.clientWidth)).toBe(true);
     if (journey.locale === 'id') {
-      await expect(page).toHaveTitle('Kalkulator Siklus Tidur: Tentukan Jam Tidur | SleepLike');
-      await expect(page.locator('h1')).toHaveText('Kalkulator Siklus Tidur');
-      await expect(page.locator('meta[name="description"]')).toHaveAttribute('content', 'Pilih jam bangun dan bandingkan perkiraan jam tidur berdasarkan siklus tidur. Privat dan edukatif; bukan nasihat medis.');
       await expect(page.locator('meta[property="og:locale"]')).toHaveAttribute('content', 'id_ID');
     }
     const resources = page.locator('.home-resources');

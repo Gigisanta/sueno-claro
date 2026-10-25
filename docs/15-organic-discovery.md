@@ -1,5 +1,30 @@
 # Organic discovery
 
+## Adult bedtime example · 2026-10-25
+
+All seven existing calculator homepages now compare two previous-evening
+bedtimes for a 07:00 wake-up. The example explicitly assumes 90-minute planning
+cycles, a 15-minute settling allowance and no clock change. It distinguishes
+those assumptions from measurements of sleep stages or time to fall asleep.
+The English page uses a.m./p.m.; the other editions retain 24-hour clocks.
+
+The accompanying adult guidance is 7–9 hours of sleep per night, from
+[NHLBI, How Much Sleep Is Enough?](https://www.nhlbi.nih.gov/health/sleep/how-much-sleep)
+(accessed 2026-10-25). That official source is visible in each homepage's source
+list. Sleep opportunity takes priority over an estimated cycle boundary; there
+is no claim of medical review or guaranteed rest.
+
+Only this compact comparison overrides the wider guide tables' minimum width,
+so all three columns fit a 390px viewport without nested horizontal scrolling.
+The existing locale journeys check that rendered geometry. Literal title,
+description and H1 copies were removed from those journeys rather than pinning
+marketing wording; document-language, Open Graph locale, calculation and
+language-switch behavior remain checked.
+
+No routes, metadata titles/descriptions, calculation formulas, advertising or
+consent behavior changed. This is a practical content improvement, not a
+measured CTR gain or an indexing/ranking claim.
+
 ## Seven-language catalog · 2026-10-23
 
 All 12 existing page topics are translated into Brazilian Portuguese, French,

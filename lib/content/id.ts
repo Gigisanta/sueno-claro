@@ -46,6 +46,21 @@ export const idPages: ContentPage[] = [
         ],
       },
       {
+        id: 'seven-am-example',
+        heading: 'Contoh: bangun pukul 07:00',
+        paragraphs: [
+          'NHLBI merekomendasikan tidur selama 7 hingga 9 jam setiap malam bagi orang dewasa. Utamakan waktu tidur yang cukup sebelum mencoba menyesuaikan jam bangun dengan perkiraan batas siklus.',
+          'Waktu mulai berbaring pada malam sebelumnya ini menggunakan asumsi siklus 90 menit untuk perencanaan, jeda 15 menit untuk tertidur, dan malam tanpa perubahan jam. Asumsi ini bukan pengukuran tahapan tidur Anda atau waktu yang Anda perlukan untuk tertidur.',
+        ],
+        table: {
+          headers: ['Mulai berbaring', 'Siklus perencanaan', 'Perkiraan durasi tidur'],
+          rows: [
+            ['21:45', '6', '9 jam'],
+            ['23:15', '5', '7 jam 30 menit'],
+          ],
+        },
+      },
+      {
         id: 'estimated-options',
         heading: 'Baca pilihan sebagai rentang kemungkinan',
         paragraphs: [
@@ -67,9 +82,9 @@ export const idPages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/id/waktu-tidur', '/id/kalkulator-tidur-siang', '/id/siklus-tidur', '/id/berapa-jam-tidur'],
-    updated: '2026-10-23',
+    updated: '2026-10-25',
   },
   {
     path: '/id/waktu-tidur',
