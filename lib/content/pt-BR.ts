@@ -46,6 +46,21 @@ export const ptBRPages: ContentPage[] = [
         ],
       },
       {
+        id: 'seven-am-example',
+        heading: 'Exemplo: acordar às 07:00',
+        paragraphs: [
+          'O NHLBI recomenda que adultos durmam de 7 a 9 horas por noite. Reserve tempo suficiente para dormir antes de tentar coincidir com o fim estimado de um ciclo.',
+          'Esses horários para deitar na noite anterior pressupõem ciclos de 90 minutos para planejamento, uma margem de 15 minutos para adormecer e uma noite sem mudança de horário no relógio. Essas premissas não são medições dos seus estágios de sono nem do tempo que você leva para adormecer.',
+        ],
+        table: {
+          headers: ['Hora de deitar', 'Ciclos de planejamento', 'Sono estimado'],
+          rows: [
+            ['21:45', '6', '9 horas'],
+            ['23:15', '5', '7 horas e 30 minutos'],
+          ],
+        },
+      },
+      {
         id: 'estimated-options',
         heading: 'Entenda as opções como uma faixa de possibilidades',
         paragraphs: [
@@ -67,9 +82,9 @@ export const ptBRPages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/pt-br/hora-de-dormir', '/pt-br/calculadora-de-cochilo', '/pt-br/ciclos-do-sono', '/pt-br/quantas-horas-dormir'],
-    updated: '2026-10-22',
+    updated: '2026-10-25',
   },
   {
     path: '/pt-br/hora-de-dormir',

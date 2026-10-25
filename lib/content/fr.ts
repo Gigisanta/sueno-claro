@@ -46,6 +46,21 @@ export const frPages: ContentPage[] = [
         ],
       },
       {
+        id: 'seven-am-example',
+        heading: 'Exemple : un réveil à 07:00',
+        paragraphs: [
+          'Le NHLBI recommande aux adultes de dormir de 7 à 9 heures par nuit. Préserve suffisamment de temps pour dormir avant de chercher à te caler sur une fin de cycle estimée.',
+          'Ces heures de coucher la veille au soir supposent des cycles de 90 minutes pour la planification, une marge de 15 minutes pour t’endormir et une nuit sans changement d’heure. Ces hypothèses ne mesurent ni tes stades de sommeil ni le temps que tu mets à t’endormir.',
+        ],
+        table: {
+          headers: ['Mise au lit', 'Cycles de planification', 'Sommeil estimé'],
+          rows: [
+            ['21:45', '6', '9 heures'],
+            ['23:15', '5', '7 heures 30 minutes'],
+          ],
+        },
+      },
+      {
         id: 'estimated-options',
         heading: 'Considère les options comme une plage de possibilités',
         paragraphs: [
@@ -67,9 +82,9 @@ export const frPages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/fr/heure-du-coucher', '/fr/calculateur-de-sieste', '/fr/cycles-du-sommeil', '/fr/combien-d-heures-dormir'],
-    updated: '2026-10-22',
+    updated: '2026-10-25',
   },
   {
     path: '/fr/heure-du-coucher',

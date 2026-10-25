@@ -46,6 +46,21 @@ export const itPages: ContentPage[] = [
         ],
       },
       {
+        id: 'seven-am-example',
+        heading: 'Esempio: sveglia alle 07:00',
+        paragraphs: [
+          'L’NHLBI raccomanda agli adulti da 7 a 9 ore di sonno per notte. Riserva prima abbastanza tempo al sonno, invece di cercare di far coincidere la sveglia con la fine stimata di un ciclo.',
+          'Questi orari per andare a letto la sera precedente presuppongono cicli di 90 minuti per la pianificazione, un margine di 15 minuti per addormentarti e una notte senza cambio dell’ora. Queste ipotesi non sono misurazioni delle tue fasi del sonno o del tempo che impieghi ad addormentarti.',
+        ],
+        table: {
+          headers: ['Ora di andare a letto', 'Cicli di pianificazione', 'Sonno stimato'],
+          rows: [
+            ['21:45', '6', '9 ore'],
+            ['23:15', '5', '7 ore 30 minuti'],
+          ],
+        },
+      },
+      {
         id: 'estimated-options',
         heading: 'Leggi le opzioni come un intervallo di possibilità',
         paragraphs: [
@@ -67,9 +82,9 @@ export const itPages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/it/ora-di-andare-a-letto', '/it/calcolatore-pisolino', '/it/cicli-del-sonno', '/it/quante-ore-dormire'],
-    updated: '2026-10-22',
+    updated: '2026-10-25',
   },
   {
     path: '/it/ora-di-andare-a-letto',

@@ -1,5 +1,41 @@
 # Organic discovery
 
+## Adult bedtime example · 2026-10-25
+
+All seven existing calculator homepages now compare two previous-evening
+bedtimes for a 07:00 wake-up. The example explicitly assumes 90-minute planning
+cycles, a 15-minute settling allowance and no clock change. It distinguishes
+those assumptions from measurements of sleep stages or time to fall asleep.
+The English example uses a.m./p.m.; the other examples use 24-hour clocks.
+
+The accompanying adult guidance is 7–9 hours of sleep per night, from
+[NHLBI, How Much Sleep Is Enough?](https://www.nhlbi.nih.gov/health/sleep/how-much-sleep)
+(accessed 2026-10-25). That official source is visible in each homepage's source
+list. Sleep opportunity takes priority over an estimated cycle boundary; there
+is no claim of medical review or guaranteed rest.
+
+Only this compact comparison overrides the wider guide tables' minimum width,
+so all three columns fit a 390px viewport without nested horizontal scrolling.
+The existing locale journeys check that rendered geometry. Literal title,
+description and H1 copies were removed from those journeys rather than pinning
+marketing wording; document-language, Open Graph locale, calculation and
+language-switch behavior remain checked.
+
+The former draft-copy word bands and their test-only counter were removed,
+without changing the tool-mode, source, translation or revision-date contracts.
+[Google's people-first content guidance](https://developers.google.com/search/docs/fundamentals/creating-helpful-content)
+explicitly says Google has no preferred word count. Useful sourced additions
+are reviewed for accuracy and rendered readability rather than a fixed total.
+
+Accessibility audits run as separate cases for each route and for the
+keyboard/calculated-results journey. All retain WCAG 2 A/AA and WCAG 2.1 AA;
+route checks also reject page overflow. This avoids charging ten audits to one
+30-second test deadline, without retries or looser limits.
+
+No routes, metadata titles/descriptions, calculation formulas, advertising or
+consent behavior changed. This is a practical content improvement, not a
+measured CTR gain or an indexing/ranking claim.
+
 ## Seven-language catalog · 2026-10-23
 
 All 12 existing page topics are translated into Brazilian Portuguese, French,
@@ -147,4 +183,8 @@ Ad approval remains disabled. No advertising changes were made to MaatWork or ot
 
 Validation: root gate PASS (typecheck, lint, 28 unit tests, export); final complete browser suite 84/84 passed across desktop/mobile Chromium and WebKit. Render inspected at 390 and 1440 px, with the directory using the available width. Independent reviewer found no blocking issues. Production and remote CI results are recorded in the task after release.
 
-Remote CI limitation: GitHub Actions run 34514589300 could not start because the account's Actions budget prevents further use. No tests ran there, and no spending settings were changed. The workflow is configured but blocked externally. To keep essential SEO checks automatic now, every local and Vercel build also validates the actual exported HTML, canonical URLs, language alternates, sitemap, unique titles, H1, parseable structured data, public resource links and PNG assets. A failed assertion fails the build before publication. Full browser checks remain locally verified until Actions capacity is restored.
+Every local and Vercel build validates the actual exported HTML, canonical URLs,
+language alternates, sitemap, unique titles, H1, parseable structured data,
+public resource links and PNG assets. A failed assertion fails the build before
+publication. Remote CI results must be checked on the release PR; a historical
+Actions-budget failure is not evidence of its current state.

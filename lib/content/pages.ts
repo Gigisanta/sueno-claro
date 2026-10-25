@@ -81,6 +81,21 @@ const originalPages: ContentPage[] = [
         ],
       },
       {
+        id: 'seven-am-example',
+        heading: 'Example: a 7 a.m. wake-up time',
+        paragraphs: [
+          'NHLBI recommends 7 to 9 hours of sleep a night for adults. Protect enough time for sleep before trying to line up an estimated cycle boundary.',
+          'These previous-evening bedtimes assume 90-minute planning cycles, a 15-minute settling allowance, and a night without a clock change. The assumptions are not measurements of your sleep stages or time to fall asleep.',
+        ],
+        table: {
+          headers: ['Get into bed', 'Planning cycles', 'Estimated sleep'],
+          rows: [
+            ['9:45 p.m.', '6', '9 hours'],
+            ['11:15 p.m.', '5', '7 hours 30 minutes'],
+          ],
+        },
+      },
+      {
         id: 'estimated-options',
         heading: 'Read the options as a range',
         paragraphs: [
@@ -102,9 +117,9 @@ const originalPages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/bedtime-calculator', '/nap-calculator', '/sleep-cycles', '/how-much-sleep'],
-    updated: '2026-10-22',
+    updated: '2026-10-25',
   },
   {
     path: '/bedtime-calculator',
@@ -288,6 +303,21 @@ const originalPages: ContentPage[] = [
         ],
       },
       {
+        id: 'seven-am-example',
+        heading: 'Ejemplo: levantarte a las 07:00',
+        paragraphs: [
+          'El NHLBI recomienda dormir entre 7 y 9 horas por noche en la edad adulta. Prioriza dormir lo suficiente antes de ajustar los horarios a ciclos estimados.',
+          'Estos horarios para acostarte la noche anterior suponen ciclos de 90 minutos y 15 minutos para conciliar el sueño, en una noche sin cambio de hora. Son supuestos de planificación: no miden tus fases de sueño ni cuánto tardas en dormirte.',
+        ],
+        table: {
+          headers: ['Hora de acostarte', 'Ciclos estimados', 'Sueño estimado'],
+          rows: [
+            ['21:45', '6', '9 horas'],
+            ['23:15', '5', '7 horas 30 minutos'],
+          ],
+        },
+      },
+      {
         id: 'opciones-estimadas',
         heading: 'Lee las opciones como un rango',
         paragraphs: [
@@ -309,9 +339,9 @@ const originalPages: ContentPage[] = [
         ],
       },
     ],
-    sources: sleepSources,
+    sources: [...sleepSources, durationSource],
     related: ['/hora-de-dormir', '/siesta', '/ciclos-de-sueno', '/cuantas-horas-dormir'],
-    updated: '2026-10-22',
+    updated: '2026-10-25',
   },
   {
     path: '/hora-de-dormir',

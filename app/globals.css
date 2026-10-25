@@ -458,6 +458,9 @@ table {
   text-align: left;
   min-width: 390px;
 }
+#seven-am-example table {
+  min-width: 0;
+}
 th {
   color: var(--gold);
   font-weight: 600;
