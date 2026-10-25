@@ -27,6 +27,11 @@ without changing the tool-mode, source, translation or revision-date contracts.
 explicitly says Google has no preferred word count. Useful sourced additions
 are reviewed for accuracy and rendered readability rather than a fixed total.
 
+Accessibility audits run as separate cases for each route and for the
+keyboard/calculated-results journey. All retain WCAG 2 A/AA and WCAG 2.1 AA;
+route checks also reject page overflow. This avoids charging ten audits to one
+30-second test deadline, without retries or looser limits.
+
 No routes, metadata titles/descriptions, calculation formulas, advertising or
 consent behavior changed. This is a practical content improvement, not a
 measured CTR gain or an indexing/ranking claim.
@@ -178,4 +183,8 @@ Ad approval remains disabled. No advertising changes were made to MaatWork or ot
 
 Validation: root gate PASS (typecheck, lint, 28 unit tests, export); final complete browser suite 84/84 passed across desktop/mobile Chromium and WebKit. Render inspected at 390 and 1440 px, with the directory using the available width. Independent reviewer found no blocking issues. Production and remote CI results are recorded in the task after release.
 
-Remote CI limitation: GitHub Actions run 34514589300 could not start because the account's Actions budget prevents further use. No tests ran there, and no spending settings were changed. The workflow is configured but blocked externally. To keep essential SEO checks automatic now, every local and Vercel build also validates the actual exported HTML, canonical URLs, language alternates, sitemap, unique titles, H1, parseable structured data, public resource links and PNG assets. A failed assertion fails the build before publication. Full browser checks remain locally verified until Actions capacity is restored.
+Every local and Vercel build validates the actual exported HTML, canonical URLs,
+language alternates, sitemap, unique titles, H1, parseable structured data,
+public resource links and PNG assets. A failed assertion fails the build before
+publication. Remote CI results must be checked on the release PR; a historical
+Actions-budget failure is not evidence of its current state.

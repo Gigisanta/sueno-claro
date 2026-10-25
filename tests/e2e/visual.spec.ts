@@ -44,14 +44,11 @@ test("all routes have unique static SEO, reciprocal languages and structured dat
   expect(error.status()).toBe(404);
   expect(await error.text()).toContain("noindex");
 });
-test("mobile and desktop remain accessible without overflow", async ({
-  page,
-  browserName,
-}) => {
-  for (const path of [
-    "/calculadora-de-sueno", "/siesta", "/sleep-cycles", "/privacidad",
-    "/pt-br", "/fr", "/de", "/it", "/id",
-  ]) {
+for (const path of [
+  "/calculadora-de-sueno", "/siesta", "/sleep-cycles", "/privacidad",
+  "/pt-br", "/fr", "/de", "/it", "/id",
+]) {
+  test(`page remains accessible without overflow at ${path}`, async ({ page }) => {
     await page.goto(path);
     const issues = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
@@ -62,7 +59,12 @@ test("mobile and desktop remain accessible without overflow", async ({
         () => document.documentElement.scrollWidth <= innerWidth,
       ),
     ).toBe(true);
-  }
+  });
+}
+test("keyboard users can skip to the calculator and calculate accessible results", async ({
+  page,
+  browserName,
+}) => {
   await page.goto("/");
   if (browserName === "webkit")
     await page.getByRole("link", { name: "Skip to content" }).focus();
