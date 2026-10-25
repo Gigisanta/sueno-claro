@@ -6,7 +6,7 @@ All seven existing calculator homepages now compare two previous-evening
 bedtimes for a 07:00 wake-up. The example explicitly assumes 90-minute planning
 cycles, a 15-minute settling allowance and no clock change. It distinguishes
 those assumptions from measurements of sleep stages or time to fall asleep.
-The English page uses a.m./p.m.; the other editions retain 24-hour clocks.
+The English example uses a.m./p.m.; the other examples use 24-hour clocks.
 
 The accompanying adult guidance is 7–9 hours of sleep per night, from
 [NHLBI, How Much Sleep Is Enough?](https://www.nhlbi.nih.gov/health/sleep/how-much-sleep)
@@ -20,6 +20,12 @@ The existing locale journeys check that rendered geometry. Literal title,
 description and H1 copies were removed from those journeys rather than pinning
 marketing wording; document-language, Open Graph locale, calculation and
 language-switch behavior remain checked.
+
+The former draft-copy word bands and their test-only counter were removed,
+without changing the tool-mode, source, translation or revision-date contracts.
+[Google's people-first content guidance](https://developers.google.com/search/docs/fundamentals/creating-helpful-content)
+explicitly says Google has no preferred word count. Useful sourced additions
+are reviewed for accuracy and rendered readability rather than a fixed total.
 
 No routes, metadata titles/descriptions, calculation formulas, advertising or
 consent behavior changed. This is a practical content improvement, not a

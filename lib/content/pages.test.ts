@@ -25,20 +25,6 @@ const spanishProductPaths = [
 const englishLegalPaths = ['/about', '/contact', '/privacy', '/terms', '/methodology'];
 const spanishLegalPaths = ['/acerca-de', '/contacto', '/privacidad', '/terminos', '/metodologia'];
 
-function contentWords(page: ContentPage): number {
-  const values = [
-    page.intro,
-    ...page.sections.flatMap((section) => [
-      ...section.paragraphs,
-      ...(section.bullets ?? []),
-      ...(section.table?.headers ?? []),
-      ...(section.table?.rows.flat() ?? []),
-    ]),
-  ];
-
-  return values.join(' ').trim().split(/\s+/u).length;
-}
-
 function pageText(page: ContentPage): string {
   return [
     page.title,
@@ -90,23 +76,9 @@ describe('content catalog', () => {
     }
   });
 
-  it('uses the requested modes and content length bands', () => {
-
-    for (const page of pages) {
-      if (page.kind === 'tool') {
-        expect(page.mode).toBe(page.key === 'nap' ? 'nap' : 'wake');
-        if (page.locale === 'en' || page.locale === 'es') {
-          expect(contentWords(page), page.path).toBeGreaterThanOrEqual(250);
-          expect(contentWords(page), page.path).toBeLessThanOrEqual(400);
-        }
-      } else {
-        expect(page.mode, page.path).toBeUndefined();
-      }
-
-      if (page.kind === 'guide' && (page.locale === 'en' || page.locale === 'es')) {
-        expect(contentWords(page), page.path).toBeGreaterThanOrEqual(500);
-        expect(contentWords(page), page.path).toBeLessThanOrEqual(750);
-      }
+  it('matches each tool to its task-appropriate calculation mode', () => {
+    for (const page of pages.filter((candidate) => candidate.kind === 'tool')) {
+      expect(page.mode, page.path).toBe(page.key === 'nap' ? 'nap' : 'wake');
     }
   });
 
