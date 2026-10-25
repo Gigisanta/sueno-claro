@@ -1,4 +1,48 @@
-# Responsive refinement · September 10, 2026
+# Responsive design · October 25, 2026
+
+## The sentence is the layout
+
+Fixed Taste v2 direction, seed `583652942`, without redraws. SleepLike keeps its
+night ground `#111514`, moon-gold `#e6c879`, and locally hosted Manrope.
+The visitor's actual time becomes the sentence: “Wake at [time] → in bed by
+[estimate]”. The time control is inside the line; its live estimate uses the
+unchanged deterministic calculation core. Calculate still creates the complete
+result list, status announcement, share links and calendar reminders. A live
+estimate alone never makes a result ad eligible.
+
+- One inline NASA night photograph; three companion orbital photographs close
+  each page. Local files, official sources, creators and public-domain basis:
+  `public/open/credits.json`. Credits are visible in the footer. Sentence pieces,
+  alt text and credit labels are translated in all seven locale dictionaries.
+- Plain navigation, square flat controls, equal 16–32px outer margins, no eyebrow
+  labels, decorative numbering, hairlines, shadows or gradients. The five type
+  roles separate the sentence from supporting copy and source notes.
+- Guides, methodology, about and legal pages use a calm reading column of at most
+  70ch. Existing paragraphs, examples, citations and non-medical disclaimers stay
+  visible and unchanged. Long h1s split into a short heading and an immediately
+  adjacent supporting continuation; SEO titles and descriptions remain intact.
+  Guide introductions also expose the localized calculator action before the
+  photograph; mobile breadcrumbs omit the separator with the current-page crumb.
+- Dates and settings stay labelled; all controls keep 44px targets and native
+  keyboard operation. Phones keep the Calculate action in the first screen and
+  stack results without overlapping twelve-hour periods and durations.
+- A single image shutter and a brief photographic drift accompany differentiated
+  heading, paragraph, list and image entrances. Everything is visible without
+  JavaScript; reduced motion removes the travel. No continuous animation needs
+  a pause control.
+- Route URLs, metadata, canonical/hreflang, JSON-LD, sitemap, robots, manifest,
+  service-worker scope, consent, analytics, ad gating and monetization are not
+  changed. Static-export and offline behavior remain the release contract.
+
+The task report and `.taste-skill/after/` hold measured inspection, screenshot
+critiques and calculator-identity evidence. They are not production-deployment
+claims.
+
+On a shared host, `PLAYWRIGHT_WORKERS=1 make verify` runs the same complete
+four-browser-project suite serially; the default remains four workers. Heavy
+verification still goes through the workstation resource guard.
+
+## Previous responsive refinement · September 10, 2026
 
 User requested a substantial mobile/desktop improvement using Taste, and diagnosis of missing advertising. Direction: a calm consumer utility, preserving SleepLike's dark/gold brand. Taste dials: DESIGN_VARIANCE 5, MOTION_INTENSITY 2, VISUAL_DENSITY 4. Native CSS, locally hosted Manrope and one Radix icon family. No animation framework, stock photography, promotional mockups or new routes.
 

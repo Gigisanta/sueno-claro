@@ -1,6 +1,25 @@
 import type { LocaleCopy } from './en';
 
 export const it: LocaleCopy = {
+  taste: {
+    wakeAt: 'Svegliarsi alle',
+    inBedBy: 'a letto alle',
+    sleepNow: 'Dormire adesso',
+    wakeAround: 'sveglia verso le',
+    napAt: 'Pisolino alle',
+    napUntil: 'sveglia verso le',
+    windowFrom: 'A letto alle',
+    windowTo: 'svegliarsi alle',
+    estimate: 'Stimato',
+    nightAlt: 'Luci delle città sotto l’orizzonte luminoso della Terra e un cielo stellato.',
+    galleryAlts: [
+      'Aurora verde e rossa sopra le luci delle città del Canada.',
+      'La Luna e i suoi crateri nel buio dello spazio.',
+      'La Via Lattea sopra l’orizzonte luminoso della Terra.',
+    ],
+    photoCredit: 'Fotografie notturne',
+    publicDomain: 'Pubblico dominio',
+  },
   chrome: {
     skip: 'Vai al contenuto',
     home: 'Pagina iniziale di SleepLike',
@@ -24,8 +43,6 @@ export const it: LocaleCopy = {
   editorial: {
     breadcrumb: 'Percorso di navigazione',
     home: 'Pagina iniziale',
-    toolEyebrow: 'FAI SPAZIO AL RIPOSO',
-    guideEyebrow: 'LA GUIDA DI SLEEPLIKE',
     reviewed: 'A cura del team SleepLike · Revisione',
     article: 'Guida e metodo',
     contents: 'In questa guida',

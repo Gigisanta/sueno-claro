@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useLayoutEffect, useState, type FormEvent } from "react";
-import { ArrowRightIcon, CalendarIcon, ClockIcon, MoonIcon, SunIcon, TimerIcon } from "@radix-ui/react-icons";
+import { useEffect, useLayoutEffect, useMemo, useState, type FormEvent } from "react";
+import { ArrowRightIcon, CalendarIcon } from "@radix-ui/react-icons";
 import { track } from "@vercel/analytics";
 import { calculate, nextLocalTime, safeSettings } from "../lib/sleep/calculate";
 import { createCalendar } from "../lib/sleep/calendar";
@@ -14,6 +14,7 @@ import type {
 import { readSharedSettings } from "../lib/privacy";
 import { usePrivacy } from "./PrivacyProvider";
 import { AdSlot } from "./AdSlot";
+import { NightPicture } from "./NightPicture";
 
 import type { Locale } from "../lib/i18n";
 import type { LocaleCopy } from "../lib/locales/en";
@@ -28,12 +29,14 @@ const empty: LocalTime = { date: "", time: "" };
 export function CalculatorShell({
   lang,
   copy: c,
+  taste: t,
   reminders,
   advertisement,
   initialMode = "wake",
 }: {
   lang: Locale;
   copy: LocaleCopy["calculator"];
+  taste: LocaleCopy["taste"];
   reminders: LocaleCopy["reminders"];
   advertisement: string;
   initialMode?: CalculatorMode;
@@ -53,6 +56,8 @@ export function CalculatorShell({
   const [zone, setZone] = useState("");
   const [status, setStatus] = useState("");
   const [manualLink, setManualLink] = useState("");
+  // Dates exist only after the client effect below; the sentence waits for it.
+  const [ready, setReady] = useState(false);
   useLayoutEffect(() => {
     const now = new Date();
     const wake = new Date(now);
@@ -118,6 +123,7 @@ export function CalculatorShell({
     setCycle(String(settings.cycleLengthMinutes));
     setFormat(settings.timeFormat);
     setZone(Intl.DateTimeFormat().resolvedOptions().timeZone);
+    setReady(true);
   }, []);
   useEffect(() => {
     const visibility = () => {
@@ -247,6 +253,40 @@ export function CalculatorShell({
     setTimeout(() => URL.revokeObjectURL(url), 1000);
     event("reminder_download");
   }
+  // Every input change clears `outcome`, so a present outcome always matches the
+  // inputs and carries the clock of the latest Calculate / Update to now.
+  const estimate = useMemo(() => {
+    if (!ready) return null;
+    return calculate({
+      mode,
+      now: new Date(),
+      ...fields,
+      settings: {
+        sleepLatencyMinutes: latency.trim() ? Number(latency) : NaN,
+        cycleLengthMinutes: cycle.trim() ? Number(cycle) : NaN,
+        timeFormat: format,
+      },
+    });
+  }, [ready, mode, fields, latency, cycle, format]);
+  const sentenceSource = outcome?.results.length ? outcome : estimate;
+  const sentenceOption = sentenceSource?.results.find(
+    (option) => option.sleepMinutes === Number(cycle) * 5,
+  ) ?? sentenceSource?.results[0];
+  function timeInput(field: Field) {
+    const issue = outcome?.issues.find((item) => item.field === field);
+    return (
+      <input
+        id={`${field}-time`}
+        type="time"
+        required
+        value={fields[field].time}
+        onChange={(e) => change(field, "time", e.target.value)}
+        aria-label={`${c[field]} · ${c.time}`}
+        aria-invalid={!!issue}
+        aria-describedby={issue ? `${field}-error` : undefined}
+      />
+    );
+  }
   useEffect(() => {
     if (!outcome?.results.length || !window.matchMedia("(max-width: 1023px)").matches) return;
     document.getElementById("results-heading")?.scrollIntoView({
@@ -268,18 +308,6 @@ export function CalculatorShell({
               required
               value={fields[field].date}
               onChange={(e) => change(field, "date", e.target.value)}
-              aria-invalid={!!issue}
-              aria-describedby={issue ? `${field}-error` : undefined}
-            />
-          </label>
-          <label htmlFor={`${field}-time`}>
-            {c.time}
-            <input
-              id={`${field}-time`}
-              type="time"
-              required
-              value={fields[field].time}
-              onChange={(e) => change(field, "time", e.target.value)}
               aria-invalid={!!issue}
               aria-describedby={issue ? `${field}-error` : undefined}
             />
@@ -313,12 +341,7 @@ export function CalculatorShell({
       className={`calculator ${outcome?.results.length ? "has-results" : "awaiting-results"}`}
       aria-label={c.label}
     >
-      <div className="calculator-controls">
-      <div
-        className="mode-grid"
-        role="group"
-        aria-label={c.mode}
-      >
+      <div className="mode-grid" role="group" aria-label={c.mode}>
         {modes.map((item, index) => (
           <button
             key={item}
@@ -329,19 +352,65 @@ export function CalculatorShell({
               setMode(item);
             }}
           >
-            {index === 0 ? <SunIcon aria-hidden="true" /> : index === 1 ? <MoonIcon aria-hidden="true" /> : index === 2 ? <TimerIcon aria-hidden="true" /> : <ClockIcon aria-hidden="true" />}
-            <span>{c.modes[index]}</span>
+            {c.modes[index]}
           </button>
         ))}
       </div>
       <form onSubmit={run} noValidate>
-        <h2 className="calculator-question">
-          {c.questions[modes.indexOf(mode)]}
-        </h2>
-        {mode === "window" && input("bedAt")}
-        {(mode === "wake" || mode === "window") && input("wakeAt")}
-        {mode === "nap" && input("napAt")}
-        {mode === "sleepNow" && <p className="now-note">{c.now}</p>}
+        <div className={`sleep-sentence sentence-${mode}`}>
+          <div className="sentence-start">
+            {mode === "sleepNow" ? (
+              <span>{t.sleepNow}</span>
+            ) : (
+              <>
+                <label htmlFor={`${mode === "nap" ? "napAt" : mode === "window" ? "bedAt" : "wakeAt"}-time`}>
+                  {mode === "nap" ? t.napAt : mode === "window" ? t.windowFrom : t.wakeAt}
+                </label>
+                {timeInput(mode === "nap" ? "napAt" : mode === "window" ? "bedAt" : "wakeAt")}
+              </>
+            )}
+          </div>
+          <div className="sentence-finish">
+            <NightPicture alt={t.nightAlt} inline />
+            <span className="sentence-arrow" aria-hidden="true">→</span>
+            {mode === "window" ? (
+              <label className="sentence-end" htmlFor="wakeAt-time">
+                {t.windowTo} {timeInput("wakeAt")}
+              </label>
+            ) : (
+              <span className="sentence-end" aria-live="polite" aria-atomic="true">
+                {mode === "wake" ? t.inBedBy : mode === "nap" ? t.napUntil : t.wakeAround}{" "}
+                {sentenceOption ? (
+                  <time dateTime={sentenceOption.target}>
+                    {new Intl.DateTimeFormat(lang, { hour: "2-digit", minute: "2-digit", hour12: format === "12h" }).formatToParts(new Date(sentenceOption.target)).map((part, index) =>
+                      part.type === "dayPeriod" ? <small key={index}>{part.value}</small> : <span key={index}>{part.value}</span>
+                    )}
+                  </time>
+                ) : <span>—</span>}
+              </span>
+            )}
+          </div>
+        </div>
+        <p className="sentence-caption">
+          {t.estimate}
+          {sentenceOption && (
+            <>
+              {!(mode === "nap" && sentenceOption.inBedMinutes === 20) && ` · ${duration(sentenceOption.sleepMinutes)} ${c.sleep}`}
+              {` · ${duration(sentenceOption.inBedMinutes)} ${c.inBed}`}
+            </>
+          )}
+        </p>
+        <div className="calculator-controls">
+          <div className="planning-dates">
+            <h2 className="calculator-question">{c.questions[modes.indexOf(mode)]}</h2>
+            <div className="planning-date-fields">
+              {mode === "window" && input("bedAt")}
+              {(mode === "wake" || mode === "window") && input("wakeAt")}
+              {mode === "nap" && input("napAt")}
+              {mode === "sleepNow" && <p className="now-note">{c.now}</p>}
+            </div>
+          </div>
+          <div className="planning-actions">
         <details className="settings">
           <summary>
             {c.settings}
@@ -403,18 +472,14 @@ export function CalculatorShell({
           {c.calculate}
           <ArrowRightIcon aria-hidden="true" />
         </button>
+          </div>
+        </div>
       </form>
       <p className="calculation-note">{c.note}</p>
-      <p className="timezone">
-        {c.zone} {zone}
-      </p>
-      <p role="status" className="status-message">
-        {status}
-      </p>
-      </div>
+      <p className="timezone">{c.zone} {zone}</p>
+      <p role="status" className="status-message">{status}</p>
       {(!outcome || outcome.results.length === 0) && (
         <aside className="results-preview" aria-label={c.how}>
-          <MoonIcon className="preview-moon" aria-hidden="true" />
           <h2>{c.previewHeading}</h2>
           <p>{c.previewIntro}</p>
           <dl className="estimate-summary">
@@ -442,11 +507,8 @@ export function CalculatorShell({
             </div>
           )}
           <ol className="results-list">
-            {outcome.results.map((option, index) => (
+            {outcome.results.map((option) => (
               <li className={`result ${mode !== "nap" && option.sleepMinutes < 420 ? "result-short" : ""}`} key={option.id}>
-                <span className="result-number" aria-hidden="true">
-                  {String(index + 1).padStart(2, "0")}
-                </span>
                 <div className="result-body">
                   <p className="result-label">
                     {option.kind === "bedtime" ? c.bed : c.wake}

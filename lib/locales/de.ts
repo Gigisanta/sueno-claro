@@ -1,6 +1,25 @@
 import type { LocaleCopy } from './en';
 
 export const de: LocaleCopy = {
+  taste: {
+    wakeAt: 'Aufwachen um',
+    inBedBy: 'ins Bett um',
+    sleepNow: 'Jetzt schlafen',
+    wakeAround: 'wach gegen',
+    napAt: 'Nickerchen um',
+    napUntil: 'wach gegen',
+    windowFrom: 'Im Bett um',
+    windowTo: 'aufwachen um',
+    estimate: 'Geschätzt',
+    nightAlt: 'Stadtlichter unter dem leuchtenden Erdhorizont und einem Sternenhimmel.',
+    galleryAlts: [
+      'Grüne und rote Polarlichter über den Stadtlichtern Kanadas.',
+      'Der Mond mit seinen Kratern vor der Dunkelheit des Alls.',
+      'Die Milchstraße über dem leuchtenden Erdhorizont.',
+    ],
+    photoCredit: 'Nachtaufnahmen',
+    publicDomain: 'Gemeinfrei',
+  },
   chrome: {
     skip: 'Zum Inhalt springen',
     home: 'SleepLike-Startseite',
@@ -24,8 +43,6 @@ export const de: LocaleCopy = {
   editorial: {
     breadcrumb: 'Brotkrümelnavigation',
     home: 'Startseite',
-    toolEyebrow: 'SCHAFF RAUM FÜR RUHE',
-    guideEyebrow: 'DER SLEEPLIKE-RATGEBER',
     reviewed: 'Vom SleepLike-Team · Überprüft',
     article: 'Ratgeber und Methode',
     contents: 'In diesem Ratgeber',

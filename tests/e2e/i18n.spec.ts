@@ -34,6 +34,12 @@ for (const journey of journeys) {
     await expect(page.locator('[data-testid^="ad-"]')).toHaveCount(0);
     await page.locator('#wakeAt-date').fill('2026-10-23');
     await page.locator('#wakeAt-time').fill('07:00');
+    await expect(page.locator('.sentence-end time')).toHaveText(journey.locale === 'id' ? '23.15' : '23:15');
+    await page.locator('#wakeAt-time').fill('07:30');
+    await expect(page.locator('.sentence-end time')).toHaveText(journey.locale === 'id' ? '23.45' : '23:45');
+    await expect(page.locator('.result')).toHaveCount(0);
+    await expect(page.locator('[data-testid^="ad-"]')).toHaveCount(0);
+    await page.locator('#wakeAt-time').fill('07:00');
     await expect(page.locator('#time-format')).toHaveValue('24h');
     await page.getByRole('button', { name: journey.calculate, exact: true }).click();
     const expectedTimes = journey.locale === 'id' ? ['21.45', '23.15', '00.45', '02.15'] : ['21:45', '23:15', '00:45', '02:15'];

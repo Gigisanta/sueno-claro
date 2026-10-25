@@ -1,7 +1,26 @@
 import type { LocaleCopy } from './en';
 export const es: LocaleCopy = {
+  taste: {
+    wakeAt: 'Despertar a las',
+    inBedBy: 'en cama a las',
+    sleepNow: 'Dormir ahora',
+    wakeAround: 'despertar hacia',
+    napAt: 'Siesta a las',
+    napUntil: 'despertar hacia',
+    windowFrom: 'En cama a las',
+    windowTo: 'despertar a las',
+    estimate: 'Estimado',
+    nightAlt: 'Luces de ciudades bajo el horizonte luminoso de la Tierra y un cielo estrellado.',
+    galleryAlts: [
+      'Aurora verde y roja sobre las luces de ciudades de Canadá.',
+      'La Luna y sus cráteres en la oscuridad del espacio.',
+      'La Vía Láctea sobre el horizonte luminoso de la Tierra.',
+    ],
+    photoCredit: 'Fotografías nocturnas',
+    publicDomain: 'Dominio público',
+  },
   chrome: { skip: 'Saltar al contenido', home: 'SleepLike, inicio', navigation: 'Navegación principal', naps: 'Siestas', guides: 'Guías', languages: 'Idioma', resources: 'Calculadoras y guías de sueño', tools: 'Planifica tu descanso', learn: 'Entiende tu sueño', tagline: 'Un poco de claridad antes de dormir.', caution: 'Herramienta educativa para adultos. No ofrece diagnóstico médico.', information: 'Información del sitio', about: 'Acerca de', contact: 'Contacto', methodology: 'Metodología', privacy: 'Privacidad', terms: 'Términos', noSignup: 'Sin registro · Para adultos' },
-  editorial: { breadcrumb: 'Ruta de navegación', home: 'Inicio', toolEyebrow: 'TU NOCHE, CON MÁS CLARIDAD', guideEyebrow: 'LA GUÍA DE SLEEPLIKE', reviewed: 'Por el equipo de SleepLike · Revisado el', article: 'Guía y método', contents: 'En esta guía', sources: 'Fuentes y revisión', sourceNote: 'Edición: equipo de SleepLike. Contenido educativo, sin revisión médica acreditada.', related: 'Sigue explorando', calculator: 'Calculadora de sueño' },
+  editorial: { breadcrumb: 'Ruta de navegación', home: 'Inicio', reviewed: 'Por el equipo de SleepLike · Revisado el', article: 'Guía y método', contents: 'En esta guía', sources: 'Fuentes y revisión', sourceNote: 'Edición: equipo de SleepLike. Contenido educativo, sin revisión médica acreditada.', related: 'Sigue explorando', calculator: 'Calculadora de sueño' },
   share: { label: 'Compartir guía', prompt: '¿A alguien le serviría esta guía?', action: 'Compartir esta guía ↗', copied: 'Enlace copiado.', manual: 'Selecciona y copia el enlace.', link: 'Enlace público' },
   privacy: { preferences: 'Preferencias de privacidad', heading: 'Tu descanso. Tus decisiones.', description: 'El cálculo se realiza en tu dispositivo. Podés permitir estadísticas agregadas; no enviamos tus horarios ni resultados.', analytics: 'Permitir estadísticas agregadas', separateConsent: 'Los anuncios no personalizados requieren consentimiento independiente.', disabled: 'La publicidad todavía no está habilitada.', review: 'Revisar consentimiento de anuncios', close: 'Cerrar' },
   advertisement: 'Publicidad',

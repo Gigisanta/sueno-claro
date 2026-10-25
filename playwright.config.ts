@@ -5,7 +5,7 @@ export default defineConfig({
   timeout: 30000,
   expect: { timeout: 7000 },
   fullyParallel: true,
-  workers: 4,
+  workers: Number(process.env.PLAYWRIGHT_WORKERS ?? 4),
   use: {
     baseURL: process.env.BASE_URL ?? `http://127.0.0.1:${port}`,
     trace: "retain-on-failure",
