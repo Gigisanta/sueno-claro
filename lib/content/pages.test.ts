@@ -25,8 +25,9 @@ const englishLegalPaths = ['/about', '/contact', '/privacy', '/terms', '/methodo
 const spanishLegalPaths = ['/acerca-de', '/contacto', '/privacidad', '/terminos', '/metodologia'];
 
 const sourceUrls = [
+  'https://www.nhlbi.nih.gov/health/sleep/how-much-sleep',
   'https://www.nhlbi.nih.gov/health/sleep/stages-of-sleep',
-  'https://www.nhlbi.nih.gov/health/sleep/healthy-sleep',
+  'https://www.nhlbi.nih.gov/health/sleep-deprivation/healthy-sleep-habits',
   'https://www.cdc.gov/sleep/about/',
 ];
 
@@ -129,18 +130,27 @@ describe('content catalog', () => {
     const methodologyText = pageText(getPage('/methodology')!);
     const spanishMethodologyText = pageText(getPage('/metodologia')!);
 
-    expect(privacyText).toContain('If advertising is enabled');
+    expect(privacyText).toContain('AdSense and its consent interface load only after you separately allow advertising');
     expect(privacyText).toContain('Vercel Analytics');
-    expect(privacyText).toContain('aggregated form');
+    expect(privacyText).toContain('aggregate page views');
+    expect(privacyText).toContain('calendar reminder downloads');
+    expect(privacyText).toContain('query string');
+    expect(privacyText).toContain('does not undo the initial request');
+    expect(privacyText).toContain('Analytics permission does not allow advertising');
+    expect(privacyText).toContain('each visit requires a new affirmative choice');
     expect(privacyText).toContain('Privacy preferences control in the footer');
-    expect(privacyText).toContain('only after your consent');
+    expect(privacyText).toContain('loads only after you opt in');
     expect(privacyText).not.toContain('without consent');
     expect(privacyText).toContain('opt out');
-    expect(spanishPrivacyText).toContain('Si se habilita publicidad');
+    expect(spanishPrivacyText).toContain('AdSense y su interfaz de consentimiento se cargan solo después');
     expect(spanishPrivacyText).toContain('Vercel Analytics');
-    expect(spanishPrivacyText).toContain('anuncios no personalizados');
+    expect(spanishPrivacyText).toContain('visitas agregadas');
+    expect(spanishPrivacyText).toContain('descargas de recordatorios de calendario');
+    expect(spanishPrivacyText).toContain('cada visita requiere una nueva aceptación afirmativa');
+    expect(spanishPrivacyText).toContain('envía esa consulta al servicio de alojamiento');
+    expect(spanishPrivacyText).toContain('Aceptar analíticas no habilita publicidad');
     expect(spanishPrivacyText).toContain('control Preferencias de privacidad del pie de página');
-    expect(spanishPrivacyText).toContain('únicamente después de tu consentimiento');
+    expect(spanishPrivacyText).toContain('después de que autorizás la publicidad por separado');
     expect(spanishPrivacyText).not.toContain('sin consentimiento');
     expect(methodologyText).toContain('four planning modes');
     expect(methodologyText).toContain('snapshot of the local time now');
@@ -150,7 +160,11 @@ describe('content catalog', () => {
     expect(spanishMethodologyText).toContain('no pronostica etapas futuras del sueño');
   });
 
-  it('uses one update date and does not import app or core code', () => {
-    expect(new Set(pages.map((page) => page.updated))).toEqual(new Set(['2026-09-10']));
+  it('dates the revised privacy pages without changing the other content dates', () => {
+    for (const page of pages) {
+      expect(page.updated).toBe(
+        page.path === '/privacy' || page.path === '/privacidad' ? '2026-09-24' : '2026-09-10',
+      );
+    }
   });
 });

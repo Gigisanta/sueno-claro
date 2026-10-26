@@ -56,6 +56,9 @@ test("short window never yields a time beyond the selected limit", async ({
   await page.locator("#wakeAt-time").fill("00:00");
   await page.getByRole("button", { name: "Calcular", exact: true }).click();
   await expect(page.locator("#wakeAt-error")).toContainText("ventana");
+  await expect(page.locator("#wakeAt-date")).toBeFocused();
+  await expect(page.locator("#wakeAt-date")).toHaveAttribute("aria-invalid", "true");
+  await expect(page.locator("#wakeAt-date")).toHaveAttribute("aria-describedby", "wakeAt-error");
   await expect(page.locator(".result")).toHaveCount(0);
   await page.locator("#wakeAt-time").fill("07:30");
   await page.getByRole("button", { name: "Calcular", exact: true }).click();
@@ -69,13 +72,30 @@ test("DST gap rejected and fold requires occurrence selection", async ({
   await page.locator("#wakeAt-time").fill("02:30");
   await page.getByRole("button", { name: "Calculate", exact: true }).click();
   await expect(page.locator("#wakeAt-error")).toContainText("does not exist");
+  await expect(page.locator("#wakeAt-date")).toBeFocused();
   await page.locator("#wakeAt-date").fill("2026-11-01");
   await page.locator("#wakeAt-time").fill("01:30");
   await page.getByRole("button", { name: "Calculate", exact: true }).click();
   await expect(page.locator("#wakeAt-error")).toContainText("Clocks go back");
+  await expect(page.locator("#wakeAt-occurrence")).toBeFocused();
+  await expect(page.locator(".result")).toHaveCount(0);
   await page.locator("#wakeAt-occurrence").selectOption("later");
   await page.getByRole("button", { name: "Calculate", exact: true }).click();
   await expect(page.locator(".result")).toHaveCount(4);
+});
+test("invalid estimate settings open and focus the correction control", async ({
+  page,
+}) => {
+  await page.goto("/");
+  await page.locator("summary").click();
+  await page.locator("#latency").fill("61");
+  await page.getByRole("button", { name: "Calculate", exact: true }).click();
+  await expect(page.locator('form > .field-error[role="alert"]')).toContainText(
+    "0–60 minutes",
+  );
+  await expect(page.locator(".settings")).toHaveAttribute("open", "");
+  await expect(page.locator(".settings summary")).toBeFocused();
+  await expect(page.locator(".result")).toHaveCount(0);
 });
 test("nap entry, equivalent language navigation and legacy links", async ({
   page,
@@ -104,13 +124,17 @@ test("shared fragment imported and stripped; copy and Web Share alternatives", a
 }) => {
   await page.addInitScript(() => {
     Object.defineProperty(navigator, "clipboard", {
+      configurable: true,
       value: {
         writeText: async (text: string) => {
           (window as any).__copied = text;
         },
       },
     });
-    Object.defineProperty(navigator, "share", { value: undefined });
+    Object.defineProperty(navigator, "share", {
+      configurable: true,
+      value: undefined,
+    });
   });
   await page.goto(
     "/#sleep=mode=wake&wake=07%3A30&wakeDate=2026-09-11&latency=15",

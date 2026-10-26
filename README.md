@@ -1,6 +1,6 @@
-> **September 2026 rework:** the current implementation and release gates are documented in [docs/13-launch-2026-09.md](docs/13-launch-2026-09.md). Earlier roadmap sections below are historical.
-
 # sleeplike
+
+> **September 2026 rework:** the current implementation and release gates are documented in [docs/13-launch-2026-09.md](docs/13-launch-2026-09.md). Earlier roadmap sections below are historical.
 
 Sleep planning calculator for adults. Bilingual static web app/PWA.
 
@@ -11,7 +11,7 @@ to an application backend.
 **Production:** https://sleeplike.maat.work  
 **GitHub:** https://github.com/Gigisanta/sueno-claro
 
-No account, microphone or application backend. Calculations stay in the browser. Aggregate analytics are optional; advertising remains disabled pending approval and consent validation. See [organic discovery and automated SEO checks](docs/15-organic-discovery.md).
+No account, microphone or application backend. Calculations stay in the browser. Aggregate analytics are optional; advertising requires a separate affirmative preference and the consent interface's approval. See [organic discovery and automated SEO checks](docs/15-organic-discovery.md).
 
 ## What it does
 

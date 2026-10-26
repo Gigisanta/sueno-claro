@@ -32,12 +32,16 @@ export interface ContentPage {
 
 const sleepSources: ContentSource[] = [
   {
+    title: 'NHLBI · How Much Sleep Is Enough?',
+    url: 'https://www.nhlbi.nih.gov/health/sleep/how-much-sleep',
+  },
+  {
     title: 'NHLBI · Sleep Phases and Stages',
     url: 'https://www.nhlbi.nih.gov/health/sleep/stages-of-sleep',
   },
   {
-    title: 'NHLBI · Healthy Sleep',
-    url: 'https://www.nhlbi.nih.gov/health/sleep/healthy-sleep',
+    title: 'NHLBI · Healthy Sleep Habits',
+    url: 'https://www.nhlbi.nih.gov/health/sleep-deprivation/healthy-sleep-habits',
   },
   {
     title: 'CDC · About Sleep',
@@ -48,6 +52,11 @@ const sleepSources: ContentSource[] = [
 const contactSource: ContentSource = {
   title: 'MaatWork · sitio público',
   url: 'https://maat.work',
+};
+
+const vercelAnalyticsSource: ContentSource = {
+  title: 'Vercel · Privacy and Compliance',
+  url: 'https://vercel.com/docs/analytics/privacy-policy',
 };
 
 export const pages: ContentPage[] = [
@@ -561,14 +570,16 @@ export const pages: ContentPage[] = [
         heading: 'The calculator runs locally',
         paragraphs: [
           'The core calculator is designed to run in your browser. It does not require an account or microphone, and it is not designed to retain a health history, sleep diary, bedtime history, wake-up history, or calculation inputs on a SleepLike server. The result is produced from the values you enter and the local clock information needed for the calculation.',
-          'A browser may store limited preferences, such as language, time format, or a consent choice. This browser storage is for preferences and consent control only; it is not used to retain a personal history of sleep or health information.',
+          'When browser storage is available, the site stores your analytics choice ("yes" or "no") and may record your advertising choice in localStorage. A stored advertising "yes" does not start ads after a page load: each visit requires a new affirmative choice. The calculator does not use localStorage or cookies to save sleep inputs or a history of calculations.',
+          'Current shared-plan links put their settings in a #sleep= URL fragment, which browsers do not send in the page request. Older links may put settings in the query string after ?; the browser sends that query to the hosting service as part of the page request. The app imports supported settings and then removes the query and fragment from the address bar, but this does not undo the initial request. Retention of request details is governed by the hosting provider.',
         ],
       },
       {
         id: 'prepared-services',
         heading: 'Prepared integrations and operation',
         paragraphs: [
-          'A third-party integration can be prepared in the code without being enabled on every deployment. Vercel Analytics is available only after you opt in through the Privacy preferences control in the footer; when enabled, it is used in an aggregated form to measure page-path activity. It is not intended to receive exact bedtime times, exact wake-up times, nap times, or the values entered into the calculator.',
+          'A third-party integration can be prepared in the code without being enabled on every deployment. Vercel Analytics loads only after you opt in through the Privacy preferences control in the footer. It is used to review aggregate page views and a small set of product actions: completed calculations, plan shares, and calendar reminder downloads. These actions carry the calculator mode and interface language as custom event properties; page URLs are reduced to the public path with query strings and fragments removed. SleepLike does not attach the exact times you enter or the calculated results to analytics events.',
+          'Vercel’s privacy documentation says a data point may include approximate geolocation (such as country, region, or city), browser and version, operating system and version, device type, and the referring page (referrer). A referrer path can itself contain an identifier. This list describes information that may be stored with a data point; it does not say every field is present for every visit or event. SleepLike’s beforeSend callback removes query strings and fragments from the page URL only; it does not filter the provider metadata listed by Vercel.',
           'The availability and configuration of optional services can change by deployment. A service named here as prepared should not be read as proof that it is operating in your visit; the consent interface and the browser network behavior are the practical indicators for that session.',
         ],
       },
@@ -576,7 +587,7 @@ export const pages: ContentPage[] = [
         id: 'advertising-choice',
         heading: 'Conditional advertising',
         paragraphs: [
-          'If advertising is enabled, it will be loaded only after the relevant Google CMP and AdSense integrations are enabled and approved. Ads remain off until those conditions are met. The consent interface is intended to let you accept, refuse, opt out, or change your choice. SleepLike requests non-personalized ads only after your consent. These ads may still use cookies and process information such as your IP address or device details. Refusing consent keeps the calculator available without ads.',
+          'If advertising is configured, AdSense and its consent interface load only after you separately allow advertising in Privacy preferences. Analytics permission does not allow advertising. Ads remain paused until the consent interface also reports the required affirmative choice. You can refuse or later revoke advertising permission; either choice keeps future ad requests off while the calculator remains available. After you opt in, requests to Google can expose technical details such as your IP address. Non-personalized ads may still use cookies and process device details.',
           'Advertising is optional to the product configuration and is not required for the local calculation. No advertising is intended to appear on this legal page. The wording here describes a possible configuration; it does not state that advertising is operating at the time you read it.',
         ],
       },
@@ -584,14 +595,14 @@ export const pages: ContentPage[] = [
         id: 'choices-and-questions',
         heading: 'Your controls and questions',
         paragraphs: [
-          'Use the Privacy preferences control in the footer to opt out or revoke a previous choice. Your browser may retain the preference needed to remember that decision. Clearing site data can remove that preference and may require you to choose again. The site does not use that storage to retain health history.',
+          'Use the Privacy preferences control in the footer to opt out or revoke a previous choice. Your browser may retain the analytics choice; advertising permission lasts only for the current page visit and requires a new affirmative choice after loading again. Clearing site data can remove stored preferences. The site does not use that storage to retain health history.',
           'For privacy questions, visit https://maat.work or use the public business contact listed on the contact page. This page is general product information and is not a promise about a service that is disabled for your deployment.',
         ],
       },
     ],
-    sources: [contactSource],
+    sources: [contactSource, vercelAnalyticsSource],
     related: ['/about', '/contact', '/terms', '/methodology'],
-    updated: '2026-09-10',
+    updated: '2026-09-24',
   },
   {
     path: '/terms',
@@ -783,14 +794,16 @@ export const pages: ContentPage[] = [
         heading: 'La calculadora funciona localmente',
         paragraphs: [
           'La calculadora principal está diseñada para funcionar en tu navegador. No requiere una cuenta ni micrófono y no está diseñada para conservar en un servidor de SleepLike un historial de salud, diario de sueño, historial de horas de dormir, historial de despertares ni los datos que ingresas. El resultado se produce con tus valores y la información del reloj local que necesita la cuenta.',
-          'El navegador puede guardar preferencias limitadas, como idioma, formato de hora o una elección de consentimiento. Ese almacenamiento sirve solo para preferencias y control del consentimiento; no se usa para conservar un historial personal de sueño ni información de salud.',
+          'Cuando el almacenamiento del navegador está disponible, el sitio guarda tu preferencia de analíticas ("sí" o "no") y puede registrar tu elección publicitaria en localStorage. Un "sí" publicitario guardado no inicia anuncios al cargar la página: cada visita requiere una nueva aceptación afirmativa. La calculadora no usa localStorage ni cookies para guardar los horarios ingresados ni un historial de cálculos.',
+          'Los enlaces actuales para compartir planes colocan los ajustes en un fragmento de URL #sleep=, que el navegador no envía en la petición de la página. Algunos enlaces antiguos pueden llevarlos en la cadena de consulta después de ?; el navegador envía esa consulta al servicio de alojamiento como parte de la petición. La aplicación importa los ajustes admitidos y luego quita la consulta y el fragmento de la barra de direcciones, pero eso no revierte la petición inicial. La conservación de esos datos depende del servicio de alojamiento.',
         ],
       },
       {
         id: 'integraciones-preparadas',
         heading: 'Integraciones preparadas y operación',
         paragraphs: [
-          'Una integración de terceros puede estar preparada en el código sin estar habilitada en todos los despliegues. Vercel Analytics está disponible solo después de que aceptas mediante el control Preferencias de privacidad del pie de página; cuando está habilitado, se usa de forma agregada para medir actividad por ruta de página. No está destinado a recibir horas exactas de dormir, despertar o siesta ni los valores ingresados en la calculadora.',
+          'Una integración de terceros puede estar preparada en el código sin estar habilitada en todos los despliegues. Vercel Analytics se carga solo después de que aceptas mediante el control Preferencias de privacidad del pie de página. Se usa para revisar visitas agregadas y algunas acciones del producto: cálculos completados, planes compartidos y descargas de recordatorios de calendario. Estas acciones incluyen el modo de cálculo y el idioma de la interfaz como datos personalizados; las URL se reducen a la ruta pública y se quitan sus consultas y fragmentos. SleepLike no adjunta a los eventos de analíticas las horas exactas que ingresas ni los resultados calculados.',
+          'La documentación de privacidad de Vercel indica que un punto de datos puede incluir ubicación geográfica aproximada (por ejemplo, país, región o ciudad), navegador y versión, sistema operativo y versión, tipo de dispositivo y página de procedencia (referrer). La ruta de esa página puede contener un identificador. La lista describe información que podría almacenarse con un punto de datos; no afirma que cada campo esté presente en todas las visitas o eventos. El callback beforeSend de SleepLike quita consultas y fragmentos solo de la URL de la página; no filtra los metadatos del proveedor que enumera Vercel.',
           'La disponibilidad y configuración de los servicios opcionales puede cambiar según el despliegue. Que un servicio aparezca descrito como preparado no significa que esté operando durante tu visita; la interfaz de consentimiento y el comportamiento de red del navegador son las señales prácticas de esa sesión.',
         ],
       },
@@ -798,7 +811,7 @@ export const pages: ContentPage[] = [
         id: 'publicidad-condicional',
         heading: 'Publicidad condicional',
         paragraphs: [
-          'Si se habilita publicidad, se cargará únicamente cuando las integraciones correspondientes de Google CMP y AdSense estén habilitadas y aprobadas. Los anuncios permanecen apagados hasta que se cumplen esas condiciones. La interfaz de consentimiento está pensada para permitirte aceptar, rechazar, excluirte o cambiar tu elección. SleepLike solicita anuncios no personalizados únicamente después de tu consentimiento. Estos anuncios pueden usar cookies y procesar información como tu dirección IP o datos del dispositivo. Si rechazas el consentimiento, la calculadora sigue disponible sin anuncios.',
+          'Si la publicidad está configurada, AdSense y su interfaz de consentimiento se cargan solo después de que autorizás la publicidad por separado en Preferencias de privacidad. Aceptar analíticas no habilita publicidad. Los anuncios siguen pausados hasta que esa interfaz también informa la elección afirmativa requerida. Podés rechazar o revocar luego el permiso publicitario; ambas opciones mantienen apagadas las futuras solicitudes de anuncios y la calculadora sigue disponible. Después de aceptar, las solicitudes a Google pueden exponer datos técnicos como tu dirección IP. Los anuncios no personalizados pueden usar cookies y procesar datos del dispositivo.',
           'La publicidad es opcional dentro de la configuración del producto y no es necesaria para la calculadora local. No se prevé publicidad en esta página legal. Este texto describe una configuración posible; no afirma que la publicidad esté operando cuando lo lees.',
         ],
       },
@@ -806,14 +819,14 @@ export const pages: ContentPage[] = [
         id: 'controles-y-preguntas',
         heading: 'Tus controles y preguntas',
         paragraphs: [
-          'Usa el control Preferencias de privacidad del pie de página para excluirte o revocar una elección anterior. El navegador puede conservar la preferencia necesaria para recordar esa decisión. Si eliminas los datos del sitio, esa preferencia puede desaparecer y tendrás que elegir nuevamente. Ese almacenamiento no se usa para conservar un historial de salud.',
+          'Usá el control Preferencias de privacidad del pie de página para rechazar o revocar una elección anterior. El navegador puede conservar la preferencia de analíticas; el permiso publicitario dura solo la visita actual a la página y requiere una nueva aceptación afirmativa después de cargarla otra vez. Si eliminás los datos del sitio, podés perder las preferencias guardadas. Ese almacenamiento no se usa para conservar un historial de salud.',
           'Para preguntas de privacidad, visita https://maat.work o utiliza el contacto comercial público indicado en la página de contacto. Esta página brinda información general del producto y no promete que esté activo un servicio que se encuentre deshabilitado en tu despliegue.',
         ],
       },
     ],
-    sources: [contactSource],
+    sources: [contactSource, vercelAnalyticsSource],
     related: ['/acerca-de', '/contacto', '/terminos', '/metodologia'],
-    updated: '2026-09-10',
+    updated: '2026-09-24',
   },
   {
     path: '/terminos',

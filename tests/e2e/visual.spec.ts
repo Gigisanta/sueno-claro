@@ -72,6 +72,33 @@ test("mobile and desktop remain accessible without overflow", async ({
     ).violations,
   ).toEqual([]);
 });
+test("privacy pages disclose Vercel's possible analytics metadata", async ({
+  page,
+}) => {
+  const policyLink = page.getByRole("link", {
+    name: "Vercel · Privacy and Compliance",
+  });
+  for (const [path, metadata, qualification] of [
+    [
+      "/privacy",
+      /data point may include approximate geolocation.*browser and version.*operating system and version.*device type/i,
+      /may be stored with a data point.*does not say every field is present for every visit or event/i,
+    ],
+    [
+      "/privacidad",
+      /un punto de datos puede incluir ubicación geográfica aproximada.*navegador y versión.*sistema operativo y versión.*tipo de dispositivo/i,
+      /podría almacenarse con un punto de datos.*no afirma que cada campo esté presente en todas las visitas o eventos/i,
+    ],
+  ] as const) {
+    await page.goto(path);
+    await expect(page.getByText(metadata)).toBeVisible();
+    await expect(page.getByText(qualification)).toBeVisible();
+    await expect(policyLink).toHaveAttribute(
+      "href",
+      "https://vercel.com/docs/analytics/privacy-policy",
+    );
+  }
+});
 test("no unconsented ads or analytics and no input data in network requests", async ({
   page,
 }) => {
@@ -86,6 +113,13 @@ test("no unconsented ads or analytics and no input data in network requests", as
     page.getByRole("checkbox", { name: "Allow aggregate usage statistics" }),
   ).not.toBeChecked();
   expect(
+    await page.evaluate(() => localStorage.getItem("sleeplike-analytics")),
+  ).toBeNull();
+  await page.getByRole("button", { name: "Privacy preferences", exact: true }).click();
+  expect(
+    await page.evaluate(() => localStorage.getItem("sleeplike-analytics")),
+  ).toBeNull();
+  expect(
     urls.some((url) =>
       /googlesyndication|doubleclick|fundingchoices|_vercel\/insights/.test(
         url,
@@ -95,6 +129,76 @@ test("no unconsented ads or analytics and no input data in network requests", as
   expect(urls.some((url) => /07%3A43|wakeDate|2026-10-20/.test(url))).toBe(
     false,
   );
+});
+test("analytics script is requested only after opt-in on a production host", async ({
+  page,
+}) => {
+  test.skip(
+    !!process.env.BASE_URL || process.env.NEXT_PUBLIC_VERCEL_ENV === "preview",
+    "requires the local export and production hostname gate",
+  );
+  const port = Number(process.env.PORT ?? 3100);
+  const publicOrigin = `http://sleeplike.maat.work:${port}`;
+  const localOrigin = `http://127.0.0.1:${port}`;
+  const analyticsRequests: string[] = [];
+  page.on("request", (request) => {
+    const url = new URL(request.url());
+    if (url.pathname === "/_vercel/insights/script.js")
+      analyticsRequests.push(request.url());
+  });
+  await page.route(`${publicOrigin}/**`, async (route) => {
+    const url = new URL(route.request().url());
+    if (url.pathname === "/_vercel/insights/script.js") {
+      await route.fulfill({
+        status: 200,
+        contentType: "application/javascript",
+        body: "window.__analyticsScriptFixture = true;",
+      });
+      return;
+    }
+    if (url.pathname.startsWith("/_vercel/insights/")) {
+      await route.fulfill({ status: 204, body: "" });
+      return;
+    }
+    const response = await route.fetch({
+      url: route.request().url().replace(publicOrigin, localOrigin),
+    });
+    await route.fulfill({ response });
+  });
+
+  await page.goto(`${publicOrigin}/`);
+  await page.getByRole("button", { name: "Privacy preferences", exact: true }).click();
+  const analytics = page.getByRole("checkbox", {
+    name: "Allow aggregate usage statistics",
+  });
+  await expect(analytics).not.toBeChecked();
+  expect(analyticsRequests).toHaveLength(0);
+  expect(
+    await page.evaluate(() => localStorage.getItem("sleeplike-analytics")),
+  ).toBeNull();
+
+  await analytics.check();
+  await expect.poll(() => analyticsRequests.length).toBe(1);
+  expect(
+    await page.evaluate(() => localStorage.getItem("sleeplike-analytics")),
+  ).toBe("yes");
+
+  await page.reload();
+  await expect.poll(() => analyticsRequests.length).toBe(2);
+  await page.getByRole("button", { name: "Privacy preferences", exact: true }).click();
+  await page
+    .getByRole("checkbox", { name: "Allow aggregate usage statistics" })
+    .uncheck();
+  expect(
+    await page.evaluate(() => localStorage.getItem("sleeplike-analytics")),
+  ).toBe("no");
+
+  await page.reload();
+  await page.getByRole("button", { name: "Privacy preferences", exact: true }).click();
+  await expect(
+    page.getByRole("checkbox", { name: "Allow aggregate usage statistics" }),
+  ).not.toBeChecked();
+  expect(analyticsRequests).toHaveLength(2);
 });
 test("privacy revocation synchronizes already open tabs", async ({
   page,

@@ -355,6 +355,23 @@ export function CalculatorShell({
       behavior: window.matchMedia("(prefers-reduced-motion: reduce)").matches ? "instant" : "smooth",
     });
   }, [outcome]);
+  useEffect(() => {
+    const firstIssue = outcome?.issues[0];
+    if (!firstIssue) return;
+    if (firstIssue.field === "settings") {
+      const settings = document.querySelector<HTMLDetailsElement>(".settings");
+      if (settings) {
+        settings.open = true;
+        settings.querySelector("summary")?.focus();
+      }
+      return;
+    }
+    const correctionControl =
+      firstIssue.code === "ambiguous"
+        ? document.getElementById(`${firstIssue.field}-occurrence`)
+        : document.getElementById(`${firstIssue.field}-date`);
+    correctionControl?.focus();
+  }, [outcome]);
   function input(field: Field) {
     const issue = outcome?.issues.find((item) => item.field === field);
     return (
