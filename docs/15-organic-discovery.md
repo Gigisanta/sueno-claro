@@ -65,7 +65,8 @@ alternates, crawlable switcher, discovery links, MaatWork credit, schema and soc
 image. The browser suite additionally checks actual hreflang return links and
 one calculator/language-switch journey per locale on desktop/mobile Chromium
 and WebKit. Unit tests preserve full translation structure and source URLs.
-Use `NEXT_PUBLIC_ADS_APPROVED=false make verify` before opening a release PR.
+Authors may rehearse with `NEXT_PUBLIC_ADS_APPROVED=false make verify`; that is
+not the merge requirement (`maat-gate verify` is).
 Independent model-assisted translation review uses ten real sample strings per
 new language in the PR; it is not accredited medical or professional translation
 certification. No deployment, indexing, traffic or ranking is implied.
@@ -186,5 +187,6 @@ Validation: root gate PASS (typecheck, lint, 28 unit tests, export); final compl
 Every local and Vercel build validates the actual exported HTML, canonical URLs,
 language alternates, sitemap, unique titles, H1, parseable structured data,
 public resource links and PNG assets. A failed assertion fails the build before
-publication. Remote CI results must be checked on the release PR; a historical
-Actions-budget failure is not evidence of its current state.
+publication. The merge requirement is a green `bin/maat-gate verify sueno-claro
+--sha <sha>` on the exact release SHA plus independent review; GitHub Actions
+is not a merge requirement.

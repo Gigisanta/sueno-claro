@@ -44,7 +44,8 @@ node scripts/prod_smoke.mjs [url]  # smoke de sólo lectura; sin url pega a prod
 ## Gate antes de "listo"
 
 `make verify` (valida docs, `tsc` vía lint, `npm test` con el cálculo, build y
-e2e) es lo que corre el preset, en pasos paralelos; ningún anuncio antes del
+e2e) es el ensayo del autor; el requisito de merge es `maat-gate verify` (el
+preset corre lo mismo en pasos paralelos); ningún anuncio antes del
 resultado; la calculadora anda sin red. Tras un deploy autorizado:
 `node scripts/prod_smoke.mjs` (Chromium + WebKit).
 
