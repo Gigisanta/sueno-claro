@@ -65,7 +65,8 @@ alternates, crawlable switcher, discovery links, MaatWork credit, schema and soc
 image. The browser suite additionally checks actual hreflang return links and
 one calculator/language-switch journey per locale on desktop/mobile Chromium
 and WebKit. Unit tests preserve full translation structure and source URLs.
-Use `NEXT_PUBLIC_ADS_APPROVED=false make verify` before opening a release PR.
+Authors may rehearse with `NEXT_PUBLIC_ADS_APPROVED=false make verify`; that is
+not the merge requirement (`maat-gate verify` is).
 Independent model-assisted translation review uses ten real sample strings per
 new language in the PR; it is not accredited medical or professional translation
 certification. No deployment, indexing, traffic or ranking is implied.
@@ -175,7 +176,7 @@ Guides offer native sharing, clipboard fallback and a selectable public URL if c
 
 The canonical root now identifies SleepLike with WebSite structured data and a stable Organization identifier. This follows Google's site-name guidance: https://developers.google.com/search/docs/appearance/site-names . It expresses a preference; it does not guarantee a particular search appearance.
 
-The quality workflow runs typechecking, unit tests, export and Chromium/WebKit tests for pushes to main and pull requests. Browser checks cover real PNG dimensions and uniqueness, canonical sharing, fallback copying, the resource directory and existing responsive/privacy/calculation behavior. Build automatically regenerates share images when catalog titles change. This workflow checks changes; it does not post promotions or create articles.
+The quality checks (typechecking, unit tests, export and Chromium/WebKit tests) run in the local gate (`bin/maat-gate run sueno-claro`); the `quality.yml` workflow is manual-only (`workflow_dispatch`). Browser checks cover real PNG dimensions and uniqueness, canonical sharing, fallback copying, the resource directory and existing responsive/privacy/calculation behavior. Build automatically regenerates share images when catalog titles change. The gate checks changes; it does not post promotions or create articles.
 
 Search Console checked on September 10: sitemap Success, 24 discovered pages; the separate Page indexing report still says Processing data. Discovered is not the same as indexed. Google/Bing sitemaps were already submitted in the initial release. Do not infer visits, positions or revenue from submission alone.
 
@@ -186,5 +187,6 @@ Validation: root gate PASS (typecheck, lint, 28 unit tests, export); final compl
 Every local and Vercel build validates the actual exported HTML, canonical URLs,
 language alternates, sitemap, unique titles, H1, parseable structured data,
 public resource links and PNG assets. A failed assertion fails the build before
-publication. Remote CI results must be checked on the release PR; a historical
-Actions-budget failure is not evidence of its current state.
+publication. The merge requirement is a green `bin/maat-gate verify sueno-claro
+--sha <sha>` on the exact release SHA plus independent review; GitHub Actions
+is not a merge requirement.

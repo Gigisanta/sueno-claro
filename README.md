@@ -62,7 +62,7 @@ Calculates practical sleep windows locally in the browser:
 ```bash
 npm ci
 PLAYWRIGHT_SKIP_BROWSER_GC=1 npx playwright install chromium webkit
-NEXT_PUBLIC_ADS_APPROVED=false make verify
+NEXT_PUBLIC_ADS_APPROVED=false make verify   # author rehearsal; merge requires `bin/maat-gate verify sueno-claro --sha <sha>`
 node scripts/prod_smoke.mjs       # against production
 node scripts/prod_smoke.mjs http://localhost:3000  # against local
 ```

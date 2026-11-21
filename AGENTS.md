@@ -43,7 +43,10 @@ node scripts/prod_smoke.mjs [url]  # smoke de sólo lectura; sin url pega a prod
 
 ## Gate antes de "listo"
 
-`make verify` en verde (valida docs, `tsc` vía lint, `npm test` con el cálculo,
-build y e2e); ningún anuncio antes del resultado; la calculadora anda
-sin red. Tras un deploy autorizado: `node scripts/prod_smoke.mjs` (Chromium +
-WebKit).
+`make verify` (valida docs, `tsc` vía lint, `npm test` con el cálculo, build y
+e2e) es el ensayo del autor; el requisito de merge es `maat-gate verify` (el
+preset corre lo mismo en pasos paralelos); ningún anuncio antes del
+resultado; la calculadora anda sin red. Tras un deploy autorizado:
+`node scripts/prod_smoke.mjs` (Chromium + WebKit).
+
+Verificación: `bin/maat-gate run sueno-claro --repo <worktree> --sha <sha>` desde `/Users/gigi/maatwork` (preset en `etc/gates.toml` de MaatWork). Un merge exige `bin/maat-gate verify sueno-claro --sha <sha>` en verde y revisión independiente sobre ese SHA. GitHub Actions no es requisito de merge.
