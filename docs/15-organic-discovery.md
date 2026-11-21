@@ -175,7 +175,7 @@ Guides offer native sharing, clipboard fallback and a selectable public URL if c
 
 The canonical root now identifies SleepLike with WebSite structured data and a stable Organization identifier. This follows Google's site-name guidance: https://developers.google.com/search/docs/appearance/site-names . It expresses a preference; it does not guarantee a particular search appearance.
 
-The quality workflow runs typechecking, unit tests, export and Chromium/WebKit tests for pushes to main and pull requests. Browser checks cover real PNG dimensions and uniqueness, canonical sharing, fallback copying, the resource directory and existing responsive/privacy/calculation behavior. Build automatically regenerates share images when catalog titles change. This workflow checks changes; it does not post promotions or create articles.
+The quality checks (typechecking, unit tests, export and Chromium/WebKit tests) run in the local gate (`bin/maat-gate run sueno-claro`); the `quality.yml` workflow is manual-only (`workflow_dispatch`). Browser checks cover real PNG dimensions and uniqueness, canonical sharing, fallback copying, the resource directory and existing responsive/privacy/calculation behavior. Build automatically regenerates share images when catalog titles change. The gate checks changes; it does not post promotions or create articles.
 
 Search Console checked on September 10: sitemap Success, 24 discovered pages; the separate Page indexing report still says Processing data. Discovered is not the same as indexed. Google/Bing sitemaps were already submitted in the initial release. Do not infer visits, positions or revenue from submission alone.
 
